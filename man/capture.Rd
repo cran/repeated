@@ -1,4 +1,4 @@
-\name(capture}
+\name{capture}
 \title{Capture-recapture Model}
 \usage{
 n <- periods # number of periods

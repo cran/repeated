@@ -1,4 +1,4 @@
-name{kalseries}
+\name{kalseries}
 \title{Repeated Measurements Models for Continuous Variables in the
 Presence of Time-varying Covariates and with Frailty or Serial
 Dependence}
@@ -12,21 +12,15 @@ kalseries(response, times=NULL, intensity="exponential",
 	ndigit=10, gradtol=0.00001, steptol=0.00001, iterlim=100,
 	fscale=1, typsiz=abs(p), stepmax=10*sqrt(p\%*\%p))
 }
-\alias{kalseries}
-\alias{coefficients.kalseries}
-\alias{deviance.kalseries}
-\alias{fitted.kalseries}
-\alias{residuals.kalseries}
-\alias{print.kalseries}
 \arguments{
 \item{response}{A list of two column matrices with responses and
 corresponding times for each individual, one matrix or dataframe of
-response values, or an object of class, response (created by
+response values, or an object of class, \code{response} (created by
 \code{\link{restovec}}) or repeated (created by \code{\link{rmna}}).}
 \item{times}{When response is a matrix, a vector of possibly unequally
 spaced times when they are the same for all individuals or a matrix of
 times. Not necessary if equally spaced. Ignored if response has class,
-response or repeated.}
+\code{response} or \code{repeated}.}
 \item{intensity}{The form of function to be put in the Pareto distribution.
 Choices are exponential, Weibull, gamma, normal, logistic, Cauchy,
 Student, log normal, log logistic, log Cauchy, log Student, and
@@ -47,16 +41,20 @@ with named unknown parameters. It must yield one value per observation.}
 \code{intensity} is used instead of the intensity.}
 \item{ccov}{A vector or matrix containing time-constant baseline
 covariates with one row per individual, a model formula using
-vectors of the same size, or an object of class, tccov (created by
-\code{\link{tcctomat}}). Ignored if response has class, repeated.}
+vectors of the same size, or an object of class, \code{tccov} (created
+by \code{\link{tcctomat}}). If response has class, \code{repeated},
+the covariates must be supplied as a Wilkinson and Rogers formula
+unless none are to be used or \code{mu} is given.}
 \item{tvcov}{A list of matrices with time-varying covariate values,
 observed at the event times in \code{response}, for each individual
 (one column per variable), one matrix or dataframe of such
-covariate values, or an object of class, tvcov (created by
+covariate values, or an object of class, \code{tvcov} (created by
 \code{\link{tvctomat}}). If a time-varying covariate is observed at
 arbitrary time, \code{\link{gettvc}} can be used to find the most
-recent values for each response and create a suitable list. Ignored if
-response has class, repeated.}
+recent values for each response and create a suitable list. If
+response has class, \code{repeated}, the covariates must be supplied
+as a Wilkinson and Rogers formula unless none are to be used or
+\code{mu} is given.}
 \item{torder}{The order of the polynomial in time to be fitted.}
 \item{interaction}{Vector of length equal to the number of
 time-constant covariates, giving the levels of interactions between
@@ -90,13 +88,16 @@ pretransformed, this must be multiplied by the Jacobian. This
 transformation cannot contain unknown parameters. For example, with a
 log transformation, \code{delta=1/y}. The jacobian is calculated
 automatically for the transform option. Ignored if response has class,
-response or repeated.}
+\code{response} or \code{repeated}.}
 \item{transform}{Transformation of the response variable: \code{identity},
 \code{exp}, \code{square}, \code{sqrt}, or \code{log}.}
 \item{link}{Link function for the mean: \code{identity}, \code{exp},
 \code{square}, \code{sqrt}, or \code{log}.}
 \item{envir}{Environment in which model formulae are to be
-interpreted.}
+interpreted or a data object of class, \code{repeated}, \code{tccov},
+or \code{tvcov}.
+If \code{response} has class \code{repeated}, it is used as the
+environment.}
 \item{others}{Arguments controlling \code{\link{nlm}}.}
 }
 \description{
@@ -112,7 +113,7 @@ parameters are unknowns. Factor variables cannot be used and
 parameters must be scalars. (See \code{\link{finterp}}.)
 
 Marginal and individual profiles can be plotted using
-\code{\link{plot.profile}} and \code{\link{plot.iprofile}} and
+\code{\link{profile}} and \code{\link{iprofile}} and
 residuals with \code{\link{plot.residuals}}.
 
 If the responses on a unit are clustered, not longitudinal, use the
@@ -125,9 +126,10 @@ A list of classes \code{kalseries} and \code{recursive} is returned.
 \seealso{
 \code{\link{carma}}, \code{\link{elliptic}}, \code{\link{finterp}},
 \code{\link{gar}}, \code{\link{gettvc}}, \code{\link{gnlmm}},
-\code{\link{gnlr}}, \code{\link{kalcount}}, \code{\link{kalsurv}},
-\code{\link{read.list}}, \code{\link{restovec}}, \code{\link{rmna}},
-\code{\link{tcctomat}}, \code{\link{tvctomat}}.
+\code{\link{gnlr}}, \code{\link{iprofile}}, \code{\link{kalcount}},
+\code{\link{kalsurv}}, \code{\link{profile}}, \code{\link{read.list}},
+\code{\link{restovec}}, \code{\link{rmna}}, \code{\link{tcctomat}},
+\code{\link{tvctomat}}.
 }
 \examples{
 treat <- c(0,0,1,1)

@@ -1,5 +1,5 @@
 Package: repeated
-Version: 0.4
+Version: 0.5
 Author: Jim Lindsey (jlindsey@luc.ac.be)
 Description: Models for non-normal repeated measurements
 Depends: requires rmutil library

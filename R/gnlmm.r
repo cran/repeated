@@ -20,9 +20,10 @@
 #
 #     gnlmm(y, distribution="normal", mu=NULL, shape=NULL, linear=NULL,
 #	nest=NULL, pmu=NULL, pshape=NULL, psd=NULL, exact=F, wt=1,
-#	delta=1, shfn=F, scale=NULL, points=10, envir=sys.frame(sys.parent()),
-#	print.level=0, typsiz=abs(p), ndigit=10, gradtol=0.00001,
-#	stepmax=sqrt(p%*%p)/10, steptol=0.00001, iterlim=100, fscale=1)
+#	delta=1, shfn=F, scale=NULL, points=10, common=F,
+#	envir=sys.frame(sys.parent()), print.level=0, typsiz=abs(p),
+#	ndigit=10, gradtol=0.00001, stepmax=sqrt(p%*%p)/10,
+#	steptol=0.00001, iterlim=100, fscale=1)
 #
 #  DESCRIPTION
 #
@@ -31,7 +32,7 @@
 
 gnlmm <- function(y, distribution="normal", mu=NULL, shape=NULL, linear=NULL,
 	nest=NULL, pmu=NULL, pshape=NULL, psd=NULL, exact=F, wt=1, delta=1,
-	shfn=F, scale=NULL, points=10, envir=sys.frame(sys.parent()),
+	shfn=F, scale=NULL, points=10, common=F, envir=sys.frame(sys.parent()),
 	print.level=0, typsiz=abs(p), ndigit=10, gradtol=0.00001,
 	stepmax=sqrt(p%*%p)/10, steptol=0.00001, iterlim=100, fscale=1){
 
@@ -67,6 +68,10 @@ if(!missing(distribution)&&!is.function(distribution)){
 shp <- distribution!="binomial"&&distribution!="Poisson"&&
 	distribution!="exponential"&&distribution!="geometric"&&
 	distribution!="logarithmic"
+if(common){
+	if(!is.function(mu))stop("with common parameters, mu must be a function")
+	if(!is.function(shape))stop("with common parameters, shape must be a function")
+	if(!is.null(linear))stop("linear cannot be used with common parameters")}
 if(!missing(scale))scale <- match.arg(scale,c("identity","log","logit",
 	"reciprocal","exp"))
 if(!missing(pmu))npl <- length(pmu)
@@ -79,26 +84,199 @@ if(np<1)stop("At least one parameter must be estimated")
 if(is.function(distribution)){
 	fcn <- distribution
 	distribution <- "own"}
-if(inherits(y,"repeated")){
+respenv <- inherits(y,"repeated")
+envname <- if(respenv)paste(deparse(substitute(y)))
+	else NULL
+lin1 <- lin2 <- NULL
+if(is.list(linear)){
+	lin1 <- linear[[1]]
+	lin2 <- linear[[2]]}
+else lin1 <- linear
+if(inherits(mu,"formula"))lin1 <- mu
+if(inherits(shape,"formula"))lin2 <- shape
+lin1a <- lin2a <- mu3 <- sh3 <- NULL
+if(respenv||inherits(envir,"repeated")||inherits(envir,"tccov")||inherits(envir,"tvcov")){
+	type <- if(respenv||inherits(envir,"repeated"))"repeated"
+		else if(inherits(envir,"tccov"))"tccov"
+		else "tvcov"
+	if(is.null(envname))envname <- paste(deparse(substitute(envir)))
+	if(inherits(lin1,"formula")){
+		if(is.function(mu)){
+			lin1a <- if(respenv)finterp(lin1,envir=y,name=envname)
+			else finterp(lin1,envir=envir,name=envname)}
+		class(lin1) <- c(class(lin1),type)}
+	if(inherits(lin2,"formula")){
+		if(is.function(shape)){
+			lin2a <- if(respenv)finterp(lin2,envir=y,name=envname)
+			else finterp(lin2,envir=envir,name=envname)}
+		class(lin2) <- c(class(lin2),type)}
+	if(is.function(mu)){
+		tmp <- parse(text=paste(deparse(mu))[-1])
+		class(mu) <- type
+		mu <- if(respenv)fnenvir(mu,envir=y,name=envname)
+			else fnenvir(mu,envir=envir,name=envname)
+		mu3 <- mu
+		if(respenv)attr(mu3,"model") <- tmp}
+	if(is.function(shape)){
+		tmp <- parse(text=paste(deparse(shape))[-1])
+		class(shape) <- type
+		shape <- if(respenv)fnenvir(shape,envir=y,name=envname)
+			else fnenvir(shape,envir=envir,name=envname)
+		sh3 <- shape
+		if(respenv)attr(sh3,"model") <- tmp}}
+if(inherits(lin1,"formula")){
+	mu2 <- if(respenv)finterp(lin1,envir=y,name=envname)
+		else finterp(lin1,envir=envir,name=envname)
+	npt1 <- length(attr(mu2,"parameters"))
+	if(is.matrix(attr(mu2,"model"))){
+		if(all(dim(attr(mu2,"model"))==1)){
+			if(is.function(mu)){
+				lin1 <- mu2
+				mu1 <- function(p) mu(p,p[npl-1]*rep(1,n))}
+			else {
+				mu1 <- function(p) p[1]*rep(1,n)
+				attributes(mu1) <- attributes(mu2)}
+			mu2 <- NULL}
+		else {
+			if(is.function(mu)){
+				lf <- if(inherits(mu,"formulafn"))length(attr(mu,"parameters"))
+					else length(if(respenv)attr(fnenvir(mu,envir=y),"parameters")
+						else attr(fnenvir(mu,envir=envir),"parameters"))
+				dm1 <- attr(mu2,"model")
+				lin1 <- mu2
+				mu2 <- function(p) mu(p,dm1%*%p[lf:(lf+npt1-1)])}}}
+	else {
+		if(is.function(mu)){
+			warning("ignoring mu function\n")
+			mu <- mu2 <- NULL}
+		if(npl!=npt1){
+			cat("\nParameters are ")
+			cat(attr(mu2,"parameters"),"\n")
+			stop(paste("pmu should have",npt1,"estimates"))}
+		if(is.list(pmu)){
+			if(!is.null(names(pmu))){
+				o <- match(attr(mu2,"parameters"),names(pmu))
+				pmu <- unlist(pmu)[o]
+				if(sum(!is.na(o))!=length(pmu))stop("invalid estimates for mu - probably wrong names")}
+			else pmu <- unlist(pmu)}}
+	if(!is.null(mu2)){
+		if(inherits(envir,"tccov")){
+			cv <- covind(response)
+			mu1 <- function(p) mu2(p)[cv]
+			attributes(mu1) <- attributes(mu2)}
+		else {
+			mu1 <- mu2
+			rm(mu2)}}}
+else if(!is.function(mu)){
+	mu1 <- function(p) p[1]*rep(1,n)
+	npt1 <- 1}
+else {
+	mu1 <- mu
+	if(length(mu1(pmu))==1)mu1 <- function(p) mu(p)*rep(1,n)}
+if(is.null(attributes(mu1))){
+	attributes(mu1) <- if(is.function(mu)){
+		if(!inherits(mu,"formulafn")){
+			if(respenv)attributes(fnenvir(mu,envir=y))
+			else attributes(fnenvir(mu,envir=envir))}
+		else attributes(mu)}
+		else {
+			if(respenv)attributes(fnenvir(mu1,envir=y))
+			else attributes(fnenvir(mu1,envir=envir))}}
+nlp <- if(is.function(mu)){
+		if(is.null(lin1))length(attr(mu1,"parameters"))
+		else length(attr(mu1,"parameters"))-1+npt1}
+       else npt1
+if(!common&&nlp!=npl)stop(paste("pmu should have",nlp,"initial estimates"))
+npl <- if(common) 1 else npl+1
+npl1 <- npl+1
+if(inherits(lin2,"formula")){
+	sh2 <- if(respenv)finterp(lin2,envir=y,start=npl1,name=envname)
+		else finterp(lin2,envir=envir,start=npl1,name=envname)
+	npt2 <- length(attr(sh2,"parameters"))
+	if(is.matrix(attr(sh2,"model"))){
+		if(all(dim(attr(sh2,"model"))==1)){
+			if(is.function(shape)){
+				lin2 <- sh2
+				sh1 <- function(p) shape(p[npl1:np],p[np]*rep(1,n))}
+			else {
+				sh1 <- function(p) p[npl1]*rep(1,n)
+				sh3 <- fnenvir(function(p) p[1]*rep(1,n))
+				attributes(sh1) <- attributes(sh2)}
+			sh2 <- NULL}
+		else {
+			if(is.function(shape)){
+				lfs <- if(inherits(shape,"formulafn"))length(attr(shape,"parameters"))
+					else length(if(respenv)attr(fnenvir(shape,envir=y),"parameters")
+						else attr(fnenvir(shape,envir=envir),"parameters"))
+				dm2 <- attr(sh2,"model")
+				sh1 <- if(shfn)function(p) shape(p[npl1:np],dm2%*%p[(npl+lfs):np], mu1(p))
+				else function(p) shape(p[npl1:np],dm2%*%p[(npl+lfs):np])}}}
+	else {
+		if(is.function(shape)){
+			warning("ignoring shape function\n")
+			shape <- sh2 <- NULL}
+		if(nps!=npt2){
+			cat("\nParameters are ")
+			cat(attr(sh2,"parameters"),"\n")
+			stop(paste("pshape should have",npt2,"estimates"))}
+		if(is.list(pshape)){
+			if(!is.null(names(pshape))){
+				o <- match(attr(sh2,"parameters"),names(pshape))
+				pshape <- unlist(pshape)[o]
+				if(sum(!is.na(o))!=length(pshape))stop("invalid estimates for shape - probably wrong names")}
+			else pshape <- unlist(pshape)}}
+	if(!is.null(sh2)){
+		if(inherits(envir,"tccov")){
+			cv <- covind(response)
+			sh1 <- function(p) sh2(p)[cv]
+			attributes(sh1) <- attributes(sh2)}
+		else {
+			sh1 <- sh2
+			rm(sh2)}}}
+else if(!is.function(shape)&&shp){
+	sh1 <- function(p) p[npl1]*rep(1,n)
+	sh3 <- fnenvir(function(p) p[1]*rep(1,n))
+	npt2 <- 1}
+else if(shp){
+	sh1 <- if(shfn)function(p) shape(p[npl1:np], mu1(p))
+		else function(p) shape(p[npl1:np])}
+else sh1 <- NULL
+if(shp){
+	if(is.null(attributes(sh1))){
+		attributes(sh1) <- if(is.function(shape)){
+			if(!inherits(shape,"formulafn")){
+				if(respenv)attributes(fnenvir(shape,envir=y))
+				else attributes(fnenvir(shape,envir=envir))}
+			else attributes(shape)}
+			else {
+				if(respenv)attributes(fnenvir(sh1,envir=y))
+				else attributes(fnenvir(sh1,envir=envir))}}
+	nlp <- if(is.function(shape)){
+			if(is.null(lin2))length(attr(sh1,"parameters"))-shfn
+			else length(attr(sh1,"parameters"))-1+npt2-shfn}
+		else npt2
+	if(!common&&nlp!=nps)stop(paste("pshape should have",nlp,"initial estimates"))}
+if(common){
+	nlp <- length(unique(c(attr(mu1,"parameters"),attr(sh1,"parameters"))))-shfn
+	if(nlp!=npl)stop(paste("with a common parameter model, pmu should contain",nlp,"estimates"))}
+pmu <- c(pmu,psd)
+p <- c(pmu,pshape)
+if(respenv){
 	if(inherits(envir,"repeated")&&(length(y$response$nobs)!=length(envir$response$nobs)||any(y$response$nobs!=envir$response$nobs)))stop("y and envir objects are incompatible")
 	if(!is.null(y$response$wt)&&!is.na(y$response$wt))wt <- y$response$wt
 	if(!is.null(y$response$delta))delta <- y$response$delta
 	if(length(y$response$nobs)==1&&y$response$nobs==1)
 		nest <- 1:length(y$response$y)
 	else nest <- covind(y)
-	if(!is.null(y$response$censor)&&any(y$response$censor!=1))y <- cbind(y$response$y,y$response$censor)
-	else if(!is.null(y$response$n))y <- cbind(y$response$y,y$response$n-y$response$y)
-	else y <- y$response$y}
+	y <- response(y)}
 else if(inherits(y,"response")){
 	if(inherits(envir,"repeated")&&(length(y$nobs)!=length(envir$response$nobs)||any(y$nobs!=envir$response$nobs)))stop("y and envir objects are incompatible")
 	if(!is.null(y$wt)&&!is.na(y$wt))wt <- y$wt
 	if(!is.null(y$delta))delta <- y$delta
-	if(length(y$nobs)==1&&y$nobs==1)
-		nest <- 1:length(y$y)
+	if(length(y$nobs)==1&&y$nobs==1)nest <- 1:length(y$y)
 	else nest <- covind(y)
-	if(!is.null(y$censor)&&any(y$censor!=1))y <- cbind(y$y,y$censor)
-	else if(!is.null(y$n))y <- cbind(y$y,y$n-y$y)
-	else y <- y$y}
+	y <- response(y)}
+if(any(is.na(y)))stop("NAs in y - use rmna")
 if(distribution=="binomial"||distribution=="double binomial"||
 	distribution=="beta binomial"||distribution=="mult binomial"){
 	if(length(dim(y))!=2||ncol(y)!=2)
@@ -160,148 +338,6 @@ k <- as.integer(k)
 quad <- gauss.hermite(points)
 sd <- quad[rep(1:points,rep(n,points)),1]
 qw <- quad[rep(1:points,rep(nind,points)),2]
-lin1 <- lin2 <- NULL
-if(is.list(linear)){
-	lin1 <- linear[[1]]
-	lin2 <- linear[[2]]}
-else lin1 <- linear
-if(inherits(mu,"formula"))lin1 <- mu
-if(inherits(shape,"formula"))lin2 <- shape
-lin1a <- lin2a <- mu3 <- sh3 <- name <- NULL
-if(inherits(envir,"repeated")||inherits(envir,"tccov")||inherits(envir,"tvcov")){
-	type <- if(inherits(envir,"repeated"))"repeated"
-		else if(inherits(envir,"tccov"))"tccov"
-		else "tvcov"
-	if(inherits(lin1,"formula")){
-		lin1a <- finterp(lin1)
-		class(lin1) <- c(class(lin1),type)}
-	if(inherits(lin2,"formula")){
-		lin2a <- finterp(lin2)
-		class(lin2) <- c(class(lin2),type)}
-	name <- paste(deparse(substitute(envir)))
-	if(is.function(mu)){
-		mu3 <- mu
-		attributes(mu3) <- attributes(fnenvir(mu))
-		class(mu) <- type
-		mu <- fnenvir(mu,envir=envir,name=name)}
-	if(is.function(shape)){
-		sh3 <- shape
-		attributes(sh3) <- attributes(fnenvir(shape))
-		class(shape) <- type
-		shape <- fnenvir(shape,envir=envir,name=name)}}
-if(inherits(lin1,"formula")){
-	mu2 <- finterp(lin1,envir=envir,name=name)
-	npt1 <- length(attr(mu2,"parameters"))
-	if(is.matrix(attr(mu2,"model"))){
-		if(all(dim(attr(mu2,"model"))==1)){
-			if(is.function(mu)){
-				lin1 <- mu2
-				mu1 <- function(p) mu(p,p[1]*rep(1,n))}
-			else {
-				mu1 <- function(p) p[1]*rep(1,n)
-				attributes(mu1) <- attributes(mu2)}
-			mu2 <- NULL}
-		else {
-			if(nrow(attr(mu2,"model"))!=n)stop("mu model matrix does not match number of response observations")
-			if(is.function(mu)){
-				dm1 <- attr(mu2,"model")
-				lin1 <- mu2
-				mu2 <- function(p) mu(p,dm1%*%p[1:npt1])}}}
-	else {
-		if(npl!=npt1){
-			cat("\nParameters are ")
-			cat(attr(mu2,"parameters"),"\n")
-			stop(paste("pmu should have",npt1,"estimates"))}
-		if(is.list(pmu)){
-			if(!is.null(names(pmu))){
-				o <- match(attr(mu2,"parameters"),names(pmu))
-				pmu <- unlist(pmu)[o]
-				if(sum(!is.na(o))!=length(pmu))stop("invalid estimates for mu - probably wrong names")}
-			else pmu <- unlist(pmu)}}
-	if(!is.null(mu2)){
-		if(inherits(envir,"tccov")){
-			cv <- covind(response)
-			mu1 <- function(p) mu2(p)[cv]
-			attributes(mu1) <- attributes(mu2)}
-		else {
-			mu1 <- mu2
-			rm(mu2)}}}
-else if(!is.function(mu)){
-	mu1 <- function(p) p[1]*rep(1,n)
-	npt1 <- 1}
-else {
-	mu1 <- mu
-	if(length(mu1(pmu))==1)mu1 <- function(p) mu(p)*rep(1,n)}
-if(is.null(attributes(mu1))){
-	attributes(mu1) <- if(is.function(mu)){
-		if(!inherits(mu,"formulafn"))attributes(fnenvir(mu))
-		else attributes(mu)}
-		else attributes(fnenvir(mu1))}
-nlp <- if(is.function(mu)){
-		if(is.null(lin1))length(attr(mu1,"parameters"))
-		else length(attr(mu1,"parameters"))-1+npt1}
-       else npt1
-if(nlp!=npl)stop(paste("pmu should have",nlp,"initial estimates"))
-npl <- npl+1
-npl1 <- npl+1
-if(inherits(lin2,"formula")){
-	sh2 <- finterp(lin2,envir=envir,start=npl1,name=name)
-	npt2 <- length(attr(sh2,"parameters"))
-	if(is.matrix(attr(sh2,"model"))){
-		if(all(dim(attr(sh2,"model"))==1)){
-			if(is.function(shape)){
-				lin2 <- sh2
-				sh1 <- function(p) shape(p[npl1:np],p[npl1]*rep(1,n))}
-			else {
-				sh1 <- function(p) p[npl1]*rep(1,n)
-				sh3 <- fnenvir(function(p) p[1]*rep(1,n))
-				attributes(sh1) <- attributes(sh2)}
-			sh2 <- NULL}
-		else {
-			if(nrow(attr(sh2,"model"))!=n)stop("shape model matrix does not match number of response observations")
-			if(is.function(shape)){
-				dm2 <- attr(sh2,"model")
-				sh1 <- if(shfn)function(p) shape(p[npl1:np], dm2%*%p[npl1:(npl1+npt2-1)], mu1(p))
-				else function(p) shape(p[npl1:np],dm2%*%p[npl1:(npl1+npt2-1)])}}}
-	else {
-		if(nps!=npt2){
-			cat("\nParameters are ")
-			cat(attr(sh2,"parameters"),"\n")
-			stop(paste("pshape should have",npt2,"estimates"))}
-		if(is.list(pshape)){
-			if(!is.null(names(pshape))){
-				o <- match(attr(sh2,"parameters"),names(pshape))
-				pshape <- unlist(pshape)[o]
-				if(sum(!is.na(o))!=length(pshape))stop("invalid estimates for shape - probably wrong names")}
-			else pshape <- unlist(pshape)}}
-	if(!is.null(sh2)){
-		if(inherits(envir,"tccov")){
-			cv <- covind(response)
-			sh1 <- function(p) sh2(p)[cv]
-			attributes(sh1) <- attributes(sh2)}
-		else {
-			sh1 <- sh2
-			rm(sh2)}}}
-else if(!is.function(shape)&&shp){
-	sh1 <- function(p) p[npl1]*rep(1,n)
-	sh3 <- fnenvir(function(p) p[1]*rep(1,n))
-	npt2 <- 1}
-else {
-	sh1 <- if(shfn)function(p) shape(p[npl1:np], mu1(p))
-		else function(p) shape(p[npl1:np])}
-if(shp){
-	if(is.null(attributes(sh1))){
-		attributes(sh1) <- if(is.function(shape)){
-			if(!inherits(shape,"formulafn"))attributes(fnenvir(shape))
-			else attributes(shape)}
-			else attributes(fnenvir(sh1))}
-	nlp <- if(is.function(shape)){
-			if(is.null(lin2))length(attr(sh1,"parameters"))-shfn
-			else length(attr(sh1,"parameters"))-1+npt2-shfn}
-		else npt2
-	if(nlp!=nps)stop(paste("pshape should have",nlp,"initial estimates"))}
-pmu <- c(pmu,psd)
-p <- c(pmu,pshape)
 if(missing(scale)){
 	if(distribution=="binomial"||distribution=="beta binomial"||
 		distribution=="double binomial"||distribution=="mult binomial")
@@ -849,6 +885,7 @@ z1 <- list(
 	mu=mu1,
 	shape=sh1,
 	linear=list(lin1,lin2),
+	common=common,
 	scale=scale,
 	points=points,
 	prior.weights=wt,

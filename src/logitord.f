@@ -18,8 +18,8 @@ c  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 c
 c  SYNOPSIS
 c
-c    subroutine logitord(y,upk,EPS,FCALLS,cg,total1,total2a,total2b,
-c   &          nobs,x,ster,hess,hesinv,iout,nflag,iter,ifun,f)
+c    subroutine logitord(y,upk,EPS,FCALLS,iout,cg,total1,total2a,
+c   &       total2b,nobs,x,ster,hess,hesinv,nflag,iter,ifun,f)
 c
 c  DESCRIPTION
 c
@@ -40,14 +40,14 @@ c
 * =========================================================================
 * 	This program is reading a user-suplied file 'users_x' 
 *	(locating in the same directory as this program) which contains 
-*	information about the name of the input datafile, value of epselon, 
+*	information about the name of the input datafile, value of epsilon, 
 *	maximum number of funstion calls, number of betas, number of sigmas, 
 *	and initial values for those estimates.
 *
 * 	!!!!         USER SHOULD SUPPLY THE FILE 'users_x'        !!!!
 * 	with all information on the same line and separated by one space: 
 * 	Name of file     - up to 20 characters,
-* 	Epselon,
+* 	Epsilon,
 * 	Maximum number of function calls,
 * 	Number of betas  - up to maxbet, 
 * 	Number of sigmas - up to maxsig, 
@@ -85,7 +85,7 @@ c
 * 	hess   -- hessian matrix
 * 	hesinv -- hessian invert matrix
 * 	ster   -- standard errors
-* 	EPS    -- epselon - stopping criteria
+* 	EPS    -- epsilon - stopping criteria
 * 	FCALLS -- number of function calls
 * 	F      -- value of our function sli
 * 	id     -- subject's id number
@@ -95,8 +95,8 @@ c
 * 	aa,aaa, i,j,j1,j2,jj
 * ========================================================================
 
-      subroutine logitord(y,upk,EPS,FCALLS,cg,total1,total2a,total2b,
-     &          nobs,x,ster,hess,hesinv,iout,nflag,iter,ifun,f)
+      subroutine logitord(y,upk,EPS,FCALLS,iout,cg,total1,total2a,
+     &      total2b,nobs,p,x,ster,hess,hesinv,nflag,iter,ifun,f)
 ! Begin main program
 
 	  implicit none  
@@ -117,7 +117,7 @@ c
 	   INTEGER total,total1,total2a,total2b,total3,total4
            INTEGER total1x,cg,nobs,iout
 	   INTEGER i,j,jj,ii
-	   INTEGER nmeth,idev,IFun,iter,nflag,upk
+	   INTEGER nmeth,idev,IFun,iter,nflag,upk,FCALLS
 
 	   ! INTEGER Array
 	   INTEGER id(maxsub), numcas(maxsub)
@@ -125,10 +125,11 @@ c
 	! Double Precision Declaration
 
 	   ! Double Precision
-	   Double Precision EPS,FCALLS,F,ACC,aa
+	   Double Precision EPS,F,ACC,aa
 
 	   ! One Dim Array
 	   DOUBLE PRECISION x(total1+total2a+total2b)
+	   DOUBLE PRECISION p(total1+total2a+total2b)
 	   DOUBLE PRECISION w(max_w),g(maxest)
            double precision ster(total1+total2a+total2b)
 
@@ -137,7 +138,7 @@ c
      +          total1+total2a+total2b), hesinv(total1+total2a+total2b,
      +          total1+total2a+total2b)
 	   DOUBLE PRECISION ri(maxsub,maxcas)
-           double precision y(nobs,2+total1-cg+total2a+total2b)
+           double precision y(nobs,3+total1-cg+total2a+total2b)
       	  
       	   ! Three Dim Array
       	   DOUBLE PRECISION z(maxsub,maxcas,maxbet)
@@ -146,8 +147,12 @@ c
       	            
 c	 *** End Declaration Section                      
 
+
            total=total1+total2a+total2b !  total # of estimates
            total1x=total1-cg+1
+           do jj=1,total
+              x(jj)=p(jj)
+           enddo
 
            total4=total*(total+7)/2 ! Calculate dimension of vector W
 
@@ -494,7 +499,7 @@ c	 Integer Declaration
 
 	   ! Integer Variables
            INTEGER total,total1,total1x,total2a,total2b,total3
-	   INTEGER j, jj, j2, j3
+	   INTEGER j, jj, j2
 	   INTEGER i, j1, upk,upk_temp,cg 
 
 	   ! Integer Array
@@ -650,13 +655,16 @@ c  5. Der. w/respect to sigma1(j1) & sigma2(j2)
                     HESS(total1+j1,total1+total2a+j2)=
      &              HESS(total1+j1,total1+total2a+j2)+
      &              s2snso12(j1,j2)/Li-dsigma1(j1)*dsigma2(j2)
-                    DO j3=1,total2b
-                       HESS(total1+total2a+j1,total1+total2a+j2)=
-     &                 HESS(total1+total2a+j1,total1+total2a+j2)+
-     &                 s2snso2(j1,j2)/Li-dsigma2(j1)*dsigma2(j2)
-	            END DO
-		 END DO
-	      END DO	      
+c  bug corrected JKL
+                 enddo
+              enddo
+              do j1=1,total2b
+                 DO j2=1,total2b
+                    HESS(total1+total2a+j1,total1+total2a+j2)=
+     &                   HESS(total1+total2a+j1,total1+total2a+j2)+
+     &                   s2snso2(j1,j2)/Li-dsigma2(j1)*dsigma2(j2)
+                 END DO
+              END DO    
            End DO ! End main loop
 	      
            sli=-sli !  take "-" in order to change Max to Min
@@ -1583,7 +1591,7 @@ c	 Integer Declaration
 	   INTEGER ifun, iter, iout, idev, ioutk
 	   INTEGER nflag, nmeth, nx, ng, ncons, nry, ncons1, ncons2
 	   INTEGER nrst, ncalls, nxpi, ngpi, nrdpi, nrypi, ngpj, nrd
-	   INTEGER mdim, upk_in,cg
+	   INTEGER mdim, upk_in,cg ,mxfun
 
 	   ! Integer Array
 	   INTEGER numcas(maxsub)
@@ -1593,7 +1601,7 @@ c	 Double Precision Declaration
 	   ! Double Precision Variables	   
            DOUBLE PRECISION F,FP,FMIN,ALPHA,AT,AP,GSQ,DG,DG1
            DOUBLE PRECISION DP,STEP,ACC,DAL,U1,U2,U3,U4,EPS
-           DOUBLE PRECISION XSQ,RTST,DSQRT,DMIN1,DMAX1,DABS,mxfun
+           DOUBLE PRECISION XSQ,RTST,DSQRT,DMIN1,DMAX1,DABS
 	  	   
 	   ! One Dim Array
 	   DOUBLE PRECISION x(total1+total2a+total2b) ,g(maxest)

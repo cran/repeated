@@ -10,23 +10,17 @@ kalcount(response, times=NULL, origin=0, intensity="exponential",
 	gradtol=0.00001, steptol=0.00001, iterlim=100, fscale=1,
 	typsiz=abs(p), stepmax=10*sqrt(p\%*\%p))
 }
-\alias{kalcount}
-\alias{coefficients.kalcount}
-\alias{deviance.kalcount}
-\alias{fitted.kalcount}
-\alias{residuals.kalcount}
-\alias{print.kalcount}
 \arguments{
 \item{response}{A list of two column matrices with counts and
 corresponding times for each individual, one matrix or dataframe of
-counts, or an object of class, response (created by
+counts, or an object of class, \code{response} (created by
 \code{\link{restovec}}) or repeated (created by \code{\link{rmna}}).
 The time origin is taken to be zero and the given times to be the ends
 of periods (since the previous time given) in which the counts occurred.}
 \item{times}{When response is a matrix, a vector of possibly unequally
 spaced times when they are the same for all individuals or a matrix of
 times. Not necessary if equally spaced. Ignored if response has class,
-response or repeated.}
+\code{response} or \code{repeated}.}
 \item{origin}{If the time origin is to be before the start of
 observations, a positive constant to be added to all times.}
 \item{intensity}{The form of function to be put in the Pareto distribution.
@@ -40,10 +34,10 @@ weighting by length of observation time may be specified by setting
 update to \code{time}.}
 \item{mu}{A regression function for the location parameter or a
 formula beginning with ~, specifying either a linear regression
-function in the Wilkinson and Rogers notation or a general function
-with named unknown parameters. If there are only time-constant
-covariates, give the initial estimates in preg; if any covariates are
-time-varying, give all initial estimates in ptvc.}
+function in the Wilkinson and Rogers notation (a log link is assumed)
+or a general function with named unknown parameters. If there are only
+time-constant covariates, give the initial estimates in preg; if any
+covariates are time-varying, give all initial estimates in ptvc.}
 \item{shape}{A regression function for the shape parameter or a
 formula beginning with ~, specifying either a linear regression
 function in the Wilkinson and Rogers notation or a general function
@@ -52,13 +46,17 @@ with named unknown parameters. It must yield one value per observation.}
 \code{intensity} is used instead of the intensity.}
 \item{ccov}{A vector or matrix containing time-constant baseline
 covariates with one row per individual, a model formula using
-vectors of the same size, or an object of class, tccov (created by
-\code{\link{tcctomat}}). Ignored if response has class, repeated.}
+vectors of the same size, or an object of class, \code{tccov} (created
+by \code{\link{tcctomat}}). If response has class, \code{repeated},
+the covariates must be supplied as a Wilkinson and Rogers formula
+unless none are to be used or \code{mu} is given.}
 \item{tvcov}{A list of matrices with time-varying covariate values,
 observed in the time periods in \code{response}, for each individual
 (one column per variable), one matrix or dataframe of such covariate
-values, or an object of class, tvcov (created by \code{\link{tvctomat}}).
-Ignored if response has class, repeated.}
+values, or an object of class, \code{tvcov} (created by
+\code{\link{tvctomat}}). If response has class, \code{repeated}, the
+covariates must be supplied as a Wilkinson and Rogers formula unless
+none are to be used or \code{mu} is given.}
 \item{preg}{Initial parameter estimates for the regression model:
 intercept plus one for each covariate in \code{ccov}. If a location
 function (mu) is supplied that contains time-varying covariates, all
@@ -84,7 +82,10 @@ frailty dependence, this is the frailty parameter.)}
 \item{pdepend}{An initial estimate for the serial dependence
 parameter.}
 \item{envir}{Environment in which model formulae are to be
-interpreted.}
+interpreted or a data object of class, \code{repeated}, \code{tccov},
+or \code{tvcov}.
+If \code{response} has class \code{repeated}, it is used as the
+environment.}
 \item{others}{Arguments controlling \code{\link{nlm}}.}
 }
 \description{
@@ -107,7 +108,7 @@ parameters are unknowns. Factor variables cannot be used and
 parameters must be scalars. (See \code{\link{finterp}}.)
 
 Marginal and individual profiles can be plotted using
-\code{\link{plot.profile}} and \code{\link{plot.iprofile}} and
+\code{\link{profile}} and \code{\link{iprofile}} and
 residuals with \code{\link{plot.residuals}}.
 }
 \value{
@@ -117,9 +118,10 @@ A list of classes \code{kalcount} and \code{recursive} is returned.
 \seealso{
 \code{\link{carma}}, \code{\link{elliptic}}, \code{\link{finterp}},
 \code{\link{gar}}, \code{\link{gettvc}}, \code{\link{gnlmm}},
-\code{\link{gnlr}}, \code{\link{kalseries}}, \code{\link{kalsurv}},
-\code{\link{nbkal}}, \code{\link{read.list}}, \code{\link{restovec}},
-\code{\link{rmna}}, \code{\link{tcctomat}}, \code{\link{tvctomat}}.
+\code{\link{gnlr}}, \code{\link{iprofile}}, \code{\link{kalseries}},
+\code{\link{kalsurv}}, \code{\link{nbkal}}, \code{\link{profile}},
+\code{\link{read.list}}, \code{\link{restovec}}, \code{\link{rmna}},
+\code{\link{tcctomat}}, \code{\link{tvctomat}}.
 }
 \examples{
 treat <- c(0,0,1,1)

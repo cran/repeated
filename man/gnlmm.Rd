@@ -3,7 +3,7 @@
 \usage{
 gnlmm(y, distribution="normal", mu=NULL, shape=NULL, linear=NULL,
 	nest=NULL, pmu=NULL, pshape=NULL, psd=NULL, exact=F, wt=1,
-	delta=1, shfn=F, scale=NULL, points=10,
+	delta=1, shfn=F, scale=NULL, points=10, common=F,
 	envir=sys.frame(sys.parent()), print.level=0, typsiz=abs(p),
 	ndigit=10, gradtol=0.00001, stepmax=10*sqrt(p\%*\%p),
 	steptol=0.00001, iterlim=100, fscale=1)
@@ -70,8 +70,16 @@ last argument of the shape function.}
 identity, log, logit, reciprocal, or exp.}
 \item{points}{The number of points for Gauss-Hermite integration of
 the random effect.}
+\item{common}{If TRUE, \code{mu} and \code{shape} must both be
+functions with, as argument, a vector of parameters having some or all
+elements in common between them so that indexing is in common
+between them; all parameter estimates must be supplied in \code{pmu}.
+If FALSE, parameters are distinct between the two functions and
+indexing starts at one in each function.}
 \item{envir}{Environment in which model formulae are to be
-interpreted.}
+interpreted or a data object of class, repeated, tccov, or tvcov.
+If \code{y} has class \code{repeated}, it is used as the
+environment.}
 \item{others}{Arguments controlling \code{\link{nlm}}.}
 }
 \description{
@@ -114,6 +122,7 @@ relevant information calculated, including error codes.
 \code{\link{lm}}.
 }
 \examples{
+library(gnlm)
 # data objects
 sex <- c(0,1)
 sx <- tcctomat(sex)
@@ -144,13 +153,17 @@ gnlmm(y, dist="gamma", mu=~b0+b1*sex+b2*dose, nest=nest, pmu=z$coef[1:3],
 	pshape=z$coef[4], psd=0.1, points=3, envir=reps)
 #
 # nonlinear regression with gamma distribution
-mu <- function(p) p[4]+exp(p[1]+p[2]*sex+p[3]*dose)
-print(z <- gnlr(y, dist="gamma", mu=mu, pmu=c(1,0,0,1), pshape=1))
+mu <- function(p) p[1]+exp(p[2]+p[3]*sex+p[4]*dose)
+print(z <- gnlr(y, dist="gamma", mu=mu, pmu=c(1,1,0,0), pshape=1))
 gnlmm(y, dist="gamma", mu=mu, nest=nest, pmu=z$coef[1:4],
 	pshape=z$coef[5], psd=0.1, points=3)
 # or
+mu2 <- function(p, linear) p[1]+exp(linear)
+gnlmm(y, dist="gamma", mu=mu2, linear=~sex+dose, nest=nest,
+	pmu=z$coef[1:4], pshape=1, psd=0.1, points=3)
+# or
 gnlmm(y, dist="gamma", mu=~b4+exp(b0+b1*sex+b2*dose), nest=nest,
-	pmu=c(z$coef[4],z$coef[1:3]), pshape=z$coef[5], psd=0.1,
+	pmu=z$coef[1:4], pshape=z$coef[5], psd=0.1,
 	points=3, envir=reps)
 #
 # include regression for the shape parameter with same mu function

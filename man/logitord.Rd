@@ -40,7 +40,7 @@ covariate is supplied and if out.tvcov and random.out.int are TRUE).}
 \item{random.drop.slope}{If TRUE, the slope of the time-varying covariate
 is random for the drop-out regression (only possible if a time-varying
 covariate is supplied and if drop.tvcov and random.drop.int are TRUE).}
-\item{binom.mix}{Number of binomial distributions in the mixture to
+\item{binom.mix}{The total in the binomial distribution used to
 approximate the normal mixing distribution.}
 \item{fcalls}{Number of function calls allowed.}
 \item{eps}{Convergence criterion.}
@@ -58,7 +58,7 @@ Ten Have, T, Kunselman, A.R., Pulkstenis, E.P. and Landis, J.R.
 \value{
 A list of class \code{logitord} is returned.
 }
-\author{T. Ten Have and J.K. Lindsey}
+\author{T.R. Ten Have and J.K. Lindsey}
 \examples{
 y <- trunc(runif(20,max=4))
 id <- gl(4,5)

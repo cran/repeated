@@ -35,7 +35,7 @@ for \code{\link{kalcount}} with exponential intensity, it is a quadratic
 function of the mean.
 
 Marginal and individual profiles can be plotted using
-\code{\link{plot.profile}} and \code{\link{plot.iprofile}} and
+\code{\link{profile}} and \code{\link{iprofile}} and
 residuals with \code{\link{plot.residuals}}.
 }
 \references{
@@ -49,8 +49,9 @@ A list of classes \code{nbkal} and \code{recursive} is returned.
 \author{J.K. Lindsey}
 \seealso{
 \code{\link{gar}}, \code{\link{gnlmm}}, \code{\link{gnlr}},
-\code{\link{kalcount}}, \code{\link{read.list}}, \code{\link{rmna}},
-\code{\link{restovec}}, \code{\link{tcctomat}}, \code{\link{tvctomat}}.
+\code{\link{iprofile}} \code{\link{kalcount}}, \code{\link{profile}}
+\code{\link{read.list}}, \code{\link{rmna}}, \code{\link{restovec}},
+\code{\link{tcctomat}}, \code{\link{tvctomat}}.
 }
 \examples{
 y <- matrix(rnbinom(20,5,0.5), ncol=5)

@@ -196,7 +196,7 @@ void gar(double y[], double total[], int *my, int nobs[], int *nind,
 	  *like-=tmp;
 	  break;
 	case 10: /* normal distribution */
-	  *like-=log(dnorm(y[nm],lmhu,lambda));
+	  *like-=log(dnorm(y[nm],lmhu,sqrt(lambda)));
 	  break;
 	case 11: /* logistic distribution */
 	  *like-=log(dlogis(y[nm],lmhu,lambda));
@@ -268,7 +268,7 @@ void gar(double y[], double total[], int *my, int nobs[], int *nind,
 	  lik=pexp(y[nm],lmhu);
 	  break;
 	case 10: /* normal distribution */
-	  lik=pnorm(y[nm],lmhu,lambda);
+	  lik=pnorm(y[nm],lmhu,sqrt(lambda));
 	  break;
 	case 11: /* logistic distribution */
 	  lik=plogis(y[nm],lmhu,lambda);

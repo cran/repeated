@@ -19,11 +19,12 @@
 #  SYNOPSIS
 #
 #     gar(response, distribution="normal", times=NULL, totals=NULL,
-#	censor=NULL, delta=NULL, mu=NULL, shape=NULL, preg=NULL,
-#	pshape=NULL, pdepend=NULL, transform="identity", link="identity",
-#	autocorr="exponential", order=1, envir=sys.frame(sys.parent()),
-#	print.level=0, ndigit=10, gradtol=0.00001, steptol=0.00001,
-#	fscale=1, iterlim=100, typsiz=abs(p), stepmax=10*sqrt(p%*%p))
+#	censor=NULL, delta=NULL, mu=NULL, shape=NULL, shfn=F,
+#	common=F, preg=NULL, pshape=NULL, pdepend=NULL,
+#	transform="identity", link="identity", autocorr="exponential",
+#	order=1, envir=sys.frame(sys.parent()), print.level=0, ndigit=10,
+#	gradtol=0.00001, steptol=0.00001, fscale=1, iterlim=100,
+#	typsiz=abs(p), stepmax=10*sqrt(p%*%p))
 #
 #  DESCRIPTION
 #
@@ -31,15 +32,16 @@
 #  various distributions
 
 gar <- function(response, distribution="normal", times=NULL, totals=NULL,
-	censor=NULL, delta=NULL, mu=NULL, shape=NULL, preg=NULL,
-	pshape=NULL, pdepend=NULL, transform="identity", link="identity",
-	autocorr="exponential", order=1, envir=sys.frame(sys.parent()),
-	print.level=0, ndigit=10, gradtol=0.00001, steptol=0.00001,
-	fscale=1, iterlim=100, typsiz=abs(p), stepmax=10*sqrt(p%*%p)){
+	censor=NULL, delta=NULL, mu=NULL, shape=NULL, shfn=F, common=F,
+	preg=NULL, pshape=NULL, pdepend=NULL, transform="identity",
+	link="identity", autocorr="exponential", order=1,
+	envir=sys.frame(sys.parent()),print.level=0, ndigit=10,
+	gradtol=0.00001, steptol=0.00001,fscale=1, iterlim=100,
+	typsiz=abs(p), stepmax=10*sqrt(p%*%p)){
 likekal <- function(p){
 	eta <- mu1(p)
 	if(sh){
-		shr <- sh1(p[nprd1:np])
+		shr <- sh1(p)
 		theta <- c(p[npr1:nprd],exp(p[np]))}
 	else theta <- p[npr1:np]
 	z <- .C("gar",
@@ -80,7 +82,10 @@ tmp <- c("identity","exp","square","sqrt","log","logit","cloglog")
 lnk <- match(link <- match.arg(link,tmp),tmp)
 if((link=="logit"||link=="cloglog")&&(mdl!=1&&mdl!=7&&mdl!=8&&mdl!=9))stop("logit and cloglog links can only be used with binary data")
 if(is.null(times)&&is.matrix(response))times <- matrix(1,nrow=nrow(response),ncol=ncol(response))
-if(!inherits(response,"repeated")){
+respenv <- inherits(response,"repeated")
+envname <- if(respenv)paste(deparse(substitute(response)))
+	else NULL
+if(!respenv){
 	if(!inherits(response,"response")){
 		response <- if(mdl==1||mdl==7||mdl==8||mdl==9)restovec(response, times=times, censor=censor, delta=delta, totals=totals)
 		else restovec(response, times=times, censor=censor, delta=delta)}
@@ -98,32 +103,41 @@ if(mdl==1||mdl==7||mdl==8||mdl==9){
 		else response$response$n <- rep(1,length(response$response$y))}}
 y <- response$response$y
 n <- length(y)
-mu3 <- sh3 <- name <- NULL
-if(inherits(envir,"repeated")||inherits(envir,"tccov")){
-	type <- if(inherits(envir,"repeated"))"repeated"
+mu3 <- sh3 <- NULL
+if(respenv||inherits(envir,"repeated")||inherits(envir,"tccov")){
+	type <- if(respenv||inherits(envir,"repeated"))"repeated"
 		else if(inherits(envir,"tccov"))"tccov"
 		else "tvcov"
-	name <- paste(deparse(substitute(envir)))
+	if(is.null(envname))envname <- paste(deparse(substitute(envir)))
 	if(inherits(mu,"formula")){
-		mu3 <- finterp(mu)
+		mu3 <- if(respenv)finterp(mu,envir=response,name=envname)
+			else finterp(mu,envir=envir,name=envname)
 		class(mu) <- c(class(mu),type)}
 	else if(is.function(mu)){
-		mu3 <- mu
-		attributes(mu3) <- attributes(fnenvir(mu))
+		tmp <- parse(text=paste(deparse(mu))[-1])
 		class(mu) <- type
-		mu <- fnenvir(mu,envir=envir,name=name)}
+		mu <- if(respenv)fnenvir(mu,envir=response,name=envname)
+			else fnenvir(mu,envir=envir,name=envname)
+		mu3 <- mu
+		if(respenv)attr(mu3,"model") <- tmp}
 	if(inherits(shape,"formula")){
-		sh3 <- finterp(shape)
+		sh3 <- if(respenv)finterp(shape,envir=response,name=envname)
+			else finterp(shape,envir=envir,name=envname)
 		class(shape) <- c(class(shape),type)}
 	else if(is.function(shape)){
-		sh3 <- shape
-		attributes(sh3) <- attributes(fnenvir(shape))
+		tmp <- parse(text=paste(deparse(shape))[-1])
 		class(shape) <- type
-		shape <- fnenvir(shape,envir=envir,name=name)}}
+		shape <- if(respenv)fnenvir(shape,envir=response,name=envname)
+			else fnenvir(shape,envir=envir,name=envname)
+		sh3 <- shape
+		if(respenv)attr(sh3,"model") <- tmp}}
 npr <- length(preg)
 npr1 <- npr+1
+nprd <- npr+length(pdepend)
+nprd1 <- if(common) 1 else nprd+1
 if(inherits(mu,"formula")){
-	mu2 <- finterp(mu,envir=envir,name=name)
+	mu2 <- if(respenv)finterp(mu,envir=response,name=envname)
+		else finterp(mu,envir=envir,name=envname)
 	npt1 <- length(attr(mu2,"parameters"))
 	if(is.matrix(attr(mu2,"model"))){
 		if(all(dim(attr(mu2,"model"))==1)){
@@ -155,21 +169,26 @@ else if(is.null(mu)){
 else mu1 <- mu
 if(!is.null(mu1)&&is.null(attributes(mu1))){
 	attributes(mu1) <- if(is.function(mu)){
-		if(!inherits(mu,"formulafn"))attributes(fnenvir(mu))
+		if(!inherits(mu,"formulafn")){
+			if(respenv)attributes(fnenvir(mu,envir=response))
+			else attributes(fnenvir(mu,envir=envir))}
 		else attributes(mu)}
-		else attributes(fnenvir(mu1))}
+		else {
+			if(respenv)attributes(fnenvir(mu1,envir=response))
+			else attributes(fnenvir(mu1,envir=envir))}}
 nlp <- if(is.function(mu1))length(attr(mu1,"parameters"))
 	else if(is.null(mu1))NULL
 	else npt1
-if(!is.null(nlp)&&nlp!=npr)
+if(!is.null(nlp)&&!common&&nlp!=npr)
 	stop(paste("preg should have",nlp,"initial estimates"))
 nps <- length(pshape)
 if(inherits(shape,"formula")){
-	sh2 <- finterp(shape,envir=envir,name=name)
+	sh2 <- if(respenv)finterp(shape,envir=response,start=nprd1,name=envname)
+		else finterp(shape,envir=envir,start=nprd1,name=envname)
 	npt2 <- length(attr(sh2,"parameters"))
 	if(is.matrix(attr(sh2,"model"))){
 		if(all(dim(attr(sh2,"model"))==1)){
-			sh1 <- function(p) p[1]*rep(1,n)
+			sh1 <- function(p) p[nprd1]*rep(1,n)
 			attributes(sh1) <- attributes(sh2)
 			sh2 <- NULL}}
 	else {
@@ -193,19 +212,28 @@ if(inherits(shape,"formula")){
 			rm(sh2)}}}
 else if(!is.function(shape)&&distribution!="binomial"&&
 	distribution!="Poisson"&&distribution!="exponential"&&
-	distribution!="geometric"&&distribution!="logarithmic")
-	sh1 <- function(p) p[1]*rep(1,n)
-else sh1 <- shape
+	distribution!="geometric"&&distribution!="logarithmic"){
+	sh1 <- function(p) p[nprd1]*rep(1,n)
+	if(length(pshape)!=1)stop("pshape must provide an estimate")}
+else sh1 <- if(shfn)function(p) shape(p[nprd1:np], mu1(p))
+	else function(p) shape(p[nprd1:np])
 if(!is.null(sh1)&&is.null(attributes(sh1)))
 	attributes(sh1) <- if(is.function(shape)){
-		if(!inherits(shape,"formulafn"))attributes(fnenvir(shape))
+		if(!inherits(shape,"formulafn")){
+			if(respenv)attributes(fnenvir(shape,envir=response))
+			else attributes(fnenvir(shape,envir=envir))}
 		else attributes(shape)}
-		else attributes(fnenvir(sh1))
-nlp <- if(is.function(shape))length(attr(sh1,"parameters"))
+		else {
+			if(respenv)attributes(fnenvir(sh1,envir=response))
+			else attributes(fnenvir(sh1,envir=envir))}
+nlp <- if(is.function(shape))length(attr(sh1,"parameters"))-shfn
 	else if(is.null(shape))NULL
 	else npt2
-if(!is.null(nlp)&&nlp!=nps)
+if(!is.null(nlp)&&!common&&nlp!=nps)
 	stop(paste("pshape should have",nlp,"initial estimates"))
+if(common){
+	nlp <- length(unique(c(attr(mu1,"parameters"),attr(sh1,"parameters"))))
+	if(nlp!=npr)stop(paste("with a common parameter model, preg should contain",nlp,"estimates"))}
 if(mdl<10){
 	if(any(y<0))stop("all responses must be non-negative")}
 else if((mdl!=10)&&(mdl!=11)&&(mdl!=12)&&(mdl!=15)&&(mdl!=18)&&(mdl!=20)&&(mdl!=26)&&(any(y<=0)))
@@ -244,14 +272,20 @@ if(order==2&&length(pdepend)!=2)stop("2 estimates of dependence parameters must 
 else if(length(pdepend)!=1&&length(pdepend)!=2)
      stop("One or two estimates of dependence parameters must be given")
 thp <- length(pdepend)==2&&order==1
-nprd <- npr+length(pdepend)
-nprd1 <- nprd+1
 sh <- is.function(shape)||inherits(shape,"formula")
 if(length(mu1(preg))!=length(response$response$y))
 	stop("The mu function must provide an estimate for each observation")
 else if(any(is.na(mu1(preg))))
 	stop("Non-numerical mu: probably invalid initial values")
 if(any(pdepend<=0))stop("All dependence parameters must be positive")
+p <- c(preg,-log(pdepend))
+if(mdl>3){
+	if(!sh)p <- c(p,log(pshape))
+	else {
+	     if(mdl>=19)p <- if(common)c(p,log(pshape[nps]))
+			else c(p,pshape[1:(nps-1)],log(pshape[nps]))
+	     else p <- c(p,pshape)}}
+np <- length(p)
 if(!sh){
 	if((mdl<=3&&nps!=0)||(mdl>3&&mdl<19&&nps!=1)||(mdl>=19&&nps!=2))
 		stop("Incorrect number of shape parameter estimates")
@@ -259,15 +293,8 @@ if(!sh){
 		stop("All shape parameters must be positive")
 	shr <- rep(0,length(response$response$y))}
 else {
-	if(any(is.na(sh1(pshape))))stop("The shape model returns NAs: probably invalid initial values")
-	if(length(sh1(pshape))!=length(response$response$y))stop("The shape function must provide an estimate for each observation")}
-p <- c(preg,-log(pdepend))
-if(mdl>3){
-	if(!sh)p <- c(p,log(pshape))
-	else {
-	     if(mdl>=19)p <- c(p,pshape[1:(nps-1)],log(pshape[nps]))
-	     else p <- c(p,pshape)}}
-np <- length(p)
+	if(any(is.na(sh1(p))))stop("The shape model returns NAs: probably invalid initial values")
+	if(length(sh1(p))!=length(response$response$y))stop("The shape function must provide an estimate for each observation")}
 if(fscale==1)fscale <- likekal(p)
 if(is.na(likekal(p)))stop("Likelihood returns NAs: probably invalid initial values")
 z0 <- nlm(likekal, p, hessian=T, print.level=print.level,
@@ -283,7 +310,7 @@ corr <- cov/(se%o%se)
 dimnames(corr) <- list(1:np,1:np)
 eta <- mu1(z0$estimate)
 if(sh){
-	shr <- sh1(z0$estimate[nprd1:np])
+	shr <- sh1(z0$estimate)
 	theta <- c(z0$estimate[npr1:nprd],exp(z0$estimate[np]))}
 else theta <- z0$estimate[npr1:np]
 z <- .C("gar",
@@ -308,18 +335,6 @@ z <- .C("gar",
 	rpred=double(n),
 	like=double(1),
 	DUP=F)
-if(transform=="exp"){
-	z$pred <- log(z$pred)
-	z$rpred <- log(z$rpred)}
-else if(transform=="square"){
-	z$pred  <- sqrt(z$pred)
-	z$rpred  <- sqrt(z$rpred)}
-else if(transform=="sqrt"){
-	z$pred <- z$pred^2
-	z$rpred <- z$rpred^2}
-else if(transform=="log"){
-	z$pred <- exp(z$pred)
-	z$rpred <- exp(z$rpred)}
 if(!is.null(mu3))mu1 <- mu3
 if(!is.null(sh3))sh1 <- sh3
 z <- list(
@@ -329,6 +344,8 @@ z <- list(
 	formula=mu,
 	shape=shape,
 	sh1=sh1,
+	shfn=shfn,
+	common=common,
 	response=response$response,
 	link=link,
 	order=order,
@@ -357,8 +374,12 @@ coefficients.gar <- function(z) z$coefficients
 deviance.gar <- function(z) 2*z$maxlike
 fitted.gar <- function(z, recursive=TRUE)
 	if(recursive) z$rpred else z$pred
-residuals.gar <- function(z, recursive=TRUE)
-	if(recursive) z$response$y-z$rpred else z$response$y-z$pred
+residuals.gar <- function(z, recursive=TRUE){
+	if(z$transform=="exp")z$response$y <- exp(z$response$y)
+	else if(z$transform=="square")z$response$y  <- z$response$y^2
+	else if(z$transform=="sqrt")z$response$y <- sqrt(z$response$y)
+	else if(z$transform=="log")z$response$y <- log(z$response$y)
+	if(recursive) z$response$y-z$rpred else z$response$y-z$pred}
 
 print.gar <- function(z, digits = max(3, .Options$digits - 3)) {
 	np1 <- if(z$distribution=="binomial"||z$distribution=="exponential"
@@ -386,7 +407,8 @@ print.gar <- function(z, digits = max(3, .Options$digits - 3)) {
 	cat("Degrees of freedom",z$df,"\n")
 	cat("AIC               ",z$aic,"\n")
 	cat("Iterations        ",z$iterations,"\n\n")
-	cat("Location parameters\n")
+	if(z$common)cat("Location model\n")
+	else cat("Location parameters\n")
 	if(!is.null(attr(z$mu,"formula")))
 		cat(deparse(attr(z$mu,"formula")),sep="\n")
 	else if(!is.null(attr(z$mu,"model"))){
@@ -395,11 +417,29 @@ print.gar <- function(z, digits = max(3, .Options$digits - 3)) {
 		t[length(t)] <- sub("\\)$","",t[length(t)])
 		cat(t,sep="\n")}
 	cname <- if(is.matrix(attr(z$mu,"model")))
-			colnames(attr(z$mu,"model"))
+		colnames(attr(z$mu,"model"))
 		else attr(z$mu,"parameters")
 	coef.table <- cbind(z$coef[1:z$npr],z$se[1:z$npr])
-	dimnames(coef.table) <- list(cname, c("estimate","se"))
-	print.default(coef.table, digits=digits, print.gap=2)
+	colname <- c("estimate","se")
+	if(!z$common){
+		dimnames(coef.table) <- list(cname,colname)
+		print.default(coef.table, digits=digits, print.gap=2)}
+	else {
+		cat("\nShape model\n")
+	        if(!is.null(attr(z$sh1,"formula")))
+	        	cat(deparse(attr(z$sh1,"formula")),sep="\n")
+	        else if(!is.null(attr(z$sh1,"model"))){
+	        	t <- deparse(attr(z$sh1,"model"))
+	        	t[1] <- sub("expression\\(","",t[1])
+	        	t[length(t)] <- sub("\\)$","",t[length(t)])
+	        	cat(t,sep="\n")}
+	        cname <- c(cname,if(is.matrix(attr(z$sh1,"model")))
+				colnames(attr(z$sh1,"model"))
+			else attr(z$sh1,"parameters")[1:(length(attr(z$sh1,"parameters"))-z$shfn)])
+		cname <- unique(cname)
+		cat("\nCommon parameters\n")
+		dimnames(coef.table) <- list(cname,colname)
+		print.default(coef.table, digits=digits, print.gap=2)}
 	if(z$thp||z$order==2){
 		cat("\nDependence parameters\n")
 		if(z$thp)cname <- c("phi","rho")
@@ -414,43 +454,34 @@ print.gar <- function(z, digits = max(3, .Options$digits - 3)) {
 			z$se[z$npr+1],exp(-z$coef[z$npr+1]))}
 	dimnames(coef.table) <- list(cname, c("estimate","se","parameter"))
 	print.default(coef.table, digits=digits, print.gap=2)
-	if(np1>0){
+	if(np1>0&&!z$common){
 		cat("\nShape parameters\n")
-		if(!is.null(z$shape)){
-			if(!is.null(attr(z$sh1,"formula")))
-				cat(deparse(attr(z$sh1,"formula")),sep="\n")
-			else if(!is.null(attr(z$sh1,"model"))){
-				t <- deparse(attr(z$sh1,"model"))
-				t[1] <- sub("expression\\(","",t[1])
-				t[length(t)] <- sub("\\)$","",t[length(t)])
-				cat(t,sep="\n")}
-			cname <- if(is.matrix(attr(z$sh1,"model")))
-					colnames(attr(z$sh1,"model"))
-				else attr(z$sh1,"parameters")
-			coef.table <- cbind(z$coef[(z$np-z$nps+1):z$np],
-				z$se[(z$np-z$nps+1):z$np])
-			colname <- c("estimate","se")
-			if(np1==2){
-				cname[length(cname)] <- "psi"
-				coef.table <- cbind(coef.table,c(rep(NA,nrow(coef.table)-1),exp(z$coef[z$np])))
-				colname <- c(colname,"parameter")}
-			dimnames(coef.table) <- list(cname,colname)}
-		else {
+		if(is.null(z$shape)){
 			cname <- "shape"
 			if(np1==2)cname <- c(cname,"psi")
 			coef.table <- cbind(z$coef[(z$np-np1+1):z$np],
 				z$se[(z$np-np1+1):z$np],
 				exp(z$coef[(z$np-np1+1):z$np]))
-			dimnames(coef.table) <- list(cname, c("estimate","se","parameter"))}
-		print.default(coef.table, digits=digits, print.gap=2)}
+				dimnames(coef.table) <- list(cname, c("estimate","se","parameter"))}
+		else {
+	                if(!is.null(attr(z$sh1,"formula")))
+	                	cat(deparse(attr(z$sh1,"formula")),sep="\n")
+	                else if(!is.null(attr(z$sh1,"model"))){
+	                	t <- deparse(attr(z$sh1,"model"))
+	                	t[1] <- sub("expression\\(","",t[1])
+	                	t[length(t)] <- sub("\\)$","",t[length(t)])
+	                	cat(t,sep="\n")}
+	                cname <- if(is.matrix(attr(z$sh1,"model")))
+					colnames(attr(z$sh1,"model"))
+				else attr(z$sh1,"parameters")[1:(length(attr(z$sh1,"parameters"))-z$shfn)]
+			np2 <- length(cname)
+			coef.table <- cbind(z$coef[(z$np-np2+1):z$np],
+				z$se[(z$np-np2+1):z$np])
+			dimnames(coef.table) <- list(cname, c("estimate","se"))
+	                if(np1==2){
+	                	cname[length(cname)] <- "psi"
+	                	coef.table <- cbind(coef.table,c(rep(NA,nrow(coef.table)-1),exp(z$coef[z$np])))
+	                	colname <- c(colname,"parameter")}}
+		print.default(coef.table,digits=digits,print.gap=2)}
 	cat("\nCorrelation matrix\n")
 	print.default(z$corr, digits=digits)}
-
-plot.residuals.gar <- function(z, x=NULL, subset=NULL, nind=NULL,
-	recursive=T, pch=20, ylab="Residual", xlab=NULL,
-	main=NULL, ...){
-	if(recursive)z$rresiduals <- z$response$y-z$rpred
-	else z$residuals <- z$response$y-z$mu(z$coef)
-	plot.residuals.default(z, x=x, subset=subset, nind=nind,
-		recursive=recursive, pch=pch, ylab=ylab,
-		xlab=xlab, main=main, ...)}

@@ -38,6 +38,8 @@ logitord <- function(y, id, out.ccov=NULL, drop.ccov=NULL, tvcov=NULL,
 # Fortran constants
 	maxsub <- 5200
 	maxcas <- 10
+	maxbet <- 25
+	maxsig <- 10
 
 	call <- sys.call()
 	cg <- length(unique(y[y>0]))
@@ -115,9 +117,11 @@ logitord <- function(y, id, out.ccov=NULL, drop.ccov=NULL, tvcov=NULL,
 	data <- rbind(y1,y2)
 	data <- data[order(data[,1],rownames(data)),]
 	total1 <- cg+n3o+n3d
+	if(total1>maxbet)stop("too many regression parameters")
 	total2a <- random.out.int+random.drop.int+random.out.slope+
 		random.drop.slope
 	total2b <- random.out.slope+random.drop.slope
+	if(total2a>maxsig||total2b>maxsig)stop("too many random parameters")
 	nobs <- nrow(data)
 	if(missing(pout)||length(pout)!=cg+n3o-1)stop(paste(cg+n3o-1,"pout estimates must be supplied"))
 	if(missing(pdrop)||length(pdrop)!=n3d+1)stop(paste(n3d+1,"pdrop estimates must be supplied"))
@@ -130,27 +134,28 @@ logitord <- function(y, id, out.ccov=NULL, drop.ccov=NULL, tvcov=NULL,
 		if(!missing(prand.drop)){
 			if(length(prand.drop)!=random.drop.int+2*random.drop.slope)stop(paste(random.drop.int+2*random.drop.slope,"prand.drop estimates must be supplied"))
 			if(random.drop.int)p[seq(total1+random.out.int+1,total1+total2a+total2b,by=2)] <- prand.drop}}
+	total <- total1+total2a+total2b
 	z <- .Fortran("logitord",
 		y=as.double(data),
 		upk=as.integer(binom.mix),
 		eps=as.double(eps),
-		fcalls=as.double(fcalls),
+		fcalls=as.integer(fcalls),
+		iout=as.integer(print.level),
 		cg=as.integer(cg),
 		total1=as.integer(total1),
 		total2a=as.integer(total2a),
 		total2b=as.integer(total2b),
 		nobs=as.integer(nobs),
-		x=as.double(p),
-		ster=double(total1+total2a+total2b),
-		hess=double((total1+total2a+total2b)^2),
-		hessinv=double((total1+total2a+total2b)^2),
-		iout=as.integer(print.level),
+		p=as.double(p),
+		x=double(total),
+		ster=double(total),
+		hess=double(total*total),
+		hessinv=double(total*total),
 		nflag=integer(1),
 		iter=integer(1),
 		ifun=integer(1),
-		like=double(1))
-# upk and something else are changed in logitord.f
-#		DUP=F)
+		like=double(1),
+		DUP=F)
 	if(z$nflag>0)switch(as.character(z$nflag),
 			"1"=warning("Maximum number of function evaluations has been used"),
 			"2"=stop("Linear search failed to improve the function value. Either the function or the gradient is incorrectly coded"),

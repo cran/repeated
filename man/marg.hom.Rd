@@ -1,4 +1,4 @@
-\name(marg.hom}
+\name{marg.hom}
 \title{Marginal Homogeneity Model}
 \usage{
 marg.hom(freq,marg1,marg2)

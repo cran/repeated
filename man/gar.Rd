@@ -1,8 +1,8 @@
 \name{gar}
 \title{Generalized autoregression}
 \usage{
-gar(response, distribution="normal", times=NULL, totals=NULL,
-	censor=NULL, delta=NULL, mu=NULL, shape=NULL, preg=NULL,
+gar(response, distribution="normal", times=NULL, totals=NULL, censor=NULL,
+	delta=NULL, mu=NULL, shape=NULL, shfn=F, common=F, preg=NULL,
 	pdepend=NULL, pshape=NULL, transform="identity", link="identity",
 	autocorr="exponential", order=1, envir=sys.frame(sys.parent()),
 	print.level=0, ndigit=10, gradtol=0.00001,steptol=0.00001,
@@ -52,10 +52,21 @@ beginning with ~, specifying either a linear regression function for
 the location parameter in the Wilkinson and Rogers notation or a
 general function with named unknown parameters. It must yield a  value
 for each observation on each individual.}
-\item{shape}{An optional user-specified shape regression function. It
-may also be a formula beginning with ~, specifying either a linear
-regression function for the shape parameter in the Wilkinson and
-Rogers notation or a general function with named unknown parameters.}
+\item{shape}{An optional user-specified shape regression function;
+this may depend on the location (function) through its second
+argument, in which case, \code{shfn} must be set to TRUE. It may also
+be a formula beginning with ~, specifying either a linear regression
+function for the shape parameter in the Wilkinson and Rogers notation
+or a general function with named unknown parameters.}
+\item{shfn}{If TRUE, the supplied shape function depends on the
+location function. The name of this location function must be the
+last argument of the shape function.}
+\item{common}{If TRUE, \code{mu} and \code{shape} must both be
+functions with, as argument, a vector of parameters having some or all
+elements in common between them so that indexing is in common
+between them; all parameter estimates must be supplied in \code{preg}.
+If FALSE, parameters are distinct between the two functions and
+indexing starts at one in each function.}
 \item{preg}{The initial parameter estimates for the location
 regression function. If \code{mu} is a formula with unknown
 parameters, their estimates must be supplied either in their order of
@@ -83,7 +94,9 @@ Ornstein-Uhlenbeck process, (2rho min(t_i,t_j)+exp(-rho t_i)
 +exp(-rho t_j)-1 -exp(rho|ti-t_j|))/2rho^3.}
 \item{order}{First- or second-order stationary autoregression.}
 \item{envir}{Environment in which model formulae are to be
-interpreted or a data object of class, repeated, tccov, or tvcov.}
+interpreted or a data object of class, repeated, tccov, or tvcov.
+If \code{response} has class \code{repeated}, it is used as the
+environment.}
 \item{others}{Arguments controlling \code{\link{nlm}}.}
 }
 \description{
@@ -95,7 +108,7 @@ parameters are unknowns. Factor variables cannot be used and
 parameters must be scalars. (See \code{\link{finterp}}.)
 
 Marginal and individual profiles can be plotted using
-\code{\link{plot.profile}} and \code{\link{plot.iprofile}} and
+\code{\link{profile}} and \code{\link{iprofile}} and
 residuals with \code{\link{plot.residuals}}.
 }
 \references{
@@ -110,10 +123,10 @@ A list of classes \code{gar} and \code{recursive} is returned.
 \author{J.K. Lindsey}
 \seealso{
 \code{\link{carma}}, \code{\link{elliptic}}, \code{\link{finterp}},
-\code{\link{gnlmm}}, \code{\link{gnlr}}, \code{\link{kalcount}},
-\code{\link{kalseries}}, \code{\link{kalsurv}},
-\code{\link{plot.profile}}, \code{\link{plot.iprofile}},
-\code{\link{plot.residuals}}, \code{\link{read.list}},
+\code{\link{gnlmm}}, \code{\link{gnlr}}, \code{\link{iprofile}},
+\code{\link{kalcount}}, \code{\link{kalseries}},
+\code{\link{kalsurv}}, \code{\link{plot.residuals}},
+\code{\link{profile}}, \code{\link{read.list}},
 \code{\link{restovec}}, \code{\link{rmna}}, \code{\link{tcctomat}},
 \code{\link{tvctomat}}.
 }

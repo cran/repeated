@@ -1,6 +1,8 @@
 \name{repeated}
 \title{Non-normal Repeated Measurements Library}
 \description{
+\code{\link{binnest}}			Binary Random Effects Model with Two Levels of Nesting
+
 \code{\link{biv.betab}}		Bivariate Beta-binomial Regression
 
 \code{\link{biv.binom}}		Marginal Bivariate Binomial Regression

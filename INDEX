@@ -1,3 +1,4 @@
+binnest		Binary Random Effects Model with Two Levels of Nesting
 biv.betab	Bivariate Beta-binomial Regression
 biv.binom	Marginal Bivariate Binomial Regression
 capture		Capture-recapture Model

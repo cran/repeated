@@ -52,9 +52,9 @@ series <- function(p){
 		p=as.double(p),
 		y=as.double(y),
 		t=as.double(times),
-		x=as.double(response$ccov$ccov),
+		x=as.double(resp$ccov$ccov),
 		nind=as.integer(nind),
-		nobs=as.integer(response$response$nobs),
+		nobs=as.integer(resp$response$nobs),
 		nbs=as.integer(length(y)),
 		nccov=as.integer(nccov),
 		npv=as.integer(npv),
@@ -65,10 +65,10 @@ series <- function(p){
 		torder=as.integer(torder),
 		inter=as.integer(interaction),
 		tvc=as.integer(tvc),
-		tvcov=response$tvcov$tvcov,
+		tvcov=resp$tvcov$tvcov,
 		fit=as.integer(0),
-		pred=double(length(response$response$y)),
-		rpred=double(length(response$response$y)),
+		pred=double(length(resp$response$y)),
+		rpred=double(length(resp$response$y)),
 		rf=as.integer(rf),
 		bbb=as.double(b),
 		sf=as.integer(sf),
@@ -83,9 +83,9 @@ serief <- function(p){
 		p=as.double(p),
 		y=as.double(y),
 		t=as.double(times),
-		x=as.double(response$ccov$ccov),
+		x=as.double(resp$ccov$ccov),
 		nind=as.integer(nind),
-		nobs=as.integer(response$response$nobs),
+		nobs=as.integer(resp$response$nobs),
 		nbs=as.integer(length(y)),
 		nccov=as.integer(nccov),
 		npv=as.integer(npv),
@@ -95,10 +95,10 @@ serief <- function(p){
 		torder=as.integer(torder),
 		inter=as.integer(interaction),
 		tvc=as.integer(tvc),
-		tvcov=response$tvcov$tvcov,
+		tvcov=resp$tvcov$tvcov,
 		fit=as.integer(0),
-		pred=double(length(response$response$y)),
-		rpred=double(length(response$response$y)),
+		pred=double(length(resp$response$y)),
+		rpred=double(length(resp$response$y)),
 		rf=as.integer(rf),
 		bbb=as.double(b),
 		sf=as.integer(sf),
@@ -118,8 +118,12 @@ tmp <- c("identity","exp","square","sqrt","log")
 lnk <- match(link <- match.arg(link,tmp),tmp)
 rf <- !is.null(mu)
 sf <- !is.null(shape)
-if(!inherits(response,"repeated")){
-	if(!inherits(response,"response"))response <- restovec(response,times,delta=delta)
+respenv <- inherits(response,"repeated")
+envname <- if(respenv)paste(deparse(substitute(response)))
+	else NULL
+if(!respenv){
+	if(!inherits(response,"response"))resp <- restovec(response,times,delta=delta)
+	else resp <- response
 	if(is.null(ccov))nccov <- 0
 	else {
 		if(!inherits(ccov,"tccov")){
@@ -132,7 +136,8 @@ if(!inherits(response,"repeated")){
 					ccname <- tmp}}
 			ccov <- tcctomat(ccov,names=ccname)}
 		nccov <- if(rf) 0 else ncol(ccov$ccov)}
-	if(!is.null(tvcov)){
+	if(is.null(tvcov))ttvc <- 0
+	else {
 		if(!inherits(tvcov,"tvcov")){
 			tvcname <- paste(deparse(substitute(tvcov)))
 			if(is.list(tvcov)&&ncol(tvcov[[1]])>1){
@@ -144,50 +149,68 @@ if(!inherits(response,"repeated")){
 				else tvcname <- colnames(tvcov[[1]])}
 			tvcov <- tvctomat(tvcov,names=tvcname)}
 		ttvc <- if(rf) 0 else ncol(tvcov$tvcov)}
-	else ttvc <- 0
-	response <- rmna(response=response, tvcov=tvcov, ccov=ccov)
+	resp <- rmna(response=resp, tvcov=tvcov, ccov=ccov)
 	if(!is.null(ccov))rm(ccov)
 	if(!is.null(tvcov))rm(tvcov)}
 else{
-	nccov <- if(rf||is.null(response$ccov$ccov)) 0
-		 else  ncol(response$ccov$ccov)
-	ttvc <- if(rf||is.null(response$tvcov$tvcov)) 0
-		 else  ncol(response$tvcov$tvcov)}
+	if(!rf){
+		resp <- response
+		if(is.null(ccov))resp$ccov <- NULL
+		else if(inherits(ccov,"formula"))
+			resp$ccov$ccov <- attr(finterp(ccov,envir=response,expand=F,name=paste(deparse(substitute(response)))),"model")[,-1,drop=F]
+		else stop("ccov must be a W&R formula")
+		if(is.null(tvcov))resp$tvcov <- NULL
+		else if(inherits(tvcov,"formula"))
+			resp$tvcov$tvcov <- attr(finterp(tvcov,envir=response,name=paste(deparse(substitute(response)))),"model")[,-1,drop=F]
+		else stop("tvcov must be a W&R formula")}
+	else resp <- rmna(response$response)
+	nccov <- if(rf||is.null(resp$ccov$ccov)) 0
+		 else  ncol(resp$ccov$ccov)
+	ttvc <- if(rf||is.null(resp$tvcov$tvcov)) 0
+		 else  ncol(resp$tvcov$tvcov)}
 if((inherits(envir,"repeated")&&
-	(length(response$response$nobs)!=length(envir$response$nobs)||
-	any(response$response$nobs!=envir$response$nobs)))||
+	(length(resp$response$nobs)!=length(envir$response$nobs)||
+	any(resp$response$nobs!=envir$response$nobs)))||
 	(inherits(envir,"tvcov")&&
-	(length(response$response$nobs)!=length(envir$tvcov$nobs)||
-	any(response$response$nobs!=envir$tvcov$nobs))))
+	(length(resp$response$nobs)!=length(envir$tvcov$nobs)||
+	any(resp$response$nobs!=envir$tvcov$nobs))))
 	stop("response and envir objects are incompatible")
-mu3 <- sh3 <- name <- NULL
-if(inherits(envir,"repeated")||inherits(envir,"tccov")){
-	type <- if(inherits(envir,"repeated"))"repeated"
+mu3 <- sh3 <- NULL
+if(respenv||inherits(envir,"repeated")||inherits(envir,"tccov")){
+	type <- if(respenv||inherits(envir,"repeated"))"repeated"
 		else if(inherits(envir,"tccov"))"tccov"
 		else "tvcov"
-	name <- paste(deparse(substitute(envir)))
+	if(is.null(envname))envname <- paste(deparse(substitute(envir)))
 	if(inherits(mu,"formula")){
-		mu3 <- finterp(mu)
+		mu3 <- if(respenv)finterp(mu,envir=response,name=envname)
+			else finterp(mu,envir=envir,name=envname)
 		class(mu) <- c(class(mu),type)}
 	else if(is.function(mu)){
-		mu3 <- mu
-		attributes(mu3) <- attributes(fnenvir(mu))
+		tmp <- parse(text=paste(deparse(mu))[-1])
 		class(mu) <- type
-		mu <- fnenvir(mu,envir=envir,name=name)}
+		mu <- if(respenv)fnenvir(mu,envir=response,name=envname)
+			else fnenvir(mu,envir=envir,name=envname)
+		mu3 <- mu
+		if(respenv)attr(mu3,"model") <- tmp}
 	if(inherits(shape,"formula")){
-		sh3 <- finterp(shape)
+		sh3 <- if(respenv)finterp(shape,envir=response,name=envname)
+			else finterp(shape,envir=envir,name=envname)
 		class(shape) <- c(class(shape),type)}
 	else if(is.function(shape)){
-		sh3 <- shape
-		attributes(sh3) <- attributes(fnenvir(shape))
+		tmp <- parse(text=paste(deparse(shape))[-1])
 		class(shape) <- type
-		shape <- fnenvir(shape,envir=envir,name=name)}}
+		shape <- if(respenv)fnenvir(shape,envir=response,name=envname)
+			else fnenvir(shape,envir=envir,name=envname)
+		sh3 <- shape
+		if(respenv)attr(sh3,"model") <- tmp}}
 npreg <- length(preg)
 mu1 <- sh1 <- v <- b <- NULL
 if(inherits(mu,"formula")){
 	pr <- if(npreg>0)preg else ptvc
 	npr <- length(pr)
-	mu2 <- finterp(mu,envir=envir,name=name,expand=is.null(preg))
+	mu2 <- if(respenv)
+		finterp(mu,envir=response,name=envname,expand=is.null(preg))
+		else finterp(mu,envir=envir,name=envname,expand=is.null(preg))
 	npt1 <- length(attr(mu2,"parameters"))
 	if(is.matrix(attr(mu2,"model"))){
 		if(all(dim(attr(mu2,"model"))==1)){
@@ -217,9 +240,13 @@ if(inherits(mu,"formula")){
 else if(is.function(mu))mu1 <- mu
 if(!is.null(mu1)&&is.null(attributes(mu1))){
 	attributes(mu1) <- if(is.function(mu)){
-		if(!inherits(mu,"formulafn"))attributes(fnenvir(mu))
+		if(!inherits(mu,"formulafn")){
+			if(respenv)attributes(fnenvir(mu,envir=response))
+			else attributes(fnenvir(mu,envir=envir))}
 		else attributes(mu)}
-		else attributes(fnenvir(mu1))}
+		else {
+			if(respenv)attributes(fnenvir(mu1,envir=response))
+			else attributes(fnenvir(mu1,envir=envir))}}
 nlp <- if(is.function(mu1))length(attr(mu1,"parameters"))
 	else if(is.null(mu1))NULL
 	else npt1
@@ -230,7 +257,8 @@ if(!is.null(nlp)){
 		stop(paste("ptvc should have",nlp,"initial estimates"))}
 nps <- length(pshape)
 if(inherits(shape,"formula")){
-	sh2 <- finterp(shape,envir=envir,name=name)
+	sh2 <- if(respenv)finterp(shape,envir=response,name=envname)
+		else finterp(shape,envir=envir,name=envname)
 	npt2 <- length(attr(sh2,"parameters"))
 	if(is.matrix(attr(sh2,"model"))){
 		if(all(dim(attr(sh2,"model"))==1)){
@@ -259,9 +287,13 @@ if(inherits(shape,"formula")){
 else if(is.function(shape))sh1 <- shape
 if(!is.null(sh1)&&is.null(attributes(sh1)))
 	attributes(sh1) <- if(is.function(shape)){
-		if(!inherits(shape,"formulafn"))attributes(fnenvir(shape))
+		if(!inherits(shape,"formulafn")){
+			if(respenv)attributes(fnenvir(shape,envir=response))
+			else attributes(fnenvir(shape,envir=envir))}
 		else attributes(shape)}
-		else attributes(fnenvir(sh1))
+		else {
+			if(respenv)attributes(fnenvir(sh1,envir=response))
+			attributes(fnenvir(sh1,envir=envir))}
 nlp <- if(is.function(shape))length(attr(sh1,"parameters"))
 	else if(is.null(shape))NULL
 	else npt2
@@ -291,12 +323,12 @@ else {
 	else if(pdepend<=0||pdepend>=1)
 		stop("Dependence parameter must be between 0 and 1")
 	else pdepend <- log(pdepend/(1-pdepend))}
-if(is.null(response$response$times)){
+if(is.null(resp$response$times)){
 	if(depend=="serial")stop("No times. Serial dependence cannot be fitted.")
 	ave <- times <- 0}
 else {
-	ave <- mean(response$response$times)
-	times <- response$response$times-ave}
+	ave <- mean(resp$response$times)
+	times <- resp$response$times-ave}
 if(!is.null(interaction)){
 	if(length(interaction)!=nccov)
 		stop(paste(nccov,"interactions with time must be specified"))
@@ -306,11 +338,11 @@ else interaction <- rep(0,nccov)
 npv <- torder+sum(interaction)
 if(rf&&npreg>0)nccov <- npreg-1
 if(!rf&&1+nccov+npv!=npreg)stop(paste(1+nccov+npv,"regression estimates must be supplied"))
-y <- response$response$y
-nind <- length(response$response$nobs)
-if(!is.null(response$response$delta))jacob <- if(length(response$response$delta)==1)
-		-length(response$response$y)*log(response$response$delta)
- 	else -sum(log(response$response$delta))
+y <- resp$response$y
+nind <- length(resp$response$nobs)
+if(!is.null(resp$response$delta))jacob <- if(length(resp$response$delta)==1)
+		-length(resp$response$y)*log(resp$response$delta)
+ 	else -sum(log(resp$response$delta))
 else jacob <- 0
 if((mdl<=3||mdl>=8)&&any(y<=0))stop("All responses must be positive")
 if(transform=="exp"){
@@ -328,17 +360,17 @@ else if(transform!="identity"){
 	else if(transform=="log"){
 		jacob <- jacob+sum(log(y[y>0]))
 		y <- log(y)}}
-if(!rf&&ttvc>0&&tvc!=ttvc)stop(paste(ttvc,"initial estimates of coefficients for time-varying covariates must be supplied"))
+if(!rf&&(ttvc>0&&tvc!=ttvc||ttvc==0&&tvc>0))stop(paste(ttvc,"initial estimates of coefficients for time-varying covariates must be supplied"))
 if(rf){
 	if(tvc>0&&nccov>0)stop("With a mean function or formula, initial estimates must be supplied either in preg or in ptvc")
 	if(tvc>0){
-		if(length(mu1(ptvc))!=length(response$response$y))stop("The mu function must provide an estimate for each observation")
+		if(length(mu1(ptvc))!=length(resp$response$y))stop("The mu function must provide an estimate for each observation")
 		tvc <- tvc-1}
 	else if(length(mu1(preg))==1){
 		if(nccov==0)mu1 <- function(p) rep(p[1],length(y))
 		else stop("Number of estimates does not correspond to mu function")}
 	else if(length(mu1(preg))!=nind)stop("The mu function or formula must provide an estimate for each individual")}
-if(sf&&length(sh1(pshape))!=length(response$response$y))stop("The shape function must provide an estimate for each observation")
+if(sf&&length(sh1(pshape))!=length(resp$response$y))stop("The shape function must provide an estimate for each observation")
 np <- 1+nccov+npv+tvc+1+(depend=="serial"||depend=="Markov")+nps+(!is.null(pintercept))
 nps1 <- np-nps-(!is.null(pintercept))+1
 p <- c(preg,ptvc,pinitial,pdepend,pshape,pintercept)
@@ -368,9 +400,9 @@ else {
 			p=as.double(p),
 			y=as.double(y),
 			t=as.double(times),
-			x=as.double(response$ccov$ccov),
+			x=as.double(resp$ccov$ccov),
 			nind=as.integer(nind),
-			nobs=as.integer(response$response$nobs),
+			nobs=as.integer(resp$response$nobs),
 			nbs=as.integer(length(y)),
 			nccov=as.integer(nccov),
 			npv=as.integer(npv),
@@ -380,10 +412,10 @@ else {
 			torder=as.integer(torder),
 			inter=as.integer(interaction),
 			tvc=as.integer(tvc),
-			tvcov=response$tvcov$tvcov,
+			tvcov=resp$tvcov$tvcov,
 			fit=as.integer(1),
-			pred=double(length(response$response$y)),
-			rpred=double(length(response$response$y)),
+			pred=double(length(resp$response$y)),
+			rpred=double(length(resp$response$y)),
 			rf=as.integer(rf),
 			bbb=as.double(b),
 			sf=as.integer(sf),
@@ -397,9 +429,9 @@ else {
 			p=as.double(p),
 			y=as.double(y),
 			t=as.double(times),
-			x=as.double(response$ccov$ccov),
+			x=as.double(resp$ccov$ccov),
 			nind=as.integer(nind),
-			nobs=as.integer(response$response$nobs),
+			nobs=as.integer(resp$response$nobs),
 			nbs=as.integer(length(y)),
 			nccov=as.integer(nccov),
 			npv=as.integer(npv),
@@ -410,28 +442,16 @@ else {
 			torder=as.integer(torder),
 			inter=as.integer(interaction),
 			tvc=as.integer(tvc),
-			tvcov=response$tvcov$tvcov,
+			tvcov=resp$tvcov$tvcov,
 			fit=as.integer(1),
-			pred=double(length(response$response$y)),
-			rpred=double(length(response$response$y)),
+			pred=double(length(resp$response$y)),
+			rpred=double(length(resp$response$y)),
 			rf=as.integer(rf),
 			bbb=as.double(b),
 			sf=as.integer(sf),
 			vv=as.double(v),
 			like=double(1),
-			DUP=F)}
-	if(transform=="exp"){
-		z$pred <- log(z$pred)
-		z$rpred <- log(z$rpred)}
-	else if(transform=="square"){
-		z$pred  <- sqrt(z$pred)
-		z$rpred  <- sqrt(z$rpred)}
-	else if(transform=="sqrt"){
-		z$pred <- z$pred^2
-		z$rpred <- z$rpred^2}
-	else if(transform=="log"){
-		z$pred <- exp(z$pred)
-		z$rpred <- exp(z$rpred)}}
+			DUP=F)}}
 if(rf&&tvc>0){
 	nccov <- tvc
 	tvc <- 0}
@@ -449,12 +469,12 @@ z <- list(
 	depend=depend,
 	torder=torder,
 	interaction=interaction,
-	response=response$response,
+	response=resp$response,
 	pred=z$pred,
 	rpred=z$rpred,
 	transform=transform,
-	ccov=response$ccov,
-	tvcov=response$tvcov,
+	ccov=resp$ccov,
+	tvcov=resp$tvcov,
 	link=link,
 	maxlike=like,
 	aic=like+np,
@@ -475,8 +495,12 @@ coefficients.kalseries <- function(z) z$coefficients
 deviance.kalseries <- function(z) 2*z$maxlike
 fitted.kalseries <- function(z, recursive=TRUE)
 	if(recursive) z$rpred else z$pred
-residuals.kalseries <- function(z, recursive=TRUE)
-	if(recursive) z$response$y-z$rpred else z$response$y-z$pred
+residuals.kalseries <- function(z, recursive=TRUE){
+	if(z$transform=="exp")z$response$y <- exp(z$response$y)
+	else if(z$transform=="square")z$response$y  <- z$response$y^2
+	else if(z$transform=="sqrt")z$response$y <- sqrt(z$response$y)
+	else if(z$transform=="log")z$response$y <- log(z$response$y)
+	if(recursive) z$response$y-z$rpred else z$response$y-z$pred}
 
 print.kalseries <- function(z, digits = max(3, .Options$digits - 3)) {
 	if(!is.null(z$ccov))nccov <- ncol(z$ccov$ccov)
