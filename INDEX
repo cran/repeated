@@ -1,0 +1,14 @@
+biv.betab	Bivariate Beta-binomial Regression
+biv.binom	Marginal Bivariate Binomial Regression
+capture		Capture-recapture Model
+catmiss		Marginal Probabilities for Categorical Repeated Measures with Missing Data
+chidden		Continuous-Time Hidden Markov Chain Models
+gar		Generalized Autoregression
+glmm		Generalized Linear Mixed Models
+gnlmm		Generalized Nonlinear Mixed Models
+hidden		Discrete-Time Hidden Markov Chain Models
+kalcount	Generalized Repeated Measurements Models for Counts
+kalseries	Generalized Repeated Measurements Models for Continuous Variables
+logitord	Ordinal Random Effects Models with Dropouts
+marg.hom	Marginal Homogeneity Model
+nbkal		Negative Binomial Model with Kalman Update
