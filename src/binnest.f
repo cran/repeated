@@ -1,6 +1,6 @@
 c
 c  repeated : A Library of Repeated Measurements Models
-c  Copyright (C) 1998 J.K. Lindsey
+c  Copyright (C) 1998, 1999, 2000, 2001 J.K. Lindsey
 c
 c  This program is free software; you can redistribute it and/or modify
 c  it under the terms of the GNU General Public License as published by
@@ -259,7 +259,7 @@ c    Integer ,Allocatable :: Mother(:)
 
 	Integer Mother(max_m)
 
-    !One Dimensional Array
+c    One Dimensional Array
 	Integer Case1(Num_F) 
 	Integer Case2(Num_M)  
 
@@ -313,7 +313,7 @@ c    Double Precision, Allocatable :: sig2kk(:,:)
 
 	Total = T1 + T2 + T3	! Number of estimate
 
-    ! Initialize Upper H and q and this value can change
+C     Initialize Upper H and q and this value can change
 	UpH1 = Uph1_Temp
 	UpH2 = Uph2_Temp
 
@@ -330,7 +330,7 @@ c	sigma2 = Temp_X(1+T1+T2:Total) ! Read Sigma2 values from the vector x
 	   sigma2(i)=temp_x(t1+t2+i)
 	enddo
 
-    ! Allocate space for V and Hchoo arrays.
+C     Allocate space for V and Hchoo arrays.
 c    Allocate (v1(uph1))
 c    Allocate (h1choo(uph1))
 c    Allocate (v2(uph2))
@@ -339,7 +339,7 @@ c    Allocate (Hn(uph2))
 c    Allocate (H1(uph1))
 c    Allocate (H2(uph2))
     
-    ! Initialize V and Hchoo arrays
+C     Initialize V and Hchoo arrays
 	do i=1, uph1
 	   v1(i) = 0.0
 	   h1choo(i) = 0.0
@@ -350,7 +350,7 @@ c    Allocate (H2(uph2))
 	   Hn(i) = 0.0
 	enddo
     
-    ! Calculate V and Hchoo arrays
+C     Calculate V and Hchoo arrays
 	Uph1 = Uph1 - 1
 	Uph2 = Uph2 - 1
 	Uh1Fac = Factor(Uph1)
@@ -370,7 +370,7 @@ c	   Hn(lowh2+1) = h2choo(lowh2+1)*q2**lowh2*(1-q2)**(Uph2-lowh2)
      1          +(Uph2-lowh2)*dlog(1-q2))
 	End do
 
-    ! Initialize variables for the main loop.
+C     Initialize variables for the main loop.
 	J_Prod = 1.0
 	A_Prod = 1.0
 	A_tmp = 1.0
@@ -400,10 +400,10 @@ c	   Hn(lowh2+1) = h2choo(lowh2+1)*q2**lowh2*(1-q2)**(Uph2-lowh2)
 	Case2_count1 = 1
 	Case2_count2 = 1
    
-    ! Begin main loop
+C     Begin main loop
 	Do i = 1, Num_F
 
-      ! Allocate beta and sigma and initialize to zero 	 
+C       Allocate beta and sigma and initialize to zero
 c      Allocate(betakk(Case1(i),Max_K))
 c      Allocate(Sig1kk(Case1(i),Max_K))
 c      Allocate(Sig2kk(Case1(i),Max_K))
@@ -419,7 +419,7 @@ c      Allocate(Sig2kk(Case1(i),Max_K))
 c      allocate(Mother(Case1(i)))
 c	   Mother = 0
 
-      ! Calculate beta and sigma 
+C       Calculate beta and sigma
 	   Do j = 1, Case1(i)	! Number of mothers with in a father
 	      Mother(j) = Case2(Case2_count1)    
 	      Do k = 1, Mother(j) ! Number of kids with in a mather
@@ -435,7 +435,7 @@ c	   Mother = 0
 	      End do
 	      case2_count1 = case2_count1 + 1 
 	   End do
-      ! Allocate H A B C and D arrays and initialize to sero
+C       Allocate H A B C and D arrays and initialize to sero
 
 c      Allocate(HAC(Case1(i),t2))
 c      Allocate(HAD(Case1(i),t3))
@@ -612,7 +612,7 @@ c     1	            lowh1*(1-q1)**(UpH1-lowh1) * G(kk))
 
 c      deallocate(Mother)   !Deallocate a 
 
-      ! Release Unused space 
+C       Release Unused space
 c      Deallocate(HA)
 c      Deallocate(HAB)
 c      Deallocate(HAC)
@@ -627,7 +627,7 @@ c      Deallocate(Sig2kk)
 	   sLi = sLi + LOG(Li)	! Summation of SLI
 
 
-      ! Calculate First Derivative
+C       Calculate First Derivative
 	   Do kk = 1, t1
 	      Gradient(kk) = Gradient(kk) + (D1_beta(kk) / Li)
 	   End do
@@ -635,10 +635,10 @@ c      Deallocate(Sig2kk)
 	      Gradient(t1+kk) = Gradient(t1+kk) + (D1_Sig1(kk) / Li)
 	   End do
 	   Do kk = 1, t3
-	      Gradient(t1+t2+kk) = Gradient(t1+t2+kk) + (D1_Sig2(kk) / Li)
+	      Gradient(t1+t2+kk)=Gradient(t1+t2+kk)+(D1_Sig2(kk)/Li)
 	   End do
       
-      ! Reset beta and sigma
+C       Reset beta and sigma
 	   do kk=1,t1
 	      D1_beta(kk) = 0.0
 	   enddo
@@ -666,13 +666,13 @@ c    DeAllocate (H2)
 	Return			! Return Sli and Gradient to Conminbn
 
 	End !Subroutine Calcbn	! End Subroutine Calcbn
-!==========================================================================
+C==========================================================================
 
 
 
-!**************************************************************************
-!			Begin Subroutine Calcbn2
-!==========================================================================
+C**************************************************************************
+C			Begin Subroutine Calcbn2
+C==========================================================================
       Subroutine Calcbn2(T1,T2,T3,Num_F,Num_M,Num_S,Case1,Case2,Temp_X,
      1   a,Max_K,Max_M,Uph1_Temp,Uph2_Temp,q1,q2,mother,rr,r,sn,z,uu1,
      2   uu2,hess,habb,habs1,
@@ -686,10 +686,10 @@ c    DeAllocate (H2)
 
         parameter(max_t1=10,max_t2=10,max_t3=10)
 
-    ! Constant declaration 
+C     Constant declaration
 	Integer Max_k, Max_M, totcol
 
-    ! Integer declaration
+C     Integer declaration
 	Integer Total, T1, T2, T3, Num_F, Num_M,Num_S
 	Integer i		!  index of Father
 	Integer j,jj,jjj	!  index of mother
@@ -704,7 +704,7 @@ c    DeAllocate (H2)
 	Integer Case2_count2
 	Integer Case2_count3  
     
-    !One Dimensional Array
+C    One Dimensional Array
 	Integer Case1(Num_F)
 	Integer Case2(Num_M)  
 
@@ -712,7 +712,7 @@ c    Integer ,Allocatable :: Mother(:)
 
 	Integer Mother(max_m)
 
-    ! Double Precision declaration
+C     Double Precision declaration
 	Double Precision Uh1Fac, Uh2Fac
 	Double Precision q1, q2,Li
 	Double Precision DSQRT, DEXP, Expon, FACTOR
@@ -758,7 +758,7 @@ c    Integer ,Allocatable :: Mother(:)
 
 	Double Precision Hess(t1+t2+t3,t1+t2+t3)
 
-    ! Double Precision allocatable array
+C     Double Precision allocatable array
 c    Double Precision, Allocatable :: HABB(:,:,:),HABS1(:,:,:)
 c    Double Precision, Allocatable :: HABS2(:,:,:),HAS1S1(:,:,:)
 c    Double Precision, Allocatable :: HAS1S2(:,:,:),HAS2S2(:,:,:)
@@ -814,7 +814,7 @@ c    Double Precision, Allocatable :: sig2kk(:,:)
 
 	Total = T1 + T2 + T3	! Number of estimate
 
-    ! Initalize R, Sn, Z, Uu1, and Uu2
+C     Initalize R, Sn, Z, Uu1, and Uu2
 	count = 0.0
 	Case2_count1 = 1
 	Do i = 1, Num_F
@@ -840,7 +840,7 @@ c    Double Precision, Allocatable :: sig2kk(:,:)
 	   End do
 	End do
 	Case2_count2 = 1
-    ! This loop use to elimilate a bug in the program
+C     This loop use to elimilate a bug in the program
 	Do i = 1, Num_F
 	   Do j = 1, Case1(i)
 	      Do k = 1, Case2(Case2_count2)
@@ -850,7 +850,7 @@ c    Double Precision, Allocatable :: sig2kk(:,:)
 	   End do
 	End do
 
-    ! Initialize Upper H and q and this value can change
+C     Initialize Upper H and q and this value can change
 	UpH1 = Uph1_Temp
 	UpH2 = Uph2_Temp
 
@@ -867,7 +867,7 @@ c	sigma2 = Temp_X(1+T1+T2:Total) ! Read Sigma2 values from the vector x
 	do i=1,t3
 	   sigma2(i)=temp_x(t1+t2+i)
 	enddo
-    ! Allocate space for V and Hchoo arrays.
+C     Allocate space for V and Hchoo arrays.
 c    Allocate (v1(uph1))
 c    Allocate (h1choo(uph1))
 c    Allocate (v2(uph2))
@@ -876,7 +876,7 @@ c    Allocate (Hn(uph2))
 c    Allocate (H1(uph1))
 c    Allocate (H2(uph2))
     
-    ! Initialize V and Hchoo arrays
+C     Initialize V and Hchoo arrays
 	do i=1,uph1
 	   v1(i) = 0.0
 	   h1choo(i) = 0.0
@@ -887,7 +887,7 @@ c    Allocate (H2(uph2))
 	   Hn(i) = 0.0
 	enddo
     
-    ! Calculate V and Hchoo arrays
+C     Calculate V and Hchoo arrays
 	Uph1 = Uph1 - 1
 	Uph2 = Uph2 - 1
 	Uh1Fac = Factor(Uph1)
@@ -907,7 +907,7 @@ c	   Hn(lowh2+1) = h2choo(lowh2+1)*q2**lowh2*(1-q2)**(Uph2-lowh2)
      1          (Uph2-lowh2)*dlog(1-q2))
 	End do
 
-    ! Initialize variables for the main loop.
+C     Initialize variables for the main loop.
 	J_Prod = 1.0
 	A_Prod = 1.0
 	A_tmp = 1.0
@@ -984,9 +984,9 @@ c	   Hn(lowh2+1) = h2choo(lowh2+1)*q2**lowh2*(1-q2)**(Uph2-lowh2)
  
 	Case2_count3 = 1
 
-    ! Begin main loop
+C     Begin main loop
 	Do i = 1, Num_F
-      ! Allocate beta and sigma and initialize to zero 	 
+C       Allocate beta and sigma and initialize to zero
 c      Allocate(betakk(Case1(i),Max_k))
 c      Allocate(Sig1kk(Case1(i),Max_k))
 c      Allocate(Sig2kk(Case1(i),Max_k))
@@ -997,7 +997,7 @@ c      Allocate(Sig2kk(Case1(i),Max_k))
 		 sig2kk(j,k) = 0.0
 	      enddo
 	   enddo
-      ! Calculate beta and sigma 
+C       Calculate beta and sigma
 
 c      Allocate(Mother(Case1(i)))
 	   do j=1,case1(i)
@@ -1019,7 +1019,7 @@ c      Allocate(Mother(Case1(i)))
 	      End do
 	      Case2_count3 = Case2_count3 + 1
 	   End do
-      ! Allocate H A B C and D arrays and initialize to sero
+C       Allocate H A B C and D arrays and initialize to sero
 c      Allocate(HAB(Case1(i),t1))
 c      Allocate(HAC(Case1(i),t2))
 c      Allocate(HAD(Case1(i),t3))
@@ -1286,33 +1286,33 @@ c     1		      (1-q2)**(UpH2 - lowh2) * A_tmp
 		    End do
 		 End do
 	      End do
-
-	      do jj=1,case1(i)
-		 do kk=1,t1
-		    do kkk=1,t1
-		       HABB(j,k,kk) = 0.0
-		    enddo
-		    do kkk=1,t2
-		       HABS1(j,k,kk) = 0.0
-		    enddo
-		    do kkk=1,t3
-		       HABS2(j,k,kk) = 0.0
-		    enddo
-		 enddo
-		 do kk=1,t2
-		    do kkk=1,t2
-		       HAS1S1(j,k,kk) = 0.0
-		    enddo
-		    do kkk=1,t3
-		       HAS1S2(j,k,kk) = 0.0
-		    enddo
-		 enddo
-		 do kk=1,t3
-		    do kkk=1,t3
-		       HAS2S2(j,k,kk) = 0.0
-		    enddo
-		 enddo
-	      enddo
+C Bruce changes first index from `j` to `jj` given J loop ends line 1257
+C	      do jj=1,case1(i)
+C		 do kk=1,t1
+C		    do kkk=1,t1
+C		       HABB(jj,k,kk) = 0.0
+C		    enddo
+C		    do kkk=1,t2
+C		       HABS1(jj,k,kk) = 0.0
+C		    enddo
+C		    do kkk=1,t3
+C		       HABS2(jj,k,kk) = 0.0
+C		    enddo
+C		 enddo
+C		 do kk=1,t2
+C		    do kkk=1,t2
+C		       HAS1S1(jj,k,kk) = 0.0
+C		    enddo
+C		    do kkk=1,t3
+C		       HAS1S2(jj,k,kk) = 0.0
+C		    enddo
+C		 enddo
+C		 do kk=1,t3
+C		    do kkk=1,t3
+C		       HAS2S2(jj,k,kk) = 0.0
+C		    enddo
+C		 enddo
+C	      enddo
 
 	      Do jj = 1, Case1(i) 
 		 Do jjj = 1, Case1(i)
@@ -1589,7 +1589,7 @@ c     1  		 lowh1*(1-q1)**(UpH1-lowh1)*GGS2S2(kk,kkk))
 
 c      Deallocate(Mother)
 
-      ! Release Unused space 
+C       Release Unused space
 c      Deallocate(HA)
 c      Deallocate(HAB)
 c      Deallocate(HAC)
@@ -1622,7 +1622,7 @@ c      Deallocate(G2S2S2)
 
 	   Li = Sum(H1,uph1)		! Li = Suma(h1-H1)*[Prod(J)*{Suma(h2-H2)*(Prod(K)}]
 
-      ! Calculate First Derivative
+C       Calculate First Derivative
 	   Do kk = 1, t1
 	      D2_beta(kk) = (D1_beta(kk) / Li)
 	   End do
@@ -1689,7 +1689,7 @@ c      Deallocate(G2S2S2)
 	      End do
 	   End do
 
-      ! Reset beta and sigma
+C       Reset beta and sigma
 	   do kk=1,t1
 	      D1_beta(kk) = 0.0
 	      D2_beta(kk) = 0.0
@@ -1732,9 +1732,9 @@ c      Deallocate(G2S2S2)
 	Return			! Return Sli and Gradient to Conminbn
 	End !Subroutine Calcbn2	! End Subroutine Calcbn
 
-!*************************************************************************
+C*************************************************************************
 		      ! Begin Subroutine CONMINBN	
-!=========================================================================
+C=========================================================================
 
 	Subroutine Conminbn(total1,total2,total3,Father,mother,kid,
      1    Case1,Case2,A,X,G,F,iter,ifun,nflag,
@@ -1784,7 +1784,7 @@ c for calcbn subroutine
 	Double Precision G(max_t1+max_t2+max_t3)    
 	Double Precision A(Kid,Totcol)
  	  
-    ! Double Precision Variables	   
+C     Double Precision Variables
 	DOUBLE PRECISION F,FP,FMIN,ALPHA,AT,AP,GSQ,DG,DG1
 	DOUBLE PRECISION DP,STEP,ACC,DAL,U1,U2,U3,U4,EPS
 	DOUBLE PRECISION XSQ,RTST,DSQRT,DMIN1,DMAX1,DABS
@@ -1798,7 +1798,7 @@ c	DOUBLE PRECISION, DIMENSION (mdim) :: w
 	Double Precision  Uu1(Father,Max_M1,Max_K1,Total2) 
 	Double Precision  Uu2(Father,Max_M1,Max_K1,Total3) 
 
-    ! End Declaration Section
+C     End Declaration Section
 
         idev=6
 	count = 0.0
@@ -1829,22 +1829,22 @@ c	DOUBLE PRECISION, DIMENSION (mdim) :: w
  
 	n=total1+total2+total3
 
-    ! Initialize ITER,IFUN,NFLAG, and IOUTK, which counts output iterations 
+C     Initialize ITER,IFUN,NFLAG, and IOUTK, which counts output iterations
 	ITER=0
 	IFUN=0
 	IOUTK=0
 	NFLAG=0
-    ! SET PARAMETERS TO EXTRACT VECTORS FROM W.
-    ! W(I) HOLDS THE SEARCH VECTOR,W(NX+I) HOLDS THE BEST CURRENT
-    ! ESTIMATE TO THE MINIMIZER,AND W(NG+I) HOLDS THE GRADIENT
-    ! AT THE BEST CURRENT ESTIMATE.
+C     SET PARAMETERS TO EXTRACT VECTORS FROM W.
+C     W(I) HOLDS THE SEARCH VECTOR,W(NX+I) HOLDS THE BEST CURRENT
+C     ESTIMATE TO THE MINIMIZER,AND W(NG+I) HOLDS THE GRADIENT
+C     AT THE BEST CURRENT ESTIMATE.
 
 	NX=N
 	NG=NX+N
 
-    ! TEST WHICH METHOD IS BEING USED.
-    ! IF NMETH=0, W(NRY+I) HOLDS THE RESTART Y VECTOR AND
-    ! W(NRD+I) HOLDS THE RESTART SEARCH VECTOR.
+C     TEST WHICH METHOD IS BEING USED.
+C     IF NMETH=0, W(NRY+I) HOLDS THE RESTART Y VECTOR AND
+C     W(NRD+I) HOLDS THE RESTART SEARCH VECTOR.
 
 	IF (NMETH.EQ.1) THEN 
 	   NCONS = 3 * N 	!If NMETH=1, W(NONS+I) holds the appr. inverse HESSIAN
@@ -1856,11 +1856,11 @@ c	DOUBLE PRECISION, DIMENSION (mdim) :: w
 	   NCONS2=NCONS+2
 	END IF
  
-    ! CALCULATE THE FUNCTION AND GRADIENT AT THE INITIAL
-    ! POINT AND INITIALIZE NRST,WHICH IS USED TO DETERMINE
-    ! WHETHER A BEALE RESTART IS BEING DONE. NRST=N MEANS THAT THIS
-    ! ITERATION IS A RESTART ITERATION. INITIALIZE RSW,WHICH INDICATES
-    ! THAT THE CURRENT SEARCH DIRECTION IS A GRADIENT DIRECTION.
+C     CALCULATE THE FUNCTION AND GRADIENT AT THE INITIAL
+C     POINT AND INITIALIZE NRST,WHICH IS USED TO DETERMINE
+C     WHETHER A BEALE RESTART IS BEING DONE. NRST=N MEANS THAT THIS
+C     ITERATION IS A RESTART ITERATION. INITIALIZE RSW,WHICH INDICATES
+C     THAT THE CURRENT SEARCH DIRECTION IS A GRADIENT DIRECTION.
 
  20	Call  Calcbn(Total1,Total2,Total3,father,mother,kid,
      1    Case1,Case2,X,G,F,R,Sn,Z,Uu1,Uu2,Max_K1,
@@ -1871,9 +1871,9 @@ c	DOUBLE PRECISION, DIMENSION (mdim) :: w
 	NRST = N
 	RSW = .TRUE.
 
-    ! CALCULATE THE INITIAL SEARCH DIRECTION , THE NORM OF X SQUARED,
-    ! AND THE NORM OF G SQUARED. DG1 IS THE CURRENT DIRECTIONAL
-    ! DERIVATIVE,WHILE XSQ AND GSQ ARE THE SQUARED NORMS.
+C     CALCULATE THE INITIAL SEARCH DIRECTION , THE NORM OF X SQUARED,
+C     AND THE NORM OF G SQUARED. DG1 IS THE CURRENT DIRECTIONAL
+C     DERIVATIVE,WHILE XSQ AND GSQ ARE THE SQUARED NORMS.
 
 	DG1 = 0.
 	XSQ = 0.
@@ -1884,20 +1884,20 @@ c	DOUBLE PRECISION, DIMENSION (mdim) :: w
 	END DO
 	GSQ = -DG1
 
-    ! TEST IF THE INITIAL POINT IS THE MINIMIZER.
-	IF (GSQ <= EPS*EPS*DMAX1(1.0D0,XSQ)) THEN
+C     TEST IF THE INITIAL POINT IS THE MINIMIZER.
+	IF (GSQ .le. EPS*EPS*DMAX1(1.0D0,XSQ)) THEN
 	   RETURN
 	END IF
 
-    ! BEGIN THE MAJOR ITERATION LOOP. NCALLS IS USED TO GUARANTEE THAT
-    ! AT LEAST TWO POINTS HAVE BEEN TRIED WHEN NMETH=0. FMIN IS THE
-    ! CURRENT FUNCTION VALUE.
+C     BEGIN THE MAJOR ITERATION LOOP. NCALLS IS USED TO GUARANTEE THAT
+C     AT LEAST TWO POINTS HAVE BEEN TRIED WHEN NMETH=0. FMIN IS THE
+C     CURRENT FUNCTION VALUE.
 
  40	FMIN=F
 	NCALLS=IFUN
 
-    ! IF OUTPUT IS DESIRED,TEST IF THIS IS THE CORRECT ITERATION
-    ! AND IF SO, WRITE OUTPUT.
+C     IF OUTPUT IS DESIRED,TEST IF THIS IS THE CORRECT ITERATION
+C     AND IF SO, WRITE OUTPUT.
 
 	IF (IOUT .eq. 0) THEN
 	   ALPHA = ALPHA * DG / DG1 ! Set ALPHA to nonrestart conjugate gadient
@@ -1908,40 +1908,40 @@ c	DOUBLE PRECISION, DIMENSION (mdim) :: w
 	   END IF
 	   ALPHA = ALPHA * DG / DG1
 	ELSE
-	   WRITE(IDEV,50)ITER,IFUN,FMIN,GSQ
+C	   WRITE(IDEV,50)ITER,IFUN,FMIN,GSQ
  50	   FORMAT(10H ITERATION,I5,20H      FUNCTION CALLS,I6/5H F = ,
-     1	D15.8,13H G-SQUARED = ,D15.8/)  
-	   WRITE(IDEV,60)(X(I),I=1,N)
+     1 D15.8,13H G-SQUARED = ,D15.8/)  
+C	   WRITE(IDEV,60)(X(I),I=1,N)
  60	   FORMAT(/8HINTER X./1H ,20D16.8)
 	END IF
 
-    ! IF NMETH=1 OR A RESTART HAS BEEN PERFORMED, SET ALPHA=1.0.
+C     IF NMETH=1 OR A RESTART HAS BEEN PERFORMED, SET ALPHA=1.0.
 	IF (NRST .eq. 1.OR.NMETH .eq. 1) THEN
 	   ALPHA=1.0
 	END IF
 
-    ! IF A GRADIENT DIRECTION IS USED, SET ALPHA=1.0/DSQRT(GSQ),
-    ! WHICH SCALES THE INITIAL SEARCH VECTOR TO UNITY.
+C     IF A GRADIENT DIRECTION IS USED, SET ALPHA=1.0/DSQRT(GSQ),
+C     WHICH SCALES THE INITIAL SEARCH VECTOR TO UNITY.
 	IF (RSW) THEN
 	   ALPHA=1.0/DSQRT(GSQ)
 	END IF
 
-    ! THE LINEAR SEARCH FITS A CUBIC TO F AND DAL, THE FUNCTION AND ITS
-    ! DERIVATIVE AT ALPHA, AND TO FP AND DP,THE FUNCTION
-    ! AND DERIVATIVE AT THE PREVIOUS TRIAL POINT AP.
-    ! INITIALIZE AP ,FP,AND DP.
+C     THE LINEAR SEARCH FITS A CUBIC TO F AND DAL, THE FUNCTION AND ITS
+C     DERIVATIVE AT ALPHA, AND TO FP AND DP,THE FUNCTION
+C     AND DERIVATIVE AT THE PREVIOUS TRIAL POINT AP.
+C     INITIALIZE AP ,FP,AND DP.
 
 	AP=0.
 	FP=FMIN
 	DP=DG1
 
-    ! SAVE THE CURRENT DERIVATIVE TO SCALE THE NEXT SEARCH VECTOR.
+C     SAVE THE CURRENT DERIVATIVE TO SCALE THE NEXT SEARCH VECTOR.
 	DG=DG1
 
-    ! UPDATE THE ITERATION.
+C     UPDATE THE ITERATION.
 	ITER=ITER+1
 
-    ! CALCULATE THE CURRENT STEPLENGTH  AND STORE THE CURRENT X AND G.
+C     CALCULATE THE CURRENT STEPLENGTH  AND STORE THE CURRENT X AND G.
 	STEP=0.
 	DO I=1,N
 	   STEP=STEP+W(I)*W(I)
@@ -1952,11 +1952,11 @@ c	DOUBLE PRECISION, DIMENSION (mdim) :: w
 	END DO
 	STEP=DSQRT(STEP)
 
-    ! BEGIN THE LINEAR SEARCH ITERATION.
-    ! TEST FOR FAILURE OF THE LINEAR SEARCH.
+C     BEGIN THE LINEAR SEARCH ITERATION.
+C     TEST FOR FAILURE OF THE LINEAR SEARCH.
 
- 80	IF (ALPHA*STEP <= ACC) THEN
-    ! TEST IF DIRECTION IS A GRADIENT DIRECTION.
+ 80	IF (ALPHA*STEP .le. ACC) THEN
+C     TEST IF DIRECTION IS A GRADIENT DIRECTION.
 	   IF (.NOT.RSW) THEN
 	      GO TO 20		! Call subroutine CALCBN           
 	   ELSE
@@ -1965,101 +1965,101 @@ c	DOUBLE PRECISION, DIMENSION (mdim) :: w
 	   END IF
 	END IF
 
-    ! CALCULATE THE TRIAL POINT.
+C     CALCULATE THE TRIAL POINT.
 	DO I = 1,N
 	   NXPI = NX + I
 	   X(I) = W(NXPI) + ALPHA * W(I)
 	END DO
 
-    ! EVALUATE THE FUNCTION AT THE TRIAL POINT.
-    ! Call CALCBN
+C     EVALUATE THE FUNCTION AT THE TRIAL POINT.
+C     Call CALCBN
 	Call  Calcbn(Total1,Total2,Total3,father,mother,kid,
      1    Case1,Case2,X,G,F,R,Sn,Z,Uu1,Uu2,Max_K1,
      2    Max_M1,Uph1_in,Uph2_in,q1_in,q2_in,mother1,hab,had,
      3    hac,ha,v1,v2,h1choo,h2choo,hn,h1,h2,betakk,sig1kk,sig2kk)
  
-    ! TEST IF THE MAXIMUM NUMBER OF FUNCTION CALLS HAVE BEEN USED.
+C     TEST IF THE MAXIMUM NUMBER OF FUNCTION CALLS HAVE BEEN USED.
 	IFUN=IFUN+1
 	IF(IFUN.gt.MXFUN) THEN 
 	   NFLAG=1
 	   RETURN
 	END IF
 
-    ! COMPUTE THE DERIVATIVE OF F AT ALPHA.
+C     COMPUTE THE DERIVATIVE OF F AT ALPHA.
 	DAL=0.0
 	DO I=1,N
 	   DAL=DAL+G(I)*W(I)
 	END DO
 
-    ! TEST WHETHER THE NEW POINT HAS A NEGATIVE SLOPE BUT A HIGHER
-    ! FUNCTION VALUE THAN ALPHA=0. IF THIS IS THE CASE,THE SEARCH
-    ! HAS PASSED THROUGH A LOCAL MAX AND IS HEADING FOR A DISTANT LOCAL
-    ! MINIMUM.
+C     TEST WHETHER THE NEW POINT HAS A NEGATIVE SLOPE BUT A HIGHER
+C     FUNCTION VALUE THAN ALPHA=0. IF THIS IS THE CASE,THE SEARCH
+C     HAS PASSED THROUGH A LOCAL MAX AND IS HEADING FOR A DISTANT LOCAL
+C     MINIMUM.
 	IF (F.gt.FMIN .AND. DAL.lt.0.) GO TO 160
 
-    ! IF NOT, TEST WHETHER THE STEPLENGTH CRITERIA HAVE BEEN MET.
+C     IF NOT, TEST WHETHER THE STEPLENGTH CRITERIA HAVE BEEN MET.
 	IF(F.gt.(FMIN+.0001*ALPHA*DG) .OR. DABS(DAL/DG)
      1   .gt.(.92)) GO TO 130
 
-    ! IF THEY HAVE BEEN MET, TEST IF TWO POINTS HAVE BEEN TRIED
-    ! IF NMETH=0 AND IF THE TRUE LINE MINIMUM HAS NOT BEEN FOUND.
-	IF ((IFUN-NCALLS) <= 1 .AND. DABS(DAL/DG).gt.EPS .AND.
+C     IF THEY HAVE BEEN MET, TEST IF TWO POINTS HAVE BEEN TRIED
+C     IF NMETH=0 AND IF THE TRUE LINE MINIMUM HAS NOT BEEN FOUND.
+	IF ((IFUN-NCALLS) .le. 1 .AND. DABS(DAL/DG).gt.EPS .AND.
      1    NMETH .eq. 0) THEN 
 	   GO TO 130
 	ELSE
 	   GO TO 170
 	END IF
-    ! A NEW POINT MUST BE TRIED. USE CUBIC INTERPOLATION TO FIND
-    ! THE TRIAL POINT AT.
+C     A NEW POINT MUST BE TRIED. USE CUBIC INTERPOLATION TO FIND
+C     THE TRIAL POINT AT.
  130	U1=DP+DAL-3.0*(FP-F)/(AP-ALPHA)
 	U2=U1*U1-DP*DAL
 	IF(U2.LT.0.)U2=0.
 	U2=DSQRT(U2)
 	AT=ALPHA-(ALPHA-AP)*(DAL+U2-U1)/(DAL-DP+2.*U2)
 
-    ! TEST WHETHER THE LINE MINIMUM HAS BEEN BRACKETED.
+C     TEST WHETHER THE LINE MINIMUM HAS BEEN BRACKETED.
 	IF((DAL/DP).GT.0.)GO TO 140
 
-    ! THE MINIMUM HAS BEEN BRACKETED. TEST WHETHER THE TRIAL POINT LIES
-    ! SUFFICIENTLY WITHIN THE BRACKETED INTERVAL.
-    ! IF IT DOES NOT, CHOOSE AT AS THE MIDPOINT OF THE INTERVAL.
+C     THE MINIMUM HAS BEEN BRACKETED. TEST WHETHER THE TRIAL POINT LIES
+C     SUFFICIENTLY WITHIN THE BRACKETED INTERVAL.
+C     IF IT DOES NOT, CHOOSE AT AS THE MIDPOINT OF THE INTERVAL.
 
 	IF(AT.LT.(1.01*DMIN1(ALPHA,AP)).OR.AT.GT.(.99*DMAX1
      1    (ALPHA,AP)))AT=(ALPHA+AP)/2.0
 	GO TO 150
 
-    ! THE MINIMUM HAS NOT BEEN BRACKETED. TEST IF BOTH POINTS ARE
-    ! GREATER THAN THE MINIMUM AND THE TRIAL POINT IS SUFFICIENTLY
-    ! SMALLER THAN EITHER.
+C     THE MINIMUM HAS NOT BEEN BRACKETED. TEST IF BOTH POINTS ARE
+C     GREATER THAN THE MINIMUM AND THE TRIAL POINT IS SUFFICIENTLY
+C     SMALLER THAN EITHER.
 
  140	IF (DAL .GT.0.0.AND.0.0.LT.AT.AND.AT.LT.
      1  (.99*DMIN1(AP,ALPHA))) GO TO 150
 
-    ! TEST IF BOTH POINTS ARE LESS THAN THE MINIMUM AND THE TRIAL POINT
-    ! IS SUFFICIENTLY LARGE.
+C     TEST IF BOTH POINTS ARE LESS THAN THE MINIMUM AND THE TRIAL POINT
+C     IS SUFFICIENTLY LARGE.
 	IF(DAL.LE.0.0.AND.AT.GT.(1.01*DMAX1(AP,ALPHA)))GO TO 150
 
-    ! IF THE TRIAL POINT IS TOO SMALL,DOUBLE THE LARGEST PRIOR POINT.
+C     IF THE TRIAL POINT IS TOO SMALL,DOUBLE THE LARGEST PRIOR POINT.
 	IF(DAL.LE.0.)AT=2.0*DMAX1(AP,ALPHA)
 
-    ! IF THE TRIAL POINT IS TOO LARGE, HALVE THE SMALLEST PRIOR POINT.
+C     IF THE TRIAL POINT IS TOO LARGE, HALVE THE SMALLEST PRIOR POINT.
 	IF(DAL.GT.0.)AT=DMIN1(AP,ALPHA)/2.0
 
-    ! SET AP=ALPHA, ALPHA=AT,AND CONTINUE SEARCH.
+C     SET AP=ALPHA, ALPHA=AT,AND CONTINUE SEARCH.
  150	AP=ALPHA
 	FP=F
 	DP=DAL
 	ALPHA=AT
 	GO TO 80
 
-    ! A RELATIVE MAX HAS BEEN PASSED.REDUCE ALPHA AND RESTART THE SEARCH.
+C     A RELATIVE MAX HAS BEEN PASSED.REDUCE ALPHA AND RESTART THE SEARCH.
  160	ALPHA=ALPHA/3.
 	AP=0.
 	FP=FMIN
 	DP=DG
 	GO TO 80
 
-    ! THE LINE SEARCH HAS CONVERGED. TEST FOR CONVERGENCE OF THE ALGORITHM.
+C     THE LINE SEARCH HAS CONVERGED. TEST FOR CONVERGENCE OF THE ALGORITHM.
  170	GSQ=0.0
 	XSQ=0.0
 	DO I=1,N
@@ -2068,20 +2068,20 @@ c	DOUBLE PRECISION, DIMENSION (mdim) :: w
 	END DO
 
 c        write(*,*)'test',eps,xsq,gsq,EPS*EPS*DMAX1(1.0D0,XSQ)
-	IF (GSQ <= EPS*EPS*DMAX1(1.0D0,XSQ)) THEN
+	IF (GSQ .le. EPS*EPS*DMAX1(1.0D0,XSQ)) THEN
 	   RETURN
 	END IF
 
-    ! SEARCH CONTINUES. SET W(I)=ALPHA*W(I),THE FULL STEP VECTOR.
+C     SEARCH CONTINUES. SET W(I)=ALPHA*W(I),THE FULL STEP VECTOR.
 	DO I=1,N
 	   W(I)=ALPHA*W(I)
 	END DO
 
-    ! COMPUTE THE NEW SEARCH VECTOR. FIRST TEST WHETHER A
-    ! CONJUGATE GRADIENT OR A VARIABLE METRIC VECTOR IS USED.
+C     COMPUTE THE NEW SEARCH VECTOR. FIRST TEST WHETHER A
+C     CONJUGATE GRADIENT OR A VARIABLE METRIC VECTOR IS USED.
 	IF (NMETH .ne. 1) THEN	! Begin if nmeth /= 1
-       ! CONJUGATE GRADIENT UPDATE SECTION.
-       ! TEST IF A POWELL RESTART IS INDICATED.
+C        CONJUGATE GRADIENT UPDATE SECTION.
+C        TEST IF A POWELL RESTART IS INDICATED.
 	   RTST=0.
 	   DO I=1,N
 	      NGPI=NG+I
@@ -2090,9 +2090,9 @@ c        write(*,*)'test',eps,xsq,gsq,EPS*EPS*DMAX1(1.0D0,XSQ)
 	   IF (DABS(RTST/GSQ).gt.0.2) THEN
 	      NRST=N
 	   END IF
-       ! IF A RESTART IS INDICATED, SAVE THE CURRENT D AND Y
-       ! AS THE BEALE RESTART VECTORS AND SAVE D'Y AND Y'Y
-       ! IN W(NCONS+1) AND W(NCONS+2).
+C        IF A RESTART IS INDICATED, SAVE THE CURRENT D AND Y
+C        AS THE BEALE RESTART VECTORS AND SAVE D'Y AND Y'Y
+C        IN W(NCONS+1) AND W(NCONS+2).
 	   IF (NRST .eq. N) THEN 
 	      W(NCONS1)=0.
 	      W(NCONS2)=0.
@@ -2106,7 +2106,7 @@ c        write(*,*)'test',eps,xsq,gsq,EPS*EPS*DMAX1(1.0D0,XSQ)
 		 W(NCONS2)=W(NCONS2)+W(I)*W(NRYPI)
 	      END DO
 	   END IF
-       ! CALCULATE  THE RESTART HESSIAN TIMES THE CURRENT GRADIENT.
+C        CALCULATE  THE RESTART HESSIAN TIMES THE CURRENT GRADIENT.
 	   U1=0.0
 	   U2=0.0
 	   DO I=1,N
@@ -2123,8 +2123,8 @@ c        write(*,*)'test',eps,xsq,gsq,EPS*EPS*DMAX1(1.0D0,XSQ)
 	      NRYPI=NRY+I
 	      W(NXPI)=-U3*G(I)-U1*W(NRYPI)-U2*W(NRDPI)
 	   END DO
-       ! IF THIS IS A RESTART ITERATION,W(NX+I) CONTAINS THE NEW SEARCH
-       ! VECTOR.
+C        IF THIS IS A RESTART ITERATION,W(NX+I) CONTAINS THE NEW SEARCH
+C        VECTOR.
 	   IF (NRST .ne. N) THEN	! begin if nrst /= n
 	  ! NOT A RESTART ITERATION. CALCULATE THE RESTART HESSIAN
 	  ! TIMES THE CURRENT Y.
@@ -2166,7 +2166,7 @@ c        write(*,*)'test',eps,xsq,gsq,EPS*EPS*DMAX1(1.0D0,XSQ)
 		 NXPI=NX+I
 		 W(NXPI)=W(NXPI)-U1*W(NGPI)-U2*W(I)
 	      END DO
-          ! CALCULATE THE DERIVATIVE ALONG THE NEW SEARCH VECTOR.
+C           CALCULATE THE DERIVATIVE ALONG THE NEW SEARCH VECTOR.
 	   END IF		! End if nrst /= n
 
 	   DG1=0.
@@ -2175,18 +2175,18 @@ c        write(*,*)'test',eps,xsq,gsq,EPS*EPS*DMAX1(1.0D0,XSQ)
 	      W(I)=W(NXPI)
 	      DG1=DG1+W(I)*G(I)
 	   END DO
-       ! IF THE NEW DIRECTION IS NOT A DESCENT DIRECTION,STOP.
+C        IF THE NEW DIRECTION IS NOT A DESCENT DIRECTION,STOP.
 	   IF (DG1.gt.0.) THEN	!    GO TO 320
 	      NFLAG = 3
 	      RETURN
 	   END IF 
 
-       ! UPDATE NRST TO ASSURE AT LEAST ONE RESTART EVERY N ITERATIONS.
+C        UPDATE NRST TO ASSURE AT LEAST ONE RESTART EVERY N ITERATIONS.
 	   IF (NRST .eq. N) NRST=0
 	   NRST=NRST+1
 	   RSW=.FALSE.
 	   GO TO 40
-       ! A VARIABLE METRIC ALGORITM IS BEING USED. CALCULATE Y AND D'Y.
+C        A VARIABLE METRIC ALGORITM IS BEING USED. CALCULATE Y AND D'Y.
 	END IF			! End if nmeth /= 1
       
 	U1=0.0
@@ -2196,16 +2196,16 @@ c        write(*,*)'test',eps,xsq,gsq,EPS*EPS*DMAX1(1.0D0,XSQ)
 	   U1=U1+W(I)*W(NGPI)
 	END DO
 
-    ! IF RSW=.TRUE.,SET UP THE INITIAL SCALED APPROXIMATE HESSIAN.
+C     IF RSW=.TRUE.,SET UP THE INITIAL SCALED APPROXIMATE HESSIAN.
 	IF (RSW) THEN
-       ! CALCULATE Y'Y.
+C        CALCULATE Y'Y.
 	   U2=0.
 	   DO I=1,N
 	      NGPI=NG+I
 	      U2=U2+W(NGPI)*W(NGPI)
 	   END DO
-       ! CALCULATE THE INITIAL HESSIAN AS H=(P'Y/Y'Y)*I
-       ! AND THE INITIAL U2=Y'HY AND W(NX+I)=HY.
+C        CALCULATE THE INITIAL HESSIAN AS H=(P'Y/Y'Y)*I
+C        AND THE INITIAL U2=Y'HY AND W(NX+I)=HY.
 	   IJ=1
 	   U3=U1/U2
 	   DO I=1,N
@@ -2221,7 +2221,7 @@ c        write(*,*)'test',eps,xsq,gsq,EPS*EPS*DMAX1(1.0D0,XSQ)
 	   END DO
 	   U2=U3*U2
 	ELSE
-       ! CALCULATE W(NX+I)=HY AND U2=Y'HY.
+C        CALCULATE W(NX+I)=HY AND U2=Y'HY.
 	   U2=0.0
 	   DO I=1,N
 	      U3=0.0
@@ -2248,7 +2248,7 @@ c        write(*,*)'test',eps,xsq,gsq,EPS*EPS*DMAX1(1.0D0,XSQ)
 	   END DO
 	END IF
 
-    ! CALCULATE THE UPDATED APPROXIMATE HESSIAN.
+C     CALCULATE THE UPDATED APPROXIMATE HESSIAN.
 	U4=1.0+U2/U1
 	DO I=1,N
 	   NXPI=NX+I
@@ -2268,7 +2268,7 @@ c        write(*,*)'test',eps,xsq,gsq,EPS*EPS*DMAX1(1.0D0,XSQ)
 	   END DO
 	END DO
 
-    ! CALCULATE THE NEW SEARCH DIRECTION W(I)=-HG AND ITS DERIVATIVE.
+C     CALCULATE THE NEW SEARCH DIRECTION W(I)=-HG AND ITS DERIVATIVE.
 	DG1=0.0
 	DO I=1,N
 	   U3=0.0
@@ -2290,7 +2290,7 @@ c        write(*,*)'test',eps,xsq,gsq,EPS*EPS*DMAX1(1.0D0,XSQ)
 	   W(I)=U3
 	END DO
 
-    ! TEST FOR A DOWNHILL DIRECTION.
+C     TEST FOR A DOWNHILL DIRECTION.
 	IF (DG1.gt.0.) THEN      
 	   NFLAG = 3
 	   RETURN
@@ -2301,6 +2301,6 @@ c        write(*,*)'test',eps,xsq,gsq,EPS*EPS*DMAX1(1.0D0,XSQ)
 
 	End !Subroutine CONMINBN	! End subroutine CONMINBN
 
-! ========================================================================
+C ========================================================================
 
-!!! The End
+C!! The End

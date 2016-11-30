@@ -1,3 +1,96 @@
+#
+#  repeated : A Library of Repeated Measurements Models
+#  Copyright (C) 1998, 1999, 2000, 2001 J.K. Lindsey
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public Licence as published by
+#  the Free Software Foundation; either version 2 of the Licence, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public Licence for more details.
+#
+#  You should have received a copy of the GNU General Public Licence
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+#  SYNOPSIS
+#
+#     capture(z,n)
+#
+#  DESCRIPTION
+#
+#    Functions to fit capture-recapture models.
+
+### function to calculate capture-recapture parameters from a Poisson glm
+###
+
+
+##' Capture-recapture Models
+##' 
+##' \code{capture} fits the Cormack capture-recapture model to \code{n} sample
+##' periods. Set \code{n} to the appropriate value and type \code{eval(setup)}.
+##' 
+##' \code{n <- periods} # number of periods
+##' 
+##' \code{eval(setup)}
+##' 
+##' This produces the following variables -
+##' 
+##' \code{p[i]}: logit capture probabilities,
+##' 
+##' \code{pbd}: constant capture probability,
+##' 
+##' \code{d[i]}: death parameters,
+##' 
+##' \code{b[i]}: birth parameters,
+##' 
+##' \code{pw}: prior weights.
+##' 
+##' Then set up a Poisson model for log linear models:
+##' 
+##' \code{z <- glm(y~model, family=poisson, weights=pw)}
+##' 
+##' and call the function, \code{capture}.
+##' 
+##' If there is constant effort, then all estimates are correct. Otherwise,
+##' \code{n[1]}, \code{p[1]}, \code{b[1]}, are correct only if there is no
+##' birth in period 1.  \code{n[s]}, \code{p[s]}, are correct only if there is
+##' no death in the last period.  \code{phi[s-1]} is correct only if effort is
+##' constant in \code{(s-1, s)}.  \code{b[s-1]} is correct only if \code{n[s]}
+##' and \code{phi[s-1]} both are.
+##' 
+##' 
+##' @param z A Poisson generalized linear model object.
+##' @param n The number of repeated observations.
+##' @aliases setup
+##' @return \code{capture} returns a matrix containing the estimates.
+##' @author J.K. Lindsey
+##' @keywords models
+##' @examples
+##' 
+##' y <- c(0,1,0,0,0,1,0,1,0,0,0,1,0,0,0,14,1,1,0,2,1,2,1,16,0,2,0,11,
+##' 	2,13,10,0)
+##' n <- 5
+##' eval(setup)
+##' # closed population
+##' print(z0 <- glm(y~p1+p2+p3+p4+p5, family=poisson, weights=pw))
+##' # deaths and emigration only
+##' print(z1 <- update(z0, .~.+d1+d2+d3))
+##' # immigration only
+##' print(z2 <- update(z1, .~.-d1-d2-d3+b2+b3+b4))
+##' # deaths, emigration, and immigration
+##' print(z3 <- update(z2, .~.+d1+d2+d3))
+##' # add trap dependence
+##' print(z4 <- update(z3, .~.+i2+i3))
+##' # constant capture probability over the three middle periods
+##' print(z5 <- glm(y~p1+pbd+p5+d1+d2+d3+b2+b3+b4, family=poisson, weights=pw))
+##' # print out estimates
+##' capture(z5, n)
+##' 
+##' @export capture
 capture <- function(z,n){
 	aft <- bef <- rep(1,2^n-1)
 	aa <- bb <- m <- rep(1,n)
@@ -26,6 +119,9 @@ capture <- function(z,n){
 	colnames(zz) <- c("i","N(i)","Phi(i-1)","P(i)","B(i-1)")
 	zz}
 
+### produce the required variables for the number of periods, n, specified
+### 
+##' @export setup
 setup <- expression({
 	p1 <- as.numeric(gl(2,1,2^n))-1
 	pbd <- p2 <- as.numeric(gl(2,2,2^n))-1

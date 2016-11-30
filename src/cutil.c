@@ -1,6 +1,6 @@
 /*
- *  repeated : A Library of Repeated Measurements Models
- *  Copyright (C) 1998 J.K. Lindsey
+ *  rmutil : A Library of Special Functions for Repeated Measurements
+ *  Copyright (C) 1998, 1999, 2000, 2001 J.K. Lindsey
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -18,9 +18,9 @@
  *
  *  SYNOPSIS
  *
- *    void F77_SYMBOL(flgamma)(double *x,double *y)
- *    void F77_SYMBOL(flbeta)(double *a,double*b,double *y)
- *    void F77_SYMBOL(fbesselk)(double *x,double *alpha,double *y)
+ *    void F77_CALL(flgamma)(double *x,double *y)
+ *    void F77_CALL(flbeta)(double *a,double*b,double *y)
+ *    void F77_CALL(fbesselk)(double *x,double *alpha,double *y)
  *
  *  DESCRIPTION
  *
@@ -30,16 +30,18 @@
  */
 
 #include <math.h>
-#include "Fortran.h"
+#include "R.h"
+#include "Rmath.h"
+#include "R_ext/RS.h"
 
-extern double lgamma(double x);
-void F77_SYMBOL(flgamma)(double *x,double *y){
-  *y=lgamma(*x);}
+extern double lgammafn(double x);
+void F77_CALL(flgamma)(double *x,double *y){
+  *y=lgammafn(*x);}
 
 extern double lbeta(double a, double b);
-void F77_SYMBOL(flbeta)(double *a,double *b,double *y){
+void F77_CALL(flbeta)(double *a,double *b,double *y){
   *y=lbeta(*a, *b);}
 
 extern double bessel_k(double x, double alpha, double expo);
-void F77_SYMBOL(fbesselk)(double *x,double *alpha, double *y){
+void F77_CALL(fbesselk)(double *x,double *alpha, double *y){
   *y=bessel_k(*x, *alpha, 1.0);}

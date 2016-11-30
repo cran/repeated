@@ -1,25 +1,25 @@
 #
 #  repeated : A Library of Repeated Measurements Models
-#  Copyright (C) 1998 J.K. Lindsey
+#  Copyright (C) 1998, 1999, 2000, 2001 J.K. Lindsey
 #
 #  This program is free software; you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation; either version 2 of the License, or
+#  it under the terms of the GNU General Public Licence as published by
+#  the Free Software Foundation; either version 2 of the Licence, or
 #  (at your option) any later version.
 #
 #  This program is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
+#  GNU General Public Licence for more details.
 #
-#  You should have received a copy of the GNU General Public License
+#  You should have received a copy of the GNU General Public Licence
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 #  SYNOPSIS
 #
 #     biv.binom(freq, marg1=~1, marg2=~1, interaction=~1, pmarg1=1,
-#	pmarg2=1,pinteraction=1, print.level=0, typsiz=abs(p),
+#	pmarg2=1,pinteraction=1, print.level=0, typsize=abs(p),
 #	ndigit=10, gradtol=0.00001, stepmax=10*sqrt(p%*%p),
 #	steptol=0.00001, iterlim=100, fscale=1)
 #
@@ -27,10 +27,50 @@
 #
 #    A function to fit a marginal bivariate binomial regression
 
+
+
+##' Marginal Bivariate Binomial Regression Models
+##' 
+##' \code{biv.binom} fits (logit) linear regression models to a marginal
+##' bivariate binomial distribution. The covariates must be of length K, that
+##' is the number of 2x2 tables.
+##' 
+##' 
+##' @param freq A four-column matrix containing K 2x2 frequency tables.
+##' @param marg1 The model formula for the first margin.
+##' @param marg2 The model formula for the second margin.
+##' @param interaction The model formula for the interaction.
+##' @param pmarg1 Initial parameter estimates for the first margin regression.
+##' @param pmarg2 Initial parameter estimates for the second margin regression.
+##' @param pinteraction Initial parameter estimates for the interaction
+##' regression.
+##' @param print.level Arguments for nlm.
+##' @param typsize Arguments for nlm.
+##' @param ndigit Arguments for nlm.
+##' @param gradtol Arguments for nlm.
+##' @param stepmax Arguments for nlm.
+##' @param steptol Arguments for nlm.
+##' @param iterlim Arguments for nlm.
+##' @param fscale Arguments for nlm.
+##' @return A list of class \code{bivbinom} is returned.
+##' @author J.K. Lindsey
+##' @keywords models
+##' @examples
+##' 
+##' # 5 2x2 tables
+##' Freq <- matrix(rpois(20,10),ncol=4)
+##' x <- c(6,8,10,12,14)
+##' print(z <- biv.binom(Freq,marg1=~x,marg2=~x,inter=~x,pmarg1=c(-2,0.08),
+##' 	pmarg2=c(-2,0.1),pinter=c(3,0)))
+##' 
+##' @export biv.binom
 biv.binom <- function(freq, marg1=~1, marg2=~1, interaction=~1, pmarg1=1,
-	pmarg2=1,pinteraction=1, print.level=0, typsiz=abs(p),
+	pmarg2=1,pinteraction=1, print.level=0, typsize=abs(p),
 	ndigit=10, gradtol=0.00001, stepmax=10*sqrt(p%*%p),
 	steptol=0.00001, iterlim=100, fscale=1){
+#
+# set up likelihood function
+#
 like1 <- function(p){
 	pia <- 1/(1+exp(dm1 %*% p[1:npt1]))
 	pib <- 1/(1+exp(dm2 %*% p[(npt1+1):(npt1+npt2)]))
@@ -49,13 +89,19 @@ like1 <- function(p){
 	ss[seq(4,n,by=4)] <- s22
 	list(like=-sum(freq*log(ss*(ss>0)+0.0001)),fitted=tot*ss,ss=ss)}
 call <- sys.call()
+#
+# check input and prepare constants
+#
 if(!is.matrix(freq))stop("freq must be a matrix")
 if(!dim(freq)[2]==4)stop("freq must have 4 columns")
 freq <- as.vector(t(freq))
 n <- length(freq)
 nn <- n/4
-tot <- rep(collapse(freq,as.integer(gl(nn,4,n))),rep(4,nn))
+tot <- rep(capply(freq,as.integer(gl(nn,4,n))),rep(4,nn))
 ss <- rep(0,n)
+#
+# change formula for margins and interaction into matrices
+#
 p <- c(pmarg1,pmarg2,pinteraction)
 if(inherits(marg1,"formula")){
 	mt <- terms(marg1)
@@ -64,7 +110,7 @@ if(inherits(marg1,"formula")){
 		colnames(dm1) <- "(Intercept)"
 		npt1 <- 1}
 	else {
-		mf <- model.frame(mt,sys.frame(sys.parent()),na.action=na.fail)
+		mf <- model.frame(mt,parent.frame(),na.action=na.fail)
 		dm1 <- model.matrix(mt, mf)
 		npt1 <- dim(dm1)[2]}
 	np <- npt1
@@ -79,7 +125,7 @@ if(inherits(marg2,"formula")){
 		colnames(dm2) <- "(Intercept)"
 		npt2 <- 1}
 	else {
-		mf <- model.frame(mt,sys.frame(sys.parent()),na.action=na.fail)
+		mf <- model.frame(mt,parent.frame(),na.action=na.fail)
 		dm2 <- model.matrix(mt, mf)
 		npt2 <- dim(dm2)[2]}
 	np <- np+npt2
@@ -94,7 +140,7 @@ if(inherits(interaction,"formula")){
 		colnames(dm3) <- "(Intercept)"
 		npt3 <- 1}
 	else {
-		mf <- model.frame(mt,sys.frame(sys.parent()),na.action=na.fail)
+		mf <- model.frame(mt,parent.frame(),na.action=na.fail)
 		dm3 <- model.matrix(mt, mf)
 		npt3 <- dim(dm3)[2]}
 	np <- np+npt3
@@ -102,19 +148,28 @@ if(inherits(interaction,"formula")){
 else stop("interaction must be a model formula")
 if(npt3!=length(pinteraction))
 	stop(paste(npt3,"parameter estimates must be supplied for interaction"))
+#
+# call nlm to optimize
+#
 like1a <- function(p) like1(p)$like
-z1 <- nlm(like1a, p=p, hessian=T, print.level=print.level, typsiz=typsiz,
+z1 <- nlm(like1a, p=p, hessian=TRUE, print.level=print.level, typsize=typsize,
 	ndigit=ndigit, gradtol=gradtol, stepmax=stepmax, steptol=steptol,
 	iterlim=iterlim, fscale=fscale)
 fit <- like1(z1$estimate)$fitted
 maxlike <- sum(fit-freq*log(fit)+lgamma(freq+1))
 aic <- maxlike+length(p)+nn
-cov <- solve(z1$hessian)
+#
+# calculate se's
+#
+a <- if(any(is.na(z1$hessian))||any(abs(z1$hessian)==Inf))0
+	else qr(z1$hessian)$rank
+if(a==np)cov <- solve(z1$hessian)
+else cov <- matrix(NA,ncol=np,nrow=np)
 se <- sqrt(diag(cov))
 z <- list(call=call,
 	maxlike=maxlike,
 	aic=aic,
-	df=n-length(p)+nn,
+	df=n-length(p)-nn,
 	fitted.values=fit,
 	coefficients=z1$estimate,
 	npt=list(npt1,npt2,npt3),
@@ -128,6 +183,8 @@ z <- list(call=call,
 class(z) <- "bivbinom"
 return(z)}
 
+### print method
+###
 print.bivbinom <- function(z){
 	npt1 <- z$npt[[1]]
 	npt2 <- z$npt[[2]]

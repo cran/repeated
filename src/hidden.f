@@ -1,6 +1,6 @@
 c
 c  repeated : A Library of Repeated Measurements Models
-c  Copyright (C) 1998 J.K. Lindsey
+c  Copyright (C) 1998, 1999, 2000, 2001 J.K. Lindsey
 c
 c  This program is free software; you can redistribute it and/or modify
 c  it under the terms of the GNU General Public License as published by
@@ -18,18 +18,18 @@ c  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 c
 c  SYNOPSIS
 c
-c    subroutine hidden(x,m,iq,nobs,mobs,s,n,l,pgamma,pos,gamma,
-c   +     model,cmu,tvmu,pshape,pfam,delta,nn,filter,cf,a,b,c,gmod,
-c   +     rhs,pivot,qraux,work,like)
+c    subroutine hidden(x,m,iq,nobs,mobs,s,n,l,pgamma,pos,gamma,model,
+c   +     lgam,cmu,tvmu,pshape,pfam,ppar,par,delta,nn,filter,cf,a,b,c,gmod,
+c   +     rhs,pivot,qraux,work,work2,like)
 c
 c  DESCRIPTION
 c
 c    Function to compute the likelihood of a hidden Markov chain model
 c  with various response types in discrete time
 c
-      subroutine hidden(x,m,iq,nobs,mobs,s,n,l,pgamma,pos,gamma,
-     +     model,cmu,tvmu,pshape,pfam,delta,nn,filter,cf,a,b,c,gmod,
-     +     rhs,pivot,qraux,work,like)
+      subroutine hidden(x,m,iq,nobs,mobs,s,n,l,pgamma,pos,gamma,model,
+     +     lgam,ismu,mu,cmu,tvmu,pshape,pfam,ppar,par,delta,nn,filter,
+     +     cf,a,b,c,gmod,rhs,pivot,qraux,work,work2,like)
 *************************************************************************
 *     Function hidden computes minus the log likelihood of a            *
 *     multivariate hidden Markov model with m states and iq individuals.*
@@ -38,19 +38,22 @@ c
 *     origin is acknowledged.                                           * 
 *                              Iain MacDonald and Walter Zucchini       *
 *     Modified by J.K. Lindsey for R, March, 1998, November, 1998       *
+*                                   December, 1999, January, 2000       *
+*     and by P.J. Lindsey for ordinal responses, December, 1999         *
 *************************************************************************
       implicit none
-      integer n(1),m,iq,i,j,k,l,model,nobs(1),mobs,ii,nm,pos(m),nn,
+      integer n(*),m,iq,i,j,k,l,model,nobs(*),mobs,ii,nm,pos(m),nn,
      +     pivot(m)
-      logical cf
-      double precision like,s(1),pi,sflog,av,pshape(m),
-     +     gmod(m,m),rhs(m),qraux(m),work(2*m),cmu(iq,m,l),
-     +     tvmu(mobs,m,l),ll,x(1),gamma(m,m),delta(m),a(m),b(m,m),
-     +     c(m),pgamma(m,m),filter(m,nn),pfam
-      double precision bernpr,poispr,multpr,binpr,exppr,bbinpr,nbinpr,
-     +     normpr,invgpr,logispr,cauchpr,laplpr,levypr,paretpr,gammpr,
-     +     weibpr,ggampr,glogpr,hjorpr,burrpr,gweipr,gextpr,ginvgpr,
-     +     powexpr
+      logical cf,ismu,ppar
+      double precision like,s(*),pi,sflog,av,pshape(m),par,
+     +     gmod(m,m),rhs(m),qraux(m),mu(nn,m,l),cmu(iq,m,l),
+     +     tvmu(mobs,m,l),ll,x(*),gamma(m,m),delta(m),a(m),b(m,m),
+     +     c(m),pgamma(m,m),filter(m,nn),pfam,tmp,tmp2,tmp3,lgam(*),
+     +     work(2*m),work2(m)
+      double precision bernpr,poispr,multpr,cmultpr,contpr,proppr,binpr,
+     +     exppr,bbinpr,nbinpr,normpr,invgpr,logispr,cauchpr,laplpr,
+     +     levypr,paretpr,gammpr,weibpr,ggampr,glogpr,hjorpr,burrpr,
+     +     gweipr,gextpr,ginvgpr,powexpr,slaplpr,studpr
 
       call fromx(x,m,gamma,pgamma,pos)
 
@@ -72,58 +75,83 @@ c initial conditions
       like=0.
       nm=0
       do 20 i = 1, iq
+         if(ppar)then
+            do 21 j=1,m
+               work2(j)=0
+ 21         continue
+         endif
          nm=nm+1
          do 30 j = 1, m
             a(j)=delta(j)
+            if(model.lt.3.or.model.gt.6)then
+               if(ismu)then
+                  tmp=mu(nm,j,1)
+               else
+                  tmp=cmu(i,j,1)+tvmu(1,j,1)
+               endif
+            endif
+            if(ppar)work2(j)=s(nm)-tmp
             goto(201,202,203,204,205,206,207,208,209,210,211,212,213,
-     +           214,215,216,217,218,219,220,221,222,223,224),model
- 201        pi = bernpr(s(nm),cmu(i,j,1)+tvmu(1,j,1))
+     +           214,215,216,217,218,219,220,221,222,223,224,225,226,
+     +           227,228,229),model
+ 201        pi = bernpr(s(nm),tmp)
             goto 250
- 202        pi = poispr(s(nm),cmu(i,j,1)+tvmu(1,j,1))
+ 202        pi = poispr(s(nm),tmp)
             goto 250
- 203        pi = multpr(s(nm),cmu,tvmu,i,j,1,iq,m,l,mobs)
+ 203        pi = multpr(s(nm),ismu,mu,cmu,tvmu,i,j,1,iq,m,l,mobs,nm,nn)
             goto 250
- 204        pi = binpr(s(nm),n(nm),cmu(i,j,1)+tvmu(1,j,1))
+ 204        pi = cmultpr(s,ismu,mu,cmu,tvmu,i,j,1,iq,m,l,mobs,nm,nn,
+     +           lgam)
             goto 250
- 205        pi = exppr(s(nm),cmu(i,j,1)+tvmu(1,j,1))
+ 205        pi = contpr(s(nm),ismu,mu,cmu,tvmu,i,j,1,iq,m,l,mobs,nm,nn)
             goto 250
- 206        pi = bbinpr(s(nm),n(nm),cmu(i,j,1)+tvmu(1,j,1),pshape(j))
+ 206        pi = proppr(s(nm),ismu,mu,cmu,tvmu,i,j,1,iq,m,l,mobs,nm,nn)
             goto 250
- 207        pi = nbinpr(s(nm),cmu(i,j,1)+tvmu(1,j,1),pshape(j))
+ 207        pi = binpr(s(nm),n(nm),tmp)
             goto 250
- 208        pi = normpr(s(nm),cmu(i,j,1)+tvmu(1,j,1),pshape(j))
+ 208        pi = exppr(s(nm),tmp)
             goto 250
- 209        pi = invgpr(s(nm),cmu(i,j,1)+tvmu(1,j,1),pshape(j))
+ 209        pi = bbinpr(s(nm),n(nm),tmp,pshape(j))
             goto 250
- 210        pi = logispr(s(nm),cmu(i,j,1)+tvmu(1,j,1),pshape(j))
+ 210        pi = nbinpr(s(nm),tmp,pshape(j))
             goto 250
- 211        pi = cauchpr(s(nm),cmu(i,j,1)+tvmu(1,j,1),pshape(j))
+ 211        pi = normpr(s(nm),tmp,pshape(j))
             goto 250
- 212        pi = laplpr(s(nm),cmu(i,j,1)+tvmu(1,j,1),pshape(j))
+ 212        pi = invgpr(s(nm),tmp,pshape(j))
             goto 250
- 213        pi = levypr(s(nm),cmu(i,j,1)+tvmu(1,j,1),pshape(j))
+ 213        pi = logispr(s(nm),tmp,pshape(j))
             goto 250
- 214        pi = paretpr(s(nm),cmu(i,j,1)+tvmu(1,j,1),pshape(j))
+ 214        pi = cauchpr(s(nm),tmp,pshape(j))
             goto 250
- 215        pi = gammpr(s(nm),cmu(i,j,1)+tvmu(1,j,1),pshape(j))
+ 215        pi = laplpr(s(nm),tmp,pshape(j))
             goto 250
- 216        pi = weibpr(s(nm),cmu(i,j,1)+tvmu(1,j,1),pshape(j))
+ 216        pi = levypr(s(nm),tmp,pshape(j))
             goto 250
- 217        pi = ggampr(s(nm),cmu(i,j,1)+tvmu(1,j,1),pshape(j),pfam)
+ 217        pi = paretpr(s(nm),tmp,pshape(j))
             goto 250
- 218        pi = glogpr(s(nm),cmu(i,j,1)+tvmu(1,j,1),pshape(j),pfam)
+ 218        pi = gammpr(s(nm),tmp,pshape(j))
             goto 250
- 219        pi = hjorpr(s(nm),cmu(i,j,1)+tvmu(1,j,1),pshape(j),pfam)
+ 219        pi = weibpr(s(nm),tmp,pshape(j))
             goto 250
- 220        pi = burrpr(s(nm),cmu(i,j,1)+tvmu(1,j,1),pshape(j),pfam)
+ 220        pi = ggampr(s(nm),tmp,pshape(j),pfam)
             goto 250
- 221        pi = gweipr(s(nm),cmu(i,j,1)+tvmu(1,j,1),pshape(j),pfam)
+ 221        pi = glogpr(s(nm),tmp,pshape(j),pfam)
             goto 250
- 222        pi = gextpr(s(nm),cmu(i,j,1)+tvmu(1,j,1),pshape(j),pfam)
+ 222        pi = hjorpr(s(nm),tmp,pshape(j),pfam)
             goto 250
- 223        pi = ginvgpr(s(nm),cmu(i,j,1)+tvmu(1,j,1),pshape(j),pfam)
+ 223        pi = burrpr(s(nm),tmp,pshape(j),pfam)
             goto 250
- 224        pi = powexpr(s(nm),cmu(i,j,1)+tvmu(1,j,1),pshape(j),pfam)
+ 224        pi = gweipr(s(nm),tmp,pshape(j),pfam)
+            goto 250
+ 225        pi = gextpr(s(nm),tmp,pshape(j),pfam)
+            goto 250
+ 226        pi = ginvgpr(s(nm),tmp,pshape(j),pfam)
+            goto 250
+ 227        pi = powexpr(s(nm),tmp,pshape(j),pfam)
+            goto 250
+ 228        pi = slaplpr(s(nm),tmp,pshape(j),pfam)
+            goto 250
+ 229        pi = studpr(s(nm),tmp,pshape(j),pfam)
  250        a(j) = a(j) + pi
  30      continue
 
@@ -146,55 +174,88 @@ c update likelihood at each subsequent time point
          do 110 k = 2, nobs(i)
             nm=nm+1
             do 70 j = 1, m
+               if(model.lt.3.or.model.gt.6)then
+                  if(ismu)then
+                     tmp=mu(nm,j,1)
+                  else
+                     tmp=cmu(i,j,1)+tvmu(k,j,1)
+                  endif
+               endif
+               if(ppar)then
+                  tmp2=tmp
+                  tmp3=par*work2(j)
+                  if(model.ne.11.and.model.ne.13.and.model.ne.14.and.
+     +                 model.ne.15.and.model.ne.16.and.model.ne.21.and.
+     +                 model.ne.27.and.model.ne.28.and.model.ne.29.and.
+     +                 tmp+tmp3.le.0.0)tmp3=0.0
+                  if(model.eq.1.and.tmp+tmp3.ge.1.0)tmp3=0.0
+                  tmp=tmp+tmp3
+                  work2(j)=s(nm)-tmp2
+               endif
                goto(301,302,303,304,305,306,307,308,309,310,311,312,313,
-     +              314,315,316,317,318,319,320,321,322,323,324),model
- 301           pi = bernpr(s(nm),cmu(i,j,1)+tvmu(k,j,1))
+     +              314,315,316,317,318,319,320,321,322,323,324,325,326,
+     +              327,328,329),model
+ 301           pi = bernpr(s(nm),tmp)
                goto 350
- 302           pi = poispr(s(nm),cmu(i,j,1)+tvmu(k,j,1))
+ 302           pi = poispr(s(nm),tmp)
                goto 350
- 303           pi = multpr(s(nm),cmu,tvmu,i,j,k,iq,m,l,mobs)
+ 303           pi = multpr(s(nm),ismu,mu,cmu,tvmu,i,j,k,iq,m,l,mobs,nm,
+     +              nn)
                goto 350
- 304           pi = binpr(s(nm),n(nm),cmu(i,j,1)+tvmu(k,j,1))
+ 304           pi = cmultpr(s,ismu,mu,cmu,tvmu,i,j,k,iq,m,l,mobs,nm,
+     +              nn,lgam)
                goto 350
- 305           pi = exppr(s(nm),cmu(i,j,1)+tvmu(k,j,1))
+ 305           pi = contpr(s(nm),ismu,mu,cmu,tvmu,i,j,k,iq,m,l,mobs,nm,
+     +              nn)
                goto 350
- 306           pi = bbinpr(s(nm),n(nm),cmu(i,j,1)+tvmu(k,j,1),pshape(j))
+ 306           pi = proppr(s(nm),ismu,mu,cmu,tvmu,i,j,k,iq,m,l,mobs,nm,
+     +              nn)
                goto 350
- 307           pi = nbinpr(s(nm),cmu(i,j,1)+tvmu(k,j,1),pshape(j))
+ 307           pi = binpr(s(nm),n(nm),tmp)
                goto 350
- 308           pi = normpr(s(nm),cmu(i,j,1)+tvmu(k,j,1),pshape(j))
+ 308           pi = exppr(s(nm),tmp)
                goto 350
- 309           pi = invgpr(s(nm),cmu(i,j,1)+tvmu(k,j,1),pshape(j))
+ 309           pi = bbinpr(s(nm),n(nm),tmp,pshape(j))
                goto 350
- 310           pi = logispr(s(nm),cmu(i,j,1)+tvmu(k,j,1),pshape(j))
+ 310           pi = nbinpr(s(nm),tmp,pshape(j))
                goto 350
- 311           pi = cauchpr(s(nm),cmu(i,j,1)+tvmu(k,j,1),pshape(j))
+ 311           pi = normpr(s(nm),tmp,pshape(j))
                goto 350
- 312           pi = laplpr(s(nm),cmu(i,j,1)+tvmu(k,j,1),pshape(j))
+ 312           pi = invgpr(s(nm),tmp,pshape(j))
                goto 350
- 313           pi = levypr(s(nm),cmu(i,j,1)+tvmu(k,j,1),pshape(j))
+ 313           pi = logispr(s(nm),tmp,pshape(j))
                goto 350
- 314           pi = paretpr(s(nm),cmu(i,j,1)+tvmu(k,j,1),pshape(j))
+ 314           pi = cauchpr(s(nm),tmp,pshape(j))
                goto 350
- 315           pi = gammpr(s(nm),cmu(i,j,1)+tvmu(k,j,1),pshape(j))
+ 315           pi = laplpr(s(nm),tmp,pshape(j))
                goto 350
- 316           pi = weibpr(s(nm),cmu(i,j,1)+tvmu(k,j,1),pshape(j))
+ 316           pi = levypr(s(nm),tmp,pshape(j))
                goto 350
- 317           pi = ggampr(s(nm),cmu(i,j,1)+tvmu(k,j,1),pshape(j),pfam)
+ 317           pi = paretpr(s(nm),tmp,pshape(j))
                goto 350
- 318           pi = glogpr(s(nm),cmu(i,j,1)+tvmu(k,j,1),pshape(j),pfam)
+ 318           pi = gammpr(s(nm),tmp,pshape(j))
                goto 350
- 319           pi = hjorpr(s(nm),cmu(i,j,1)+tvmu(k,j,1),pshape(j),pfam)
+ 319           pi = weibpr(s(nm),tmp,pshape(j))
                goto 350
- 320           pi = burrpr(s(nm),cmu(i,j,1)+tvmu(k,j,1),pshape(j),pfam)
+ 320           pi = ggampr(s(nm),tmp,pshape(j),pfam)
                goto 350
- 321           pi = gweipr(s(nm),cmu(i,j,1)+tvmu(k,j,1),pshape(j),pfam)
+ 321           pi = glogpr(s(nm),tmp,pshape(j),pfam)
                goto 350
- 322           pi = gextpr(s(nm),cmu(i,j,1)+tvmu(k,j,1),pshape(j),pfam)
+ 322           pi = hjorpr(s(nm),tmp,pshape(j),pfam)
                goto 350
- 323           pi = ginvgpr(s(nm),cmu(i,j,1)+tvmu(k,j,1),pshape(j),pfam)
+ 323           pi = burrpr(s(nm),tmp,pshape(j),pfam)
                goto 350
- 324           pi = powexpr(s(nm),cmu(i,j,1)+tvmu(k,j,1),pshape(j),pfam)
+ 324           pi = gweipr(s(nm),tmp,pshape(j),pfam)
+               goto 350
+ 325           pi = gextpr(s(nm),tmp,pshape(j),pfam)
+               goto 350
+ 326           pi = ginvgpr(s(nm),tmp,pshape(j),pfam)
+               goto 350
+ 327           pi = powexpr(s(nm),tmp,pshape(j),pfam)
+               goto 350
+ 328           pi = slaplpr(s(nm),tmp,pshape(j),pfam)
+               goto 350
+ 329           pi = studpr(s(nm),tmp,pshape(j),pfam)
  350           do 60 ii = 1, m
                   b(ii,j) = gamma(ii,j)+pi
  60            continue
@@ -268,7 +329,7 @@ c transform back to original values
 ***************************************************************************
       implicit none
       integer m,i,ii,j,pos(m)
-      double precision sum,gamma(m,m),x(1),pgamma(m,m)
+      double precision sum,gamma(m,m),x(*),pgamma(m,m)
 
       ii=0
       do 30 i = 1, m
@@ -280,7 +341,7 @@ c transform back to original values
                gamma(i,j)=pgamma(i,j)
             else
                ii=ii+1
-               gamma(i,j) =d exp(x(ii))
+               gamma(i,j) =dexp(x(ii))
                sum = sum + gamma(i,j)
             endif
  20      continue
@@ -297,9 +358,9 @@ c transform back to original values
 * Computes stationary distribution of Markov chain *
 ****************************************************
       implicit none
-      integer m,i,j,rank,info,pivot(1)
-      double precision qraux(1),work(1),
-     +     gamma(m,m),delta(1),gmod(m,m),rhs(1)
+      integer m,i,j,rank,info,pivot(*)
+      double precision qraux(*),work(*),dummy,
+     +     gamma(m,m),delta(*),gmod(m,m),rhs(*)
 
       do 20 i = 2, m
          do 10 j = 1, m
@@ -315,7 +376,9 @@ c transform back to original values
  30   continue
       rhs(1) = 1.
       call dqrdc2(gmod,m,m,m,1d-07,rank,qraux,pivot,work)
-      call dqrcf(gmod,m,rank,qraux,rhs,1,delta,info,1)
+c      call dqrcf(gmod,m,rank,qraux,rhs,1,delta,info)
+      call dqrsl(gmod,m,m,rank,qraux,rhs,dummy,rhs,delta,
+     +     dummy,dummy,100,info)
       return
       end
 
@@ -346,34 +409,154 @@ c transform back to original values
       double precision svec,pvec
 
       poispr = -pvec
-      do 1 j = 1, svec
+      do 1 j = 1, int(svec)
          poispr = poispr+dlog(pvec/dble(j))
  1    continue
       return
       end
 
-      double precision function multpr(svec,cmu,tvmu,i,j,k,iq,m,l,
-     +     mobs)
+C      do 1 j = 1, 999999999
+C         if(j > svec) exit
+C         poispr = poispr+dlog(pvec/dble(j))
+C 1    continue
+C      return
+C      end
+
+      double precision function multpr(svec,ismu,mu,cmu,tvmu,i,j,k,
+     +     iq,m,l,mobs,nm,nn)
 *****************************
 * Multinomial probabilities *
 *****************************
       implicit none
-      integer i,j,k,iq,m,l,mobs,n
-      double precision svec,cmu(iq,m,l),tvmu(mobs,m,l),pi
+      integer i,j,k,iq,m,l,mobs,n,nn,nm
+      double precision svec,mu(nn,m,l),cmu(iq,m,l),tvmu(mobs,m,l),
+     +     denom
+      logical ismu
 
-      pi=1.
-      do 1 n=1,l
-         pi=pi+dexp(cmu(i,j,n)+tvmu(k,j,n))
- 1    continue
-      if(svec.le.l)then
-         pi = dexp(cmu(i,j,svec)+tvmu(k,j,svec))/pi
+      denom=1.
+      if(ismu)then
+         do 1 n=1,l
+            denom=denom+dexp(mu(nm,j,n))
+ 1       continue
+         if(svec.gt.0)then
+            multpr = mu(nm,j,int(svec))-dlog(denom)
+         else
+            multpr = -dlog(denom)
+         endif
       else
-         pi = 1./pi
+         do 2 n=1,l
+            denom=denom+dexp(cmu(i,j,n)+tvmu(k,j,n))
+ 2       continue
+         if(svec.gt.0)then
+            multpr = cmu(i,j,int(svec))+tvmu(k,j,int(svec))-dlog(denom)
+         else
+            multpr = -dlog(denom)
+         endif
+      endif
+      return
+      end
+
+      double precision function cmultpr(svec,ismu,mu,cmu,tvmu,i,j,k,
+     +     iq,m,l,mobs,nm,nn,lgam)
+***********************************
+* Multinomial count probabilities *
+***********************************
+      implicit none
+      integer i,j,k,iq,m,l,mobs,n,nn,nm
+      double precision mu(nn,m,l),cmu(iq,m,l),tvmu(mobs,m,l),
+     +     svec(*),lgam(*),pi,denom,sum
+      logical ismu
+
+      denom=1.
+      pi=lgam(nm)
+      sum=svec(1+(nm-1)*(l+1))
+      if(ismu)then
+         do 1 n=1,l
+            sum=sum+svec(n+1+(nm-1)*(l+1))
+            pi=pi+svec(n+1+(nm-1)*(l+1))*mu(nm,j,n)
+            denom=denom+dexp(mu(nm,j,n))
+ 1       continue
+      else
+         do 2 n=1,l
+            sum=sum+svec(n+1+(nm-1)*(l+1))
+            pi=pi+svec(n+1+(nm-1)*(l+1))*(cmu(i,j,n)+tvmu(k,j,n))
+            denom=denom+dexp(cmu(i,j,n)+tvmu(k,j,n))
+ 2       continue
+      endif
+      cmultpr=pi-sum*dlog(denom)
+      return
+      end
+
+      double precision function contpr(svec,ismu,mu,cmu,tvmu,i,j,k,
+     +     iq,m,l,mobs,nm,nn)
+**********************************************
+* Continuation-ratio probabilities (upwards) *
+**********************************************
+      implicit none
+      integer i,j,k,iq,m,l,mobs,n,nn,nm
+      double precision svec,mu(nn,m,l),cmu(iq,m,l),tvmu(mobs,m,l),pi
+      logical ismu
+
+      if(ismu)then
+         if(svec.eq.0)then
+            pi=1.
+         else
+            pi=1./(1.+dexp(mu(nm,j,int(svec))))
+         endif
+         do 2 n=int(svec)+1,l
+            pi=pi/(1.+dexp(-mu(nm,j,n)))
+ 2       continue
+      else
+         if(svec.eq.0)then
+            pi=1.
+         else
+            pi=1./(1.+dexp(cmu(i,j,int(svec))+tvmu(k,j,int(svec))))
+         endif
+         do 4 n=int(svec)+1,l
+            pi=pi/(1.+dexp(-cmu(i,j,n)-tvmu(k,j,n)))
+ 4       continue
       endif
       if(pi.gt.0.) then
-         multpr=dlog(pi)
+         contpr=dlog(pi)
       else
-         multpr=-35.
+         contpr=-35.
+      endif
+      return
+      end
+
+      double precision function proppr(svec,ismu,mu,cmu,tvmu,i,j,k,
+     +     iq,m,l,mobs,nm,nn)
+***********************************
+* Proportional-odds probabilities *
+***********************************
+      implicit none
+      integer i,j,k,iq,m,l,mobs,nn,nm
+      double precision svec,mu(nn,m,l),cmu(iq,m,l),tvmu(mobs,m,l),pi
+      logical ismu
+
+      if(ismu)then
+         if(svec.eq.l)then
+            pi=1./(1.+dexp(mu(nm,j,l)))
+         else if(svec.gt.0)then
+            pi=1/(1.+dexp(-mu(nm,j,int(svec+1))))
+     +           -1/(1.+dexp(-mu(nm,j,int(svec))))
+         else
+            pi=1/(1.+dexp(-mu(nm,j,1)))
+         endif
+      else
+         if(svec.eq.l)then
+            pi=1./(1.+dexp(cmu(i,j,l)+tvmu(k,j,l)))
+         else if(svec.gt.0)then
+            pi=1/(1.+dexp(-cmu(i,j,int(svec+1))-tvmu(k,j,int(svec+1))))
+     +           -1/(1.+dexp(-cmu(i,j,int(svec))-tvmu(k,j,int(svec))))
+         else
+            pi=1/(1.+dexp(-cmu(i,j,1)-tvmu(k,j,1)))
+         endif
+      endif
+      if(pi.gt.0.) then
+         proppr=dlog(pi)
+      else
+         proppr=-35.
       endif
       return
       end
@@ -397,12 +580,12 @@ c transform back to original values
             tmp2=nvec+1.0
             if(svec.lt.nvec/2)then
                tmp=svec+1.0
-               do 1 j = 1, svec
+               do 1 j = 1, int(svec)
                   binpr=binpr*(tmp2-j)/(tmp-j)
  1             continue
             else
                tmp=nvec-svec+1.0
-               do 2 j = 1, nvec-svec
+               do 2 j = 1, int(nvec-svec)
                   binpr=binpr*(tmp2-j)/(tmp-j)
  2             continue
             endif
@@ -451,12 +634,12 @@ c transform back to original values
       tmp2=nvec+1.0
       if(svec.lt.nvec/2)then
          tmp3=svec+1.0
-         do 1 j = 1, svec
+         do 1 j = 1, int(svec)
             tmp=tmp*(tmp2-j)/(tmp3-j)
  1       continue
       else
          tmp3=nvec-svec+1.0
-         do 2 j = 1, nvec-svec
+         do 2 j = 1, int(nvec-svec)
             tmp=tmp*(tmp2-j)/(tmp3-j)
  2       continue
       endif
@@ -527,8 +710,7 @@ c transform back to original values
       implicit none
       double precision svec,pvec,pshape
 
-      cauchpr=dsqrt(pshape)
-      cauchpr = -dlog(cauchpr*(1+((svec-pvec)/cauchpr)**2)*3.141
+      cauchpr = -dlog(pshape*(1+((svec-pvec)/pshape)**2)*3.141
      +     592653589793238462643383279502884197169399375)
       return
       end
@@ -546,7 +728,7 @@ c transform back to original values
 
       double precision function levypr(svec,pvec,pshape)
 *************************
-* Laplace probabilities *
+* Levy probabilities *
 *************************
       implicit none
       double precision svec,pvec,pshape
@@ -641,8 +823,8 @@ c transform back to original values
       double precision svec,pvec,pshape,pfam
 
       burrpr=svec/pvec
-      burrpr=dlog(pshape/pvec)+(pshape-1.0)*dlog(burrpr)-
-     +	    (pfam+1.0)*dlog(1.0+burrpr**pshape/pfam)
+      burrpr=dlog(pfam*pshape/pvec)+(pshape-1.0)*dlog(burrpr)-
+     +	    (pfam+1.0)*dlog(1.0+burrpr**pshape)
       return
       end
 
@@ -702,5 +884,36 @@ c transform back to original values
       call flgamma(tmp2,powexpr)
       powexpr=-(dabs(svec-pvec)/tmp1)**(2.0*dabs(pfam))/2.0
      +     -dlog(tmp1*2.0**tmp2)-powexpr
+      return
+      end
+
+      double precision function slaplpr(svec,pvec,pshape,pfam)
+******************************
+* skew Laplace probabilities *
+******************************
+      implicit none
+      double precision svec,pvec,pshape,pfam,tmp
+
+      if(svec.gt.pvec)then
+         tmp=-pfam*(svec-pvec)
+      else
+         tmp=(svec-pvec)/pfam
+      endif
+      slaplpr = dlog(pfam)+tmp/pshape-dlog((1+pfam**2)*pshape)
+      return
+      end
+
+      double precision function studpr(svec,pvec,pshape,pfam)
+***************************
+* Student t probabilities *
+***************************
+      implicit none
+      double precision svec,pvec,pshape,pfam,tmp
+
+      call flgamma(0.5*(pfam+1.0),studpr)
+      call flgamma(0.5*pfam,tmp)
+      studpr = studpr-tmp-0.5*(dlog(pfam*3.1415926535897932384626433
+     +     83279502884197169399375)+(pfam+1.0)*dlog(1+((svec-pvec)
+     +     /pshape)**2/pfam))-dlog(pshape)
       return
       end
