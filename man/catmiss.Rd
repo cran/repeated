@@ -55,4 +55,3 @@ catmiss(resp, y[1:26])
 J.K. Lindsey
 }
 \keyword{models}
-

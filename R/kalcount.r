@@ -233,7 +233,7 @@ kalcount <- function(response=NULL, times=NULL, origin=0,
 kcountb <- function(p){
 	if(rf)b <- mu1(p)
 	if(sf)v <- sh1(p[nps1:np])
-	z <- .C("kcountb",
+	z <- .C("kcountb_c",
 		p=as.double(p),
 		y=as.double(resp$response$times),
 		origin=as.double(origin),
@@ -267,7 +267,7 @@ kcountb <- function(p){
 countfb <- function(p){
 	if(rf)b <- mu1(p)
 	if(sf)v <- sh1(p[nps1:np])
-	z <- .C("countfb",
+	z <- .C("countfb_c",
 		p=as.double(p),
 		y=as.double(resp$response$times),
 		c=as.integer(resp$response$y),
@@ -670,7 +670,7 @@ dimnames(corr) <- list(1:np,1:np)
 z <- if(depend=="frailty"){
 	if(rf)b <- mu1(z0$estimate)
 	if(sf)v <- sh1(z0$estimate[nps1:np])
-	.C("countfb",
+	.C("countfb_c",
         	p=as.double(z0$estimate),
         	y=as.double(resp$response$times),
         	c=as.integer(resp$response$y),
@@ -697,7 +697,7 @@ z <- if(depend=="frailty"){
 else {
 	if(rf)b <- mu1(z0$estimate)
 	if(sf)v <- sh1(z0$estimate[nps1:np])
-	.C("kcountb",
+	.C("kcountb_c",
         	p=as.double(z0$estimate),
         	y=as.double(resp$response$times),
         	origin=as.double(origin),

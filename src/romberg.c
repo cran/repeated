@@ -18,7 +18,7 @@
  *
  *  SYNOPSIS
  *
- *    void romberg(void *fcn, double *a, double *b, int *len, double *eps,
+ *    void romberg_c(void *fcn, double *a, double *b, int *len, double *eps,
  *	      int *pts, int *max, int *err, double sumlen[])
  *
  *  DESCRIPTION
@@ -117,7 +117,7 @@ static void evalRfn(void *fcn, double a[], double b[], int n, int len,
     for(k=0;k<len;k++)sum[k]=(sum[k]+(b[k]-a[k])*tmpsum[k]/nn)/3.0;
     return;}}
 
-void romberg(void *fcn, double *a, double *b, int *len, double *eps,
+void romberg_c(void *fcn, double *a, double *b, int *len, double *eps,
 	     int *pts, int *max, int *err, double sumlen[])
 {
   int i,j,j1,finish;

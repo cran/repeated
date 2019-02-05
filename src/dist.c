@@ -19,27 +19,27 @@
  *  SYNOPSIS
  *
  * void pdp(int q[], int *my, double m[], double s[], int *nn, double res[])
- * void ddp(int y[], int *my, double m[], double s[], int *nn,
+ * void ddp_c(int y[], int *my, double m[], double s[], int *nn,
  *	 double wt[], double res[])
  * void pmp(int q[], int *my, double m[], double s[], int *nn, double res[])
- * void dmp(int y[], int *my, double m[], double s[], int *nn,
+ * void dmp_c(int y[], int *my, double m[], double s[], int *nn,
  *	 double wt[], double res[])
  * void ppvfp(int q[], double m[], double s[], double f[], int *nn,
  *       double res[])
- * void dpvfp(int y[], double m[], double s[], double f[], int *nn,
+ * void dpvfp_c(int y[], double m[], double s[], double f[], int *nn,
  *	 double wt[], double res[])
  * void pdb(int q[], int n[], double m[], double s[], int *nn, double res[])
- * void ddb(int y[], int n[], double m[], double s[], int *nn,
+ * void ddb_c(int y[], int n[], double m[], double s[], int *nn,
  *	 double wt[], double res[])
  * void pmb(int q[], int n[], double m[], double s[], int *nn, double res[])
- * void dmb(int y[], int n[], double m[], double s[], int *nn,
+ * void dmb_c(int y[], int n[], double m[], double s[], int *nn,
  *	 double wt[], double res[])
  *
- * void psimplex(double y[], double m[], double s[], double f[], int *len,
+ * void psimplex_c(double y[], double m[], double s[], double f[], int *len,
  *	   double *eps, int *pts, int *max, int *err, double res[])
- * void pginvgauss(double y[], double m[], double s[], double f[], int *len,
+ * void pginvgauss_c(double y[], double m[], double s[], double f[], int *len,
  *	   double *eps, int *pts, int *max, int *err, double res[])
- * void ppowexp(double y[], double m[], double s[], double f[], int *len,
+ * void ppowexp_c(double y[], double m[], double s[], double f[], int *len,
  *	   double *eps, int *pts, int *max, int *err, double res[])
  *
  *  DESCRIPTION
@@ -74,7 +74,7 @@ void pdp(int q[], int *my, double m[], double s[], int *nn, double res[]){
   for(i=0;i<*nn;i++)
     res[i]=dpnc(q[i],m[i],s[i])/dpnc(*my,m[i],s[i]);}
 
-void ddp(int y[], int *my, double m[], double s[], int *nn,
+void ddp_c(int y[], int *my, double m[], double s[], int *nn,
 	 double wt[], double res[]){
   int i,y1;
   for(i=0;i<*nn;i++){
@@ -98,7 +98,7 @@ void pmp(int q[], int *my, double m[], double s[], int *nn, double res[]){
     ss=log(s[i]);
     res[i]=mpnc(q[i],m[i],ss)/mpnc(*my,m[i],ss);}}
 
-void dmp(int y[], int *my, double m[], double s[], int *nn,
+void dmp_c(int y[], int *my, double m[], double s[], int *nn,
 	 double wt[], double res[]){
   int i;
   double ss;
@@ -129,7 +129,7 @@ static double pvfc(int y, double m, double s, double f){
     r+=c[y*(y-1)+i-1]*exp(i*tmp2+(i*f-y)*tmp3-(i*(f-1))*tmp4);}
   return(r);}
 
-void dpvfp(int y[], double m[], double s[], double f[], int *nn,
+void dpvfp_c(int y[], double m[], double s[], double f[], int *nn,
 	 double wt[], double res[]){
   int i;
   for(i=0;i<*nn;i++){
@@ -151,7 +151,7 @@ void ppvfp(int q[], double m[], double s[], double f[], int *nn, double res[]){
     else {
       res[i]=0.;
       for(j=0;j<q[i];j++){
-	dpvfp(&j,&(m[i]),&(s[i]),&(f[i]),&k,&wt,&tmp);
+	dpvfp_c(&j,&(m[i]),&(s[i]),&(f[i]),&k,&wt,&tmp);
 	res[i]+=tmp;}}}}
 
 /* double binomial */
@@ -170,7 +170,7 @@ void pdb(int q[], int n[], double m[], double s[], int *nn, double res[]){
   for(i=0;i<*nn;i++)
     res[i]=dbnc(q[i],n[i],m[i],s[i])/dbnc(n[i],n[i],m[i],s[i]);}
 
-void ddb(int y[], int n[], double m[], double s[], int *nn,
+void ddb_c(int y[], int n[], double m[], double s[], int *nn,
 	 double wt[], double res[]){
   int i,y2,yy1,yy2;
   for(i=0;i<*nn;i++){
@@ -199,7 +199,7 @@ void pmb(int q[], int n[], double m[], double s[], int *nn, double res[]){
     ss=log(s[i]);
     res[i]=mbnc(q[i],n[i],m[i],ss)/mbnc(n[i],n[i],m[i],ss);}}
 
-void dmb(int y[], int n[], double m[], double s[], int *nn,
+void dmb_c(int y[], int n[], double m[], double s[], int *nn,
 	 double wt[], double res[]){
   int i;
   double ss;
@@ -319,7 +319,7 @@ static void dsimplex(double y[], double m[], double s[], double f[], int len,
   int i;
   for(i=0;i<len;i++)res[i]=exp(-pow((y[i]-m[i])/(m[i]*(1-m[i])),2)/(2*y[i]*(1-y[i])*s[i]))/sqrt(2*M_PI*s[i]*pow(y[i]*(1-y[i]),3));}
 
-void psimplex(double y[], double m[], double s[], double f[], int *len,
+void psimplex_c(double y[], double m[], double s[], double f[], int *len,
 	   double *eps, int *pts, int *max, int *err, double res[]){
   double *x;
   int i;
@@ -333,7 +333,7 @@ static void dginvgauss(double y[], double m[], double s[], double f[], int len,
   int i;
   for(i=0;i<len;i++)res[i]=pow(y[i],f[i]-1)*exp(-(1./y[i]+y[i]/pow(m[i],2))/(2.*s[i]))/(pow(m[i],f[i])*(2.*bessel_k(1/(s[i]*m[i]),fabs(f[i]),1.0)));}
 
-void pginvgauss(double y[], double m[], double s[], double f[], int *len,
+void pginvgauss_c(double y[], double m[], double s[], double f[], int *len,
 	   double *eps, int *pts, int *max, int *err, double res[]){
   double *x;
   int i;
@@ -351,7 +351,7 @@ static void dpowexp(double y[], double m[], double s[], double f[], int len,
     b=1.+1./(2.*f[i]);
     res[i]=exp(-pow(fabs(y[i]-m[i])/ss,2.*f[i])/2.)/(ss*gammafn(b)*pow(2.,b));}}
 
-void ppowexp(double y[], double m[], double s[], double f[], int *len,
+void ppowexp_c(double y[], double m[], double s[], double f[], int *len,
 	   double *eps, int *pts, int *max, int *err, double res[]){
   double *x;
   int i;

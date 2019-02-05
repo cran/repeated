@@ -6,8 +6,8 @@
 \title{Ordinal Random Effects Models with Dropouts}
 \usage{
 logitord(y, id, out.ccov = NULL, drop.ccov = NULL, tvcov = NULL,
-  out.tvcov = !is.null(tvcov), drop.tvcov = !is.null(tvcov), pout, pdrop,
-  prand.out, prand.drop, random.out.int = TRUE,
+  out.tvcov = !is.null(tvcov), drop.tvcov = !is.null(tvcov), pout,
+  pdrop, prand.out, prand.drop, random.out.int = TRUE,
   random.out.slope = !is.null(tvcov), random.drop.int = TRUE,
   random.drop.slope = !is.null(tvcov), binom.mix = 5, fcalls = 900,
   eps = 1e-04, print.level = 0)
@@ -87,12 +87,11 @@ logitord(y, id=id, out.ccov=~age, drop.ccov=age, pout=c(1,0,0),
 logitord(y, id, tvcov=times, pout=c(1,0,0), pdrop=c(1,0))
 
 }
-\author{
-T.R. Ten Have and J.K. Lindsey
-}
 \references{
 Ten Have, T.R., Kunselman, A.R., Pulkstenis, E.P. and Landis,
 J.R. (1998) Biometrics 54, 367-383, for the binary case.
 }
+\author{
+T.R. Ten Have and J.K. Lindsey
+}
 \keyword{models}
-

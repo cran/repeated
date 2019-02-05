@@ -18,7 +18,7 @@ c  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 c
 c  SYNOPSIS
 c
-c    subroutine chidden(x,m,iq,nobs,mobs,s,n,times,l,pgamma,gamma,gamma2,
+c    subroutine chidden_f(x,m,iq,nobs,mobs,s,n,times,l,pgamma,gamma,gamma2,
 c   +     val,vec,invec,model,lgam,ismu,mu,cmu,tvmu,pshape,pfam,ppar,par,
 c   +     delta,nn,filter,cf,a,b,c,gmod,rhs,pivot,qraux,work,work2,work3,
 c   +     like)
@@ -28,7 +28,7 @@ c
 c    Function to compute the likelihood of a hidden Markov chain model
 c  with various response types in continuous time
 c
-      subroutine chidden(x,m,iq,nobs,mobs,s,n,times,l,pgamma,gamma,
+      subroutine chidden_f(x,m,iq,nobs,mobs,s,n,times,l,pgamma,gamma,
      +     gamma2,val,vec,invec,model,lgam,ismu,mu,cmu,tvmu,pshape,pfam,
      +     ppar,par,delta,nn,filter,cf,a,b,c,gmod,rhs,pivot,qraux,work,
      +     work2,work3,like)

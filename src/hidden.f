@@ -18,7 +18,7 @@ c  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 c
 c  SYNOPSIS
 c
-c    subroutine hidden(x,m,iq,nobs,mobs,s,n,l,pgamma,pos,gamma,model,
+c    subroutine hidden_f(x,m,iq,nobs,mobs,s,n,l,pgamma,pos,gamma,model,
 c   +     lgam,cmu,tvmu,pshape,pfam,ppar,par,delta,nn,filter,cf,a,b,c,gmod,
 c   +     rhs,pivot,qraux,work,work2,like)
 c
@@ -27,7 +27,7 @@ c
 c    Function to compute the likelihood of a hidden Markov chain model
 c  with various response types in discrete time
 c
-      subroutine hidden(x,m,iq,nobs,mobs,s,n,l,pgamma,pos,gamma,model,
+      subroutine hidden_f(x,m,iq,nobs,mobs,s,n,l,pgamma,pos,gamma,model,
      +     lgam,ismu,mu,cmu,tvmu,pshape,pfam,ppar,par,delta,nn,filter,
      +     cf,a,b,c,gmod,rhs,pivot,qraux,work,work2,like)
 *************************************************************************

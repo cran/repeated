@@ -18,7 +18,7 @@ c  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 c
 c  SYNOPSIS
 c
-c     subroutine gcopula(theta,like,x,y,nobs,nest,lnest,nind,
+c     subroutine gcopula_f(theta,like,x,y,nobs,nest,lnest,nind,
 c    +     nld,npre,npar,ar,v,tmp1,tmp2,tmp3,warn)
 c
 c  DESCRIPTION
@@ -28,7 +28,7 @@ c copula with various autocorrelation functions and
 c one or two levels of random effects
 c
 c
-      subroutine gcopula(theta,like,x,y,nobs,nest,lnest,nind,
+      subroutine gcopula_f(theta,like,x,y,nobs,nest,lnest,nind,
      +     nld,npre,npar,ar,v,tmp1,tmp2,tmp3,warn)
 c
 c routine for computing -log(l),

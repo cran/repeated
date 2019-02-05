@@ -18,12 +18,12 @@
  *
  *  SYNOPSIS
  *
- * void kcountb(double p[],double y[],double *origin,int c[],double x[],
+ * void kcountb_c(double p[],double y[],double *origin,int c[],double x[],
  *	int *nind,int nobs[],int *nbs,int *nccov,int *model,
  *	int *density,int *pfamily,int *dep,int *birth,int *tvc,double tvcov[],
  *	int *fit,double pred[],double rpred[],int *rf, double bbb[],
  *	int *sf, double vv[], double *like)
- * void countfb(double p[],double y[],int c[], double x[],int *nind,
+ * void countfb_c(double p[],double y[],int c[], double x[],int *nind,
  *	int nobs[],int *nbs,int *nccov,int *model,int *density,
  *	int *tvc,double tvcov[],int *fit,double pred[],double rpred[],int *rf,
  *	double bbb[],int *sf,double vv[],int *frser,double *like)
@@ -43,7 +43,7 @@
 
 static double dpvfp2(int y, double d, double s, double s1, double f);
 
-void kcountb(double p[],double y[],double *origin,int c[],double x[],
+void kcountb_c(double p[],double y[],double *origin,int c[],double x[],
 	int *nind,int nobs[],int *nbs,int *nccov,int *model,
 	int *density,int *pfamily,int *dep,int *birth,int *tvc,double tvcov[],
 	int *fit,double pred[],double rpred[],int *rf, double bbb[],
@@ -272,7 +272,7 @@ void kcountb(double p[],double y[],double *origin,int c[],double x[],
     yy0=yy;}}
   return;}
 
-void countfb(double p[],double y[],int c[], double x[],int *nind,
+void countfb_c(double p[],double y[],int c[], double x[],int *nind,
 	int nobs[],int *nbs,int *nccov,int *model,int *density,
 	int *tvc,double tvcov[],int *fit,double pred[],double rpred[],int *rf,
 	double bbb[], int *sf, double vv[], int *frser, double *like){

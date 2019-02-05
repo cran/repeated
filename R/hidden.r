@@ -209,7 +209,7 @@ likel <- function(p){
 	if(np>np1){
 		if(np3-np1==1)pshape <- rep(p[np3],states)
 		else pshape <- p[np2:np3]}
-	z <- .Fortran("hidden",
+	z <- .Fortran("hidden_f",
 		x=as.double(p),
 		as.integer(states),
 		iq=as.integer(nosubj),
@@ -258,7 +258,7 @@ like <- function(p){
 	if(np>np1){
 		if(np3-np1==1)pshape <- rep(p[np3],states)
 		else pshape <- p[np2:np3]}
-	z <- .Fortran("hidden",
+	z <- .Fortran("hidden_f",
 		x=as.double(p),
 		as.integer(states),
 		iq=as.integer(nosubj),
@@ -320,7 +320,7 @@ if(!is.null(par)&&(ord||distribution=="Bernoulli"||distribution=="multinomial"))
 if(!is.matrix(pgamma)||dim(pgamma)[2]!=dim(pgamma)[1]){
 	if(length(pgamma)==1&&pgamma==1)pgamma <- as.matrix(pgamma)
 	else stop("pgamma must be a square transition matrix")}
-if(any(pgamma<0||pgamma>1))
+if(any(pgamma<0)||any(pgamma>1))
 	stop("All pgamma estimates must be between zero and one")
 states <- dim(pgamma)[1]
 if(states>1&&any(diag(pgamma)==1))stop("Diagonal of pgamma cannot be 1")

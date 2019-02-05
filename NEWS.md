@@ -1,4 +1,14 @@
 #------------------------------------------------------------------------------
+#version 1.1.1
+#------------------------------------------------------------------------------
+
+  * https://github.com/swihart/repeated/issues/14
+  * Found no calls to: ‘R_registerRoutines’, ‘R_useDynamicSymbols’) Fix
+  * abs --> fabs in gar.c
+  * comment out plevy .C calls because we just import from rmutil all along
+  * Corrected failure: length > 1 in coercion to logical errors
+  
+#------------------------------------------------------------------------------
 #version 1.1.0
 #------------------------------------------------------------------------------
 

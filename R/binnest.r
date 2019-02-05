@@ -260,7 +260,7 @@ p <- c(preg,pre1,pre2)
 #
 # call Fortran to optimize likelihood
 #
-z0 <- .Fortran("binnest",
+z0 <- .Fortran("binnest_f",
 	Fvalue=double(1),
 	res=integer(3),  #  Iter_N,Fun_N,flag
 	x=double(total),

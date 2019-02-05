@@ -5,11 +5,12 @@
 \title{Generalized Nonlinear Mixed Models}
 \usage{
 gnlmm(y = NULL, distribution = "normal", mu = NULL, shape = NULL,
-  linear = NULL, nest = NULL, pmu = NULL, pshape = NULL, psd = NULL,
-  exact = FALSE, wt = 1, delta = 1, shfn = FALSE, scale = NULL,
-  points = 10, common = FALSE, envir = parent.frame(), print.level = 0,
-  typsize = abs(p), ndigit = 10, gradtol = 1e-05, stepmax = sqrt(p \%*\%
-  p)/10, steptol = 1e-05, iterlim = 100, fscale = 1)
+  linear = NULL, nest = NULL, pmu = NULL, pshape = NULL,
+  psd = NULL, exact = FALSE, wt = 1, delta = 1, shfn = FALSE,
+  scale = NULL, points = 10, common = FALSE,
+  envir = parent.frame(), print.level = 0, typsize = abs(p),
+  ndigit = 10, gradtol = 1e-05, stepmax = sqrt(p \%*\% p)/10,
+  steptol = 1e-05, iterlim = 100, fscale = 1)
 }
 \arguments{
 \item{y}{A response vector for uncensored data, a two column matrix for
@@ -232,4 +233,3 @@ gnlmm(y, dist="gamma", mu=~b4+exp(b0+b1*sex+b2*dose), shape=~a1+a2*sex,
 J.K. Lindsey
 }
 \keyword{models}
-

@@ -244,23 +244,23 @@ plaplace <- function(q, m=0, s=1){
 	ifelse(u<0,t,1-t)}
 dlaplace <- function(y, m=0, s=1)
 	exp(-abs(y-m)/s)/(2*s)
-plevy <- function(q, m=0, s=1){
-	if(any(q<m))stop("some y <= m")
-	len <- length(q)
-	z <- .C("plevy",
-		as.double(q),
-		as.double(m),
-		as.double(s),
-		as.double(1),
-		len=as.integer(len),
-		eps=as.double(1.0e-6),
-		pts=as.integer(5),
-		max=as.integer(16),
-		err=integer(1),
-		res=double(len),
-		# DUP=FALSE,
-		PACKAGE="repeated")
-	z$res}
+# plevy <- function(q, m=0, s=1){
+# 	if(any(q<m))stop("some y <= m")
+# 	len <- length(q)
+# 	z <- .C("plevy_c",
+# 		as.double(q),
+# 		as.double(m),
+# 		as.double(s),
+# 		as.double(1),
+# 		len=as.integer(len),
+# 		eps=as.double(1.0e-6),
+# 		pts=as.integer(5),
+# 		max=as.integer(16),
+# 		err=integer(1),
+# 		res=double(len),
+# 		# DUP=FALSE,
+# 		PACKAGE="repeated")
+# 	z$res}
 dlevy <- function(y, m=0, s=1){
 	if(any(y<=m))stop("some y <= m")
 	sqrt(s/(2*pi*(y-m)^3))*exp(-s/(2*(y-m)))}
@@ -292,7 +292,7 @@ gcopula <- function(theta){
 		if(any(u==1,na.rm=TRUE))u[u==1] <- 1-1e-15
 		if(any(u==0,na.rm=TRUE))u[u==0] <- 1e-15
 		q <- qnorm(u)
-		z <- .Fortran("gcopula",
+		z <- .Fortran("gcopula_f",
 			theta=as.double(corr),
 			like=double(1),
 			x=as.double(response$response$times),

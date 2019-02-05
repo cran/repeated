@@ -18,7 +18,7 @@ c     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 c     
 c     SYNOPSIS
 c     
-c     subroutine logitord(y,upk,EPS,FCALLS,iout,cg,total1,total2a,
+c     subroutine logitord_f(y,upk,EPS,FCALLS,iout,cg,total1,total2a,
 c     &       total2b,nobs,x,ster,hess,hesinv,nflag,iter,ifun,f)
 c     
 c     DESCRIPTION
@@ -95,7 +95,7 @@ c
 *     aa,aaa, i,j,j1,j2,jj
 *     ========================================================================
 
-      subroutine logitord(y,upk,EPS,FCALLS,iout,cg,total1,total2a,
+      subroutine logitord_f(y,upk,EPS,FCALLS,iout,cg,total1,total2a,
      &     total2b,nobs,p,x,ster,hess,hesinv,nflag,iter,ifun,f)
                                 ! Begin main program
 

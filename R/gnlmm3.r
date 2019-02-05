@@ -272,7 +272,7 @@ phjorth <- function(y, m, s, f) 1-(1+s*y)^(-f/s)*exp(-(y/m)^2/2)
 # generalized inverse Gauss cdf
 #
 pginvgauss <- function(y, m, s, f)
-	.C("pginvgauss",
+	.C("pginvgauss_c",
 		as.double(y),
 		as.double(m),
 		as.double(s),
@@ -289,7 +289,7 @@ pginvgauss <- function(y, m, s, f)
 # power exponential cdf
 #
 ppowexp <- function(y, m, s, f){
-	z <- .C("ppowexp",
+	z <- .C("ppowexp_c",
 		as.double(y),
 		as.double(m),
 		as.double(s),
@@ -307,7 +307,7 @@ ppowexp <- function(y, m, s, f){
 # power variance function Poisson density
 #
 dpvfpois <- function(y, m, s, f)
-	.C("dpvfp",
+	.C("dpvfp_c",
 		as.integer(y),
 		as.double(m),
 		as.double(s),

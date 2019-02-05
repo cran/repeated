@@ -250,27 +250,27 @@ plaplace <- function(y,m,s){
 	t <- exp(-abs(u))/2
 	ifelse(u<0,t,1-t)}
 #
-# Levy cdf
+# Levy cdf (a pure R version is imported from rmutil)
 #
-plevy <- function(y, m, s)
-	.C("plevy",
-		as.double(y),
-		as.double(m),
-		as.double(s),
-		as.double(1),
-		len=as.integer(n),
-		eps=as.double(1.0e-6),
-		pts=as.integer(5),
-		max=as.integer(16),
-		err=integer(1),
-		res=double(n),
-		#DUP=FALSE,
-		PACKAGE="repeated")$res
+# plevy <- function(y, m, s)
+# 	.C("plevy_c",
+# 		as.double(y),
+# 		as.double(m),
+# 		as.double(s),
+# 		as.double(1),
+# 		len=as.integer(n),
+# 		eps=as.double(1.0e-6),
+# 		pts=as.integer(5),
+# 		max=as.integer(16),
+# 		err=integer(1),
+# 		res=double(n),
+# 		#DUP=FALSE,
+# 		PACKAGE="repeated")$res
 #
 # simplex cdf
 #
 psimplex <- function(y, m, s)
-        z <- .C("psimplex",
+        z <- .C("psimplex_c",
         	as.double(y),
         	as.double(m),
         	as.double(s),
@@ -782,7 +782,7 @@ if (!censor){
 		const <- -wt*lchoose(nn,y[,1])},
 	"double binomial"={
 		fcn <- function(p) {
-			-.C("ddb",as.integer(y[,1]),as.integer(nn),
+			-.C("ddb_c",as.integer(y[,1]),as.integer(nn),
 				as.double(mu4(p)),as.double(exp(sh1(p))),
 				as.integer(n),as.double(wt),res=double(n),
 				#DUP=FALSE,
@@ -790,7 +790,7 @@ if (!censor){
 		const <- 0},
 	"mult binomial"={
 		fcn <- function(p) {
-			-.C("dmb",as.integer(y[,1]),as.integer(nn),
+			-.C("dmb_c",as.integer(y[,1]),as.integer(nn),
 				as.double(mu4(p)),as.double(exp(sh1(p))),
 				as.integer(n),as.double(wt),res=double(n),
 				#DUP=FALSE,
@@ -811,7 +811,7 @@ if (!censor){
 		const <- wt*lgamma(y+1)},
 	"double Poisson"={
 		fcn <- function(p) {
-			-.C("ddp",as.integer(y),as.integer(my),
+			-.C("ddp_c",as.integer(y),as.integer(my),
 				as.double(mu4(p)),as.double(exp(sh1(p))),
 				as.integer(length(y)),as.double(wt),
 				res=double(length(y)),
@@ -820,7 +820,7 @@ if (!censor){
 		const <- 0},
 	"mult Poisson"={
 		fcn <- function(p) {
-			-.C("dmp",as.integer(y),as.integer(my),
+			-.C("dmp_c",as.integer(y),as.integer(my),
 				as.double(mu4(p)),as.double(exp(sh1(p))),
 				as.integer(length(y)),as.double(wt),
 				res=double(length(y)),

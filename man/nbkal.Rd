@@ -5,9 +5,10 @@
 \alias{print.nbkal}
 \title{Negative Binomial Models with Kalman Update}
 \usage{
-nbkal(response, times, mu, preg, pdepend, kalman = TRUE, print.level = 0,
-  ndigit = 10, gradtol = 1e-05, steptol = 1e-05, fscale = 1,
-  iterlim = 100, typsize = abs(p), stepmax = 10 * sqrt(p \%*\% p))
+nbkal(response, times, mu, preg, pdepend, kalman = TRUE,
+  print.level = 0, ndigit = 10, gradtol = 1e-05, steptol = 1e-05,
+  fscale = 1, iterlim = 100, typsize = abs(p), stepmax = 10 *
+  sqrt(p \%*\% p))
 }
 \arguments{
 \item{response}{A list of two column matrices with counts and corresponding
@@ -70,13 +71,12 @@ mu <- function(p) p[1]*log(y0)+(times<30)*p[2]*
 nbkal(y, preg=c(1.3,0.008,-0.05), times=times, pdep=1.2, mu=mu)
 
 }
-\author{
-P. Lambert and J.K. Lindsey
-}
 \references{
 Lambert, P. (1996) Applied Statistics 45, 31-38.
 
 Lambert, P. (1996) Biometrics 52, 50-55.
 }
+\author{
+P. Lambert and J.K. Lindsey
+}
 \keyword{models}
-

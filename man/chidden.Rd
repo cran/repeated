@@ -8,9 +8,9 @@ chidden(response = NULL, totals = NULL, times = NULL,
   distribution = "Bernoulli", mu = NULL, cmu = NULL, tvmu = NULL,
   pgamma, pmu = NULL, pcmu = NULL, ptvmu = NULL, pshape = NULL,
   pfamily = NULL, par = NULL, pintercept = NULL, delta = NULL,
-  envir = parent.frame(), print.level = 0, ndigit = 10, gradtol = 1e-05,
-  steptol = 1e-05, fscale = 1, iterlim = 100, typsize = abs(p),
-  stepmax = 10 * sqrt(p \%*\% p))
+  envir = parent.frame(), print.level = 0, ndigit = 10,
+  gradtol = 1e-05, steptol = 1e-05, fscale = 1, iterlim = 100,
+  typsize = abs(p), stepmax = 10 * sqrt(p \%*\% p))
 }
 \arguments{
 \item{response}{A list of two or three column matrices with counts or
@@ -202,9 +202,6 @@ plot(iprofile(z), lty=2)
 plot(mprofile(z), add=TRUE)
 
 }
-\author{
-J.K. Lindsey
-}
 \references{
 MacDonald, I.L. and Zucchini, W. (1997) Hidden Markov and other
 Models for Discrete-valued Time Series. Chapman & Hall.
@@ -214,5 +211,7 @@ For time-discretized Poisson processes, see
 Davison, A.C. and Ramesh, N.I. (1996) Some models for discretized series of
 events. JASA 91: 601-609.
 }
+\author{
+J.K. Lindsey
+}
 \keyword{models}
-

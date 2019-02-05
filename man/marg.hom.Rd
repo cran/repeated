@@ -35,4 +35,3 @@ marg.hom(Freq, Left, Right)
 J.K. Lindsey
 }
 \keyword{models}
-

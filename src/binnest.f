@@ -18,7 +18,7 @@ c  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 c
 c  SYNOPSIS
 c
-c           subroutine binnest(F_value,res,x,g,hess,p,
+c           subroutine binnest_f(F_value,res,x,g,hess,p,
 c     1    num_case1,num_case2,num_subj,max_kid,max_mother,totcol,
 c     2    total1,total2,total3,uph1_in,uph2_in,fcalls,dim_w,par,
 c     3    Case1,Case2,subject,iout,hab,had,hac,ha,
@@ -34,7 +34,7 @@ c   Fortran code to fit binary random effects models with two levels
 c  of nesting.
 c
 c	Program Logit_bin_nest
-      subroutine binnest(F_value,res,x,g,hess,p,
+      subroutine binnest_f(F_value,res,x,g,hess,p,
      1    num_case1,num_case2,num_subj,max_kid,max_mother,totcol,
      2    total1,total2,total3,uph1_in,uph2_in,fcalls,dim_w,par,
      3    Case1,Case2,subject,iout,hab,had,hac,ha,

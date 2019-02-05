@@ -162,7 +162,7 @@
 ##' @importFrom graphics par plot 
 ##' @importFrom stats as.formula dbeta dbinom dcauchy dexp dgamma dlogis dnbinom dnorm dpois dt dweibull gaussian glm glm.control model.frame model.matrix na.fail nlm pbeta pcauchy pexp pgamma pgeom plogis pnbinom pnorm ppois pt pweibull qnorm summary.glm terms uniroot update.formula
 ##' @import rmutil
-##' @useDynLib repeated
+##' @useDynLib repeated, .registration=TRUE
 gnlmix <- function(y=NULL, distribution="normal", mixture="normal",
 	random=NULL, nest=NULL, mu=NULL, shape=NULL, linear=NULL,
 	pmu=NULL, pshape=NULL, pmix=NULL, delta=1, common=FALSE,
@@ -171,7 +171,7 @@ gnlmix <- function(y=NULL, distribution="normal", mixture="normal",
 	iterlim=100, fscale=1, eps=1.0e-4, points=5, steps=10){
 
 int1 <- function(ff, aa, bb)
-	.C("romberg",
+	.C("romberg_c",
 		ff,
 		as.double(aa),
 		as.double(bb),
@@ -559,13 +559,13 @@ if(!censor)fcn <- switch(distribution,
 		u <- s*(1-m)
 		exp(lbeta(y[,1]+t,y[,2]+u)-lbeta(t,u)+lchoose(nn,y[,1]))},
 	"double binomial"=function(p,r)
-		exp(.C("ddb",as.integer(y[,1]),as.integer(nn),
+		exp(.C("ddb_c",as.integer(y[,1]),as.integer(nn),
 			as.double(mu1(p,r)),as.double(exp(sh1(p))),
 			as.integer(n),as.double(wt),res=double(n),
 			#DUP=FALSE,
 			PACKAGE="repeated")$res),
 	"mult binomial"=function(p,r)
-		exp(.C("dmb",as.integer(y[,1]),as.integer(nn),
+		exp(.C("dmb_c",as.integer(y[,1]),as.integer(nn),
 			as.double(mu1(p,r)),as.double(exp(sh1(p))),
 			as.integer(n),as.double(wt),res=double(n),
 			#DUP=FALSE,
@@ -573,13 +573,13 @@ if(!censor)fcn <- switch(distribution,
 	Poisson=function(p,r)dpois(y,mu1(p,r)),
 	"negative binomial"=function(p,r)dnbinom(y,exp(sh1(p)),mu1(p,r)),
 	"double Poisson"=function(p,r)
-		exp(.C("ddp",as.integer(y),as.integer(my),
+		exp(.C("ddp_c",as.integer(y),as.integer(my),
 			as.double(mu1(p,r)),as.double(exp(sh1(p))),
 			as.integer(n),as.double(wt),res=double(n),
 			#DUP=FALSE,
 			PACKAGE="repeated")$res),
 	"mult Poisson"=function(p,r)
-		exp(.C("dmp",as.integer(y),as.integer(my),
+		exp(.C("dmp_c",as.integer(y),as.integer(my),
 			as.double(mu1(p,r)),as.double(exp(sh1(p))),
 			as.integer(n),as.double(wt),res=double(n),
 			#DUP=FALSE,

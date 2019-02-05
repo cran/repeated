@@ -18,12 +18,12 @@
  *
  *  SYNOPSIS
  *
- *  void kserie(double p[],double y[],double t[],double x[],int *nind,
+ *  void kserie_c(double p[],double y[],double t[],double x[],int *nind,
  *	int nobs[],int *nbs,int *nccov,int *npv,int *model,int *link,
  *	int *density,int *pfamily,int *dep,int *torder,int inter[],int *tvc,
  *	double tvcov[],int *fit,double pred[],double rpred[],int *rf,
  *	double bb[],int *sf, double vv[], double *like)
- *  void krand(double p[],double y[],double t[],double x[],int *nind,
+ *  void krand_c(double p[],double y[],double t[],double x[],int *nind,
  *	int nobs[],int *nbs,int *nccov,int *npv,int *model,int *link,
  *	int *density,int *torder,int inter[],int *tvc,double tvcov[],
  *	int *fit,double pred[],double rpred[],int *rf,
@@ -42,7 +42,7 @@
 #include "R.h"
 #include "Rmath.h"
 
-void kserie(double p[],double y[],double t[],double x[],int *nind,int nobs[],
+void kserie_c(double p[],double y[],double t[],double x[],int *nind,int nobs[],
 	    int *nbs,int *nccov,int *npv,int *model,int *link,int *density,
 	    int *pfamily,int *dep,int *torder,int inter[],int *tvc,
 	    double tvcov[],int *fit,double pred[],double rpred[],int *rf,
@@ -275,7 +275,7 @@ void kserie(double p[],double y[],double t[],double x[],int *nind,int nobs[],
       nm++;}}
   return;}
 
-void krand(double p[],double y[],double t[],double x[],int *nind,int nobs[],
+void krand_c(double p[],double y[],double t[],double x[],int *nind,int nobs[],
 	   int *nbs,int *nccov,int *npv,int *model,int *link,int *density,
 	   int *torder,int inter[],int *tvc,double tvcov[],
 	   int *fit,double pred[],double rpred[],int *rf,

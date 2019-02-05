@@ -4,10 +4,10 @@
 \alias{biv.binom}
 \title{Marginal Bivariate Binomial Regression Models}
 \usage{
-biv.binom(freq, marg1 = ~1, marg2 = ~1, interaction = ~1, pmarg1 = 1,
-  pmarg2 = 1, pinteraction = 1, print.level = 0, typsize = abs(p),
-  ndigit = 10, gradtol = 1e-05, stepmax = 10 * sqrt(p \%*\% p),
-  steptol = 1e-05, iterlim = 100, fscale = 1)
+biv.binom(freq, marg1 = ~1, marg2 = ~1, interaction = ~1,
+  pmarg1 = 1, pmarg2 = 1, pinteraction = 1, print.level = 0,
+  typsize = abs(p), ndigit = 10, gradtol = 1e-05, stepmax = 10 *
+  sqrt(p \%*\% p), steptol = 1e-05, iterlim = 100, fscale = 1)
 }
 \arguments{
 \item{freq}{A four-column matrix containing K 2x2 frequency tables.}
@@ -62,4 +62,3 @@ print(z <- biv.binom(Freq,marg1=~x,marg2=~x,inter=~x,pmarg1=c(-2,0.08),
 J.K. Lindsey
 }
 \keyword{models}
-

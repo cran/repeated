@@ -6,8 +6,8 @@
 \usage{
 glmm(formula, family = gaussian, data = list(), weights = NULL,
   offset = NULL, nest, delta = 1, maxiter = 20, points = 10,
-  print.level = 0, control = glm.control(epsilon = 1e-04, maxit = 10, trace
-  = FALSE))
+  print.level = 0, control = glm.control(epsilon = 1e-04, maxit = 10,
+  trace = FALSE))
 }
 \arguments{
 \item{formula}{A symbolic description of the model to be fitted. If it
@@ -84,4 +84,3 @@ glmm(cbind(r,n-r)~x, family=binomial, nest=nest, data=df)
 J.K. Lindsey
 }
 \keyword{models}
-

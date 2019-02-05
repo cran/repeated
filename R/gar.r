@@ -270,7 +270,7 @@ likekal <- function(p){
 	else theta <- if(tm)p[nprd1:np] else p[npr1:np]
 	if(tm)dep <- dep1(p)
 	if(archtype>0)parch <- p[npa]
-	z <- .C("gar",
+	z <- .C("gar_c",
 		y=as.double(y),
 		total=as.double(response$response$n),
 		my=as.integer(3*max(y)),
@@ -795,7 +795,7 @@ if(tm)dep <- dep1(z0$estimate)
 # calculate predicted values (and volatility)
 #
 if(archtype>0)parch <- z0$estmate[npa]
-z <- .C("gar",
+z <- .C("gar_c",
 	y=as.double(y),
 	total=as.double(response$response$n),
 	my=as.integer(3*max(y)),

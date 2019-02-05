@@ -5,12 +5,12 @@
 \title{Generalized Nonlinear Regression with a Random Parameter}
 \usage{
 gnlmix(y = NULL, distribution = "normal", mixture = "normal",
-  random = NULL, nest = NULL, mu = NULL, shape = NULL, linear = NULL,
-  pmu = NULL, pshape = NULL, pmix = NULL, delta = 1, common = FALSE,
-  envir = parent.frame(), print.level = 0, typsize = abs(p),
-  ndigit = 10, gradtol = 1e-05, stepmax = 10 * sqrt(p \%*\% p),
-  steptol = 1e-05, iterlim = 100, fscale = 1, eps = 1e-04, points = 5,
-  steps = 10)
+  random = NULL, nest = NULL, mu = NULL, shape = NULL,
+  linear = NULL, pmu = NULL, pshape = NULL, pmix = NULL,
+  delta = 1, common = FALSE, envir = parent.frame(),
+  print.level = 0, typsize = abs(p), ndigit = 10, gradtol = 1e-05,
+  stepmax = 10 * sqrt(p \%*\% p), steptol = 1e-05, iterlim = 100,
+  fscale = 1, eps = 1e-04, points = 5, steps = 10)
 }
 \arguments{
 \item{y}{A response vector of uncensored data, a two column matrix for
@@ -163,4 +163,3 @@ gnlmix(reps, distribution="gamma", mixture="gamma",
 J.K. Lindsey
 }
 \keyword{models}
-

@@ -240,7 +240,7 @@ total <- total1+total2a+total2b
 #
 # call Fortran to optimize likelihood
 #
-z <- .Fortran("logitord",
+z <- .Fortran("logitord_f",
 	y=as.double(data),
 	upk=as.integer(binom.mix),
 	eps=as.double(eps),

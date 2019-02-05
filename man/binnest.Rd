@@ -4,10 +4,11 @@
 \alias{binnest}
 \title{Binary Random Effects Models with Two Levels of Nesting}
 \usage{
-binnest(response, totals = NULL, nest = NULL, ccov = NULL, tvcov = NULL,
-  mu = ~1, re1 = ~1, re2 = ~1, preg = NULL, pre1 = NULL,
-  pre2 = NULL, binom.mix = c(10, 10), binom.prob = c(0.5, 0.5),
-  fcalls = 900, eps = 0.01, print.level = 0)
+binnest(response, totals = NULL, nest = NULL, ccov = NULL,
+  tvcov = NULL, mu = ~1, re1 = ~1, re2 = ~1, preg = NULL,
+  pre1 = NULL, pre2 = NULL, binom.mix = c(10, 10),
+  binom.prob = c(0.5, 0.5), fcalls = 900, eps = 0.01,
+  print.level = 0)
 }
 \arguments{
 \item{response}{A list of three column matrices with counts, corresponding
@@ -112,9 +113,6 @@ binnest(reps, mu=~treatment, preg=c(1,-1), pre1=1)
 binnest(reps, mu=~treatment, preg=c(1,-1), pre2=1)
 
 }
-\author{
-T.R. Ten Have and J.K. Lindsey
-}
 \references{
 Ten Have, T.R., Kunselman, A.R., and Tran, L. (1999) Statistics
 in Medicine 18, 947-960.
@@ -124,5 +122,7 @@ in Medicine 18, 947-960.
 \code{\link[rmutil]{restovec}}, \code{\link[rmutil]{rmna}},
 \code{\link[rmutil]{tcctomat}}, \code{\link[rmutil]{tvctomat}}.
 }
+\author{
+T.R. Ten Have and J.K. Lindsey
+}
 \keyword{models}
-

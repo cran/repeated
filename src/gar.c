@@ -18,7 +18,7 @@
  *
  *  SYNOPSIS
  *
- *  void gar(double y[], double total[], int *my, int nobs[], int *nind,
+ *  void gar_c(double y[], double total[], int *my, int nobs[], int *nind,
  *	 double times[], int censor[], int *cens, double eta[], int *tm,
  *	 double theta[], double dep[], int *model, int *thp, double shape[],
  *	 int *sh, int *link, int *ar, int *order, double *parch,
@@ -38,7 +38,7 @@
 #include "R.h"
 #include "Rmath.h"
 
-void gar(double y[], double total[], int *my, int nobs[], int *nind,
+void gar_c(double y[], double total[], int *my, int nobs[], int *nind,
 	double times[], int censor[], int *cens, double eta[], int *tm,
 	double theta[], double dep[], int *model, int *thp, double shape[],
 	int *sh, int *link, int *ar, int *order, double *parch, int *arch,
@@ -160,12 +160,12 @@ void gar(double y[], double total[], int *my, int nobs[], int *nind,
 	  break;
 	case 5: /* multiplicative Poisson distribution */
 	  iy=y[nm];
-	  dmp(&iy,my,&lmhu,&lambda,&nn,&wt,&tmp);
+	  dmp_c(&iy,my,&lmhu,&lambda,&nn,&wt,&tmp);
 	  *like-=tmp;
 	  break;
 	case 6: /* double Poisson distribution */
 	  iy=y[nm];
-	  ddp(&iy,my,&lmhu,&lambda,&nn,&wt,&tmp);
+	  ddp_c(&iy,my,&lmhu,&lambda,&nn,&wt,&tmp);
 	  *like-=tmp;
 	  break;
 	case 7: /* Consul generalized Poisson distribution */
@@ -179,12 +179,12 @@ void gar(double y[], double total[], int *my, int nobs[], int *nind,
 	  break;
 	case 9: /* multiplicative binomial distribution */
 	  iy=y[nm]; iy2=total[nm];
-	  dmb(&iy,&iy2,&lmhu,&lambda,&nn,&wt,&tmp);
+	  dmb_c(&iy,&iy2,&lmhu,&lambda,&nn,&wt,&tmp);
 	  *like-=tmp;
 	  break;
 	case 10: /* double binomial distribution */
 	  iy=y[nm]; iy2=total[nm];
-	  ddb(&iy,&iy2,&lmhu,&lambda,&nn,&wt,&tmp);
+	  ddb_c(&iy,&iy2,&lmhu,&lambda,&nn,&wt,&tmp);
 	  *like-=tmp;
 	  break;
 	case 11: /* normal distribution */
@@ -268,7 +268,7 @@ void gar(double y[], double total[], int *my, int nobs[], int *nind,
 	case 31: /* power variance function Poisson distribution */
 	  iy=y[nm];
 	  tmp=lambda2/lmhu;
-	  dpvfp(&iy,&lmhu,&lambda,&tmp,&nn,&wt,&lik);
+	  dpvfp_c(&iy,&lmhu,&lambda,&tmp,&nn,&wt,&lik);
 	  *like-=log(lik);
 	  break;
 	case 32: /* skew Laplace distribution */
@@ -317,7 +317,7 @@ void gar(double y[], double total[], int *my, int nobs[], int *nind,
 	  lik=pbeta(y[nm],lmhu*lambda/(1-lmhu),lambda,1,0);
 	  break;
 	case 21: /* simplex distribution */
-	  psimplex(&y[nm],&lmhu,&lambda,&tmp,&nn,&eps,&pts,&max,&iy,&lik);
+	  psimplex_c(&y[nm],&lmhu,&lambda,&tmp,&nn,&eps,&pts,&max,&iy,&lik);
 	  break;
 	case 22: /* two-sided power distribution */
 	  lik=y[nm]<lmhu?log(lmhu)+lambda*log(y[nm]/lmhu):
@@ -345,15 +345,15 @@ void gar(double y[], double total[], int *my, int nobs[], int *nind,
 	    (1.0-exp(-pow(lmhu,-lambda))));
 	  break;
 	case 29: /* generalized inverse Gauss distribution */
-	  pginvgauss(&y[nm],&lmhu,&lambda,&lambda2,&nn,&eps,&pts,&max,&iy,&lik);
+	  pginvgauss_c(&y[nm],&lmhu,&lambda,&lambda2,&nn,&eps,&pts,&max,&iy,&lik);
 	  break;
 	case 30: /* power exponential distribution */
-	  ppowexp(&y[nm],&lmhu,&lambda,&lambda2,&nn,&eps,&pts,&max,&iy,&lik);
+	  ppowexp_c(&y[nm],&lmhu,&lambda,&lambda2,&nn,&eps,&pts,&max,&iy,&lik);
 	  lik=lik-lmhu>0?0.5+lik:0.5-lik;
 	  break;
 	case 32: /* skew Laplace distribution */
 	  tmp=(y[nm]-lmhu)/lambda;
-	  lik=tmp>0?1-exp(-lambda2*abs(tmp))/(1+lambda2*lambda2):lambda2*lambda2*exp(-abs(tmp)/lambda2)/(1+lambda2*lambda2);
+	  lik=tmp>0?1-exp(-lambda2*fabs(tmp))/(1+lambda2*lambda2):lambda2*lambda2*exp(-fabs(tmp)/lambda2)/(1+lambda2*lambda2);
 	  break;
 	case 33: /* Student t */
 	  lik=pt((y[nm]-lmhu)/lambda,lambda2,1,0);

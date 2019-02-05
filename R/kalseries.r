@@ -305,7 +305,7 @@ kalseries <- function(response=NULL, times=NULL, intensity="exponential",
 series <- function(p){
 	if(rf)b <- mu1(p)
 	if(sf)v <- sh1(p[nps1:np])
-	z <- .C("kserie",
+	z <- .C("kserie_c",
 		p=as.double(p),
 		y=as.double(y),
 		t=as.double(times),
@@ -341,7 +341,7 @@ series <- function(p){
 serief <- function(p){
 	if(rf)b <- mu1(p)
 	if(sf)v <- sh1(p[nps1:np])
-	z <- .C("krand",
+	z <- .C("krand_c",
 		p=as.double(p),
 		y=as.double(y),
 		t=as.double(times),
@@ -798,7 +798,7 @@ else {
 	z <- if(depend=="frailty"){
 		if(rf)b <- mu1(p)
 		if(sf)v <- sh1(p[nps1:np])
-		.C("krand",
+		.C("krand_c",
 			p=as.double(p),
 			y=as.double(y),
 			t=as.double(times),
@@ -829,7 +829,7 @@ else {
 	else {
 		if(rf)b <- mu1(p)
 		if(sf)v <- sh1(p[nps1:np])
-		z <- .C("kserie",
+		z <- .C("kserie_c",
 			p=as.double(p),
 			y=as.double(y),
 			t=as.double(times),

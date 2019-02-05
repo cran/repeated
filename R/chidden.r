@@ -228,7 +228,7 @@ likel <- function(p){
 	if(np>np1){
 		if(np3-np1==1)pshape <- rep(p[np3],states)
 		else pshape <- p[np2:np3]}
-	z <- .Fortran("chidden",
+	z <- .Fortran("chidden_f",
 		x=as.double(p),
 		as.integer(states),
 		iq=as.integer(nosubj),
@@ -282,7 +282,7 @@ like <- function(p){
 	if(np>np1){
 		if(np3-np1==1)pshape <- rep(p[np3],states)
 		else pshape <- p[np2:np3]}
-	z <- .Fortran("chidden",
+	z <- .Fortran("chidden_f",
 		x=as.double(p),
 		as.integer(states),
 		iq=as.integer(nosubj),
