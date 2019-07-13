@@ -154,7 +154,7 @@ c
 c     check that correlation matrix is positive definite
 c
       if(npre+npar.gt.1.and..not.warn)then
-         call rs(nld,nobs,v,tmp1,0,0,tmp2,tmp3,ierr)
+         call rs(nld,nobs,v,tmp1,0,0.0D0,tmp2,tmp3,ierr)
          tmp=1.
          do 2 j=1,nobs
             tmp=tmp*tmp1(j)

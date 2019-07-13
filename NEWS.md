@@ -1,4 +1,18 @@
 #------------------------------------------------------------------------------
+#version 1.1.2
+#------------------------------------------------------------------------------
+
+  * https://github.com/swihart/repeated/issues/15
+  * `repeated` was flagged for LTO mismatches using gcc9 and subsequently taken off CRAN.
+  * LTOs are fixed with the following 3 edits:
+  * 1.  In gausscop.f, line 157:  make 0 -> 0.0D0 for 6th argument in rs()
+  * 2.  In chidden.f, line 436: comment out real precision rank and make rank integer in line above (435)
+  * 3.  chidden.f:462:12:  `dqrcf(gmod,m,rank,qraux,work3,m,invec,info,1)` -> `dqrcf(gmod,m,rank,qraux,work3,m,invec,info)`
+  
+  In addition I've embellished the DESCRIPTION with information about models and citations   to JK
+  Lindsey's textbooks.
+
+#------------------------------------------------------------------------------
 #version 1.1.1
 #------------------------------------------------------------------------------
 

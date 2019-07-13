@@ -1,7 +1,7 @@
 ad4652e2dcfd4a0ecf91a2c01a7defd5 *COPYING
-3edb7ae08aa435b2f8814ece674e7996 *DESCRIPTION
+b17832e69d23e31bf7bfcf1eeb33c342 *DESCRIPTION
 fba233ff25d8cbc4cf1daa9261662f5c *NAMESPACE
-15842cec6bcb5744e6b7f9e873a3c417 *NEWS.md
+9011504b9491bac333b9512386a50b9b *NEWS.md
 023f9a154fa58c9a8ade2f230bcaa609 *R/binnest.r
 7f7e23c08b633bf337bf4df41a960c41 *R/bivbetab.r
 08f383919987272fb0d1bb761a643570 *R/bivbinom.r
@@ -53,7 +53,7 @@ a4e62ff574df4169ed24cc35fd8f18d7 *src/calcs3.c
 22596688b6aa760f01ad237e3dcdce78 *src/calcs3.h
 2764c299e39337605fc6f980865991c0 *src/calcs4.c
 4ee9a12108143294f6c668066fa79412 *src/calcs4.h
-8ef766641eaea74e4e56c981fa8725d7 *src/chidden.f
+fd6402b5ca818411a437833f22a1b63f *src/chidden.f
 17b9883568d316efe771b524b68394d5 *src/cphidden.f
 56be3da0a27ad554ac2b456af1cd58c9 *src/cutil.c
 dec0bfcc01ab69b25ed9121cf66652c0 *src/defs.h
@@ -63,7 +63,7 @@ dccd5a32702ff168ef068262881d710c *src/dist.h
 b9c96a37979accae8a8baa5cd7e81448 *src/gaps.c
 cb5fe8375fb617a165218b22edc92922 *src/gaps.h
 4b1958c5f3b14e3a82a0cae793dc0264 *src/gar.c
-864e9791b41163b2ca453d9779991600 *src/gausscop.f
+0e072e44a171aa55907a753f95363989 *src/gausscop.f
 458000a5efc369f8998f7c449730a071 *src/hidden.f
 b1aeb7c33a669bf63ae0229dd09317cc *src/kcountb.c
 195dc78a6c31f837bbfdf7ed511a377e *src/kserieb.c
