@@ -5,12 +5,27 @@
 \alias{logitord.print}
 \title{Ordinal Random Effects Models with Dropouts}
 \usage{
-logitord(y, id, out.ccov = NULL, drop.ccov = NULL, tvcov = NULL,
-  out.tvcov = !is.null(tvcov), drop.tvcov = !is.null(tvcov), pout,
-  pdrop, prand.out, prand.drop, random.out.int = TRUE,
-  random.out.slope = !is.null(tvcov), random.drop.int = TRUE,
-  random.drop.slope = !is.null(tvcov), binom.mix = 5, fcalls = 900,
-  eps = 1e-04, print.level = 0)
+logitord(
+  y,
+  id,
+  out.ccov = NULL,
+  drop.ccov = NULL,
+  tvcov = NULL,
+  out.tvcov = !is.null(tvcov),
+  drop.tvcov = !is.null(tvcov),
+  pout,
+  pdrop,
+  prand.out,
+  prand.drop,
+  random.out.int = TRUE,
+  random.out.slope = !is.null(tvcov),
+  random.drop.int = TRUE,
+  random.drop.slope = !is.null(tvcov),
+  binom.mix = 5,
+  fcalls = 900,
+  eps = 1e-04,
+  print.level = 0
+)
 }
 \arguments{
 \item{y}{A vector of binary or ordinal responses with levels 1 to k and 0

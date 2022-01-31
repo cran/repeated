@@ -8,15 +8,36 @@
 \alias{print.kalcount}
 \title{Repeated Measurements Models for Counts with Frailty or Serial Dependence}
 \usage{
-kalcount(response = NULL, times = NULL, origin = 0,
-  intensity = "exponential", depend = "independence",
-  update = "Markov", mu = NULL, shape = NULL, density = FALSE,
-  ccov = NULL, tvcov = NULL, preg = NULL, ptvc = NULL,
-  pbirth = NULL, pintercept = NULL, pshape = NULL, pinitial = 1,
-  pdepend = NULL, pfamily = NULL, envir = parent.frame(),
-  print.level = 0, ndigit = 10, gradtol = 1e-05, steptol = 1e-05,
-  fscale = 1, iterlim = 100, typsize = abs(p), stepmax = 10 *
-  sqrt(p \%*\% p))
+kalcount(
+  response = NULL,
+  times = NULL,
+  origin = 0,
+  intensity = "exponential",
+  depend = "independence",
+  update = "Markov",
+  mu = NULL,
+  shape = NULL,
+  density = FALSE,
+  ccov = NULL,
+  tvcov = NULL,
+  preg = NULL,
+  ptvc = NULL,
+  pbirth = NULL,
+  pintercept = NULL,
+  pshape = NULL,
+  pinitial = 1,
+  pdepend = NULL,
+  pfamily = NULL,
+  envir = parent.frame(),
+  print.level = 0,
+  ndigit = 10,
+  gradtol = 1e-05,
+  steptol = 1e-05,
+  fscale = 1,
+  iterlim = 100,
+  typsize = abs(p),
+  stepmax = 10 * sqrt(p \%*\% p)
+)
 }
 \arguments{
 \item{response}{A list of two column matrices with counts and corresponding

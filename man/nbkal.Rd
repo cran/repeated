@@ -5,10 +5,22 @@
 \alias{print.nbkal}
 \title{Negative Binomial Models with Kalman Update}
 \usage{
-nbkal(response, times, mu, preg, pdepend, kalman = TRUE,
-  print.level = 0, ndigit = 10, gradtol = 1e-05, steptol = 1e-05,
-  fscale = 1, iterlim = 100, typsize = abs(p), stepmax = 10 *
-  sqrt(p \%*\% p))
+nbkal(
+  response,
+  times,
+  mu,
+  preg,
+  pdepend,
+  kalman = TRUE,
+  print.level = 0,
+  ndigit = 10,
+  gradtol = 1e-05,
+  steptol = 1e-05,
+  fscale = 1,
+  iterlim = 100,
+  typsize = abs(p),
+  stepmax = 10 * sqrt(p \%*\% p)
+)
 }
 \arguments{
 \item{response}{A list of two column matrices with counts and corresponding

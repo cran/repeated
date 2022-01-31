@@ -4,9 +4,20 @@
 \alias{biv.betab}
 \title{Bivariate Beta-binomial Regression Models}
 \usage{
-biv.betab(freq, x = NULL, p, depend = TRUE, print.level = 0,
-  typsize = abs(p), ndigit = 10, gradtol = 1e-05, stepmax = 10 *
-  sqrt(p \%*\% p), steptol = 1e-05, iterlim = 100, fscale = 1)
+biv.betab(
+  freq,
+  x = NULL,
+  p,
+  depend = TRUE,
+  print.level = 0,
+  typsize = abs(p),
+  ndigit = 10,
+  gradtol = 1e-05,
+  stepmax = 10 * sqrt(p \%*\% p),
+  steptol = 1e-05,
+  iterlim = 100,
+  fscale = 1
+)
 }
 \arguments{
 \item{freq}{A matrix containing four columns corresponding to 00, 01, 10,

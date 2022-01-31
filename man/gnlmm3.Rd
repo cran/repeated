@@ -4,13 +4,34 @@
 \alias{gnlmm3}
 \title{Generalized Nonlinear Mixed Models for Three-parameter Distributions}
 \usage{
-gnlmm3(y = NULL, distribution = "normal", mu = NULL, shape = NULL,
-  nest = NULL, family = NULL, linear = NULL, pmu = NULL,
-  pshape = NULL, pfamily = NULL, psd = NULL, exact = FALSE,
-  wt = 1, scale = NULL, points = 10, common = FALSE, delta = 1,
-  envir = parent.frame(), print.level = 0, typsize = abs(p),
-  ndigit = 10, gradtol = 1e-05, stepmax = 10 * sqrt(p \%*\% p),
-  steptol = 1e-05, iterlim = 100, fscale = 1)
+gnlmm3(
+  y = NULL,
+  distribution = "normal",
+  mu = NULL,
+  shape = NULL,
+  nest = NULL,
+  family = NULL,
+  linear = NULL,
+  pmu = NULL,
+  pshape = NULL,
+  pfamily = NULL,
+  psd = NULL,
+  exact = FALSE,
+  wt = 1,
+  scale = NULL,
+  points = 10,
+  common = FALSE,
+  delta = 1,
+  envir = parent.frame(),
+  print.level = 0,
+  typsize = abs(p),
+  ndigit = 10,
+  gradtol = 1e-05,
+  stepmax = 10 * sqrt(p \%*\% p),
+  steptol = 1e-05,
+  iterlim = 100,
+  fscale = 1
+)
 }
 \arguments{
 \item{y}{A response vector for uncensored data, a two column matrix for

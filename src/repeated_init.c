@@ -16,7 +16,7 @@ extern void kserie_c(void *, void *, void *, void *, void *, void *, void *, voi
 extern void pginvgauss_c(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
 extern void ppowexp_c(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
 extern void psimplex_c(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
-extern void romberg_c(void *, void *, void *, void *, void *, void *, void *, void *, void *);
+// extern void romberg_c(void *, void *, void *, void *, void *, void *, void *, void *, void *);
 
 static const R_CMethodDef CEntries[] = {
     {"countfb_c",    (DL_FUNC) &countfb_c,    21},
@@ -32,8 +32,17 @@ static const R_CMethodDef CEntries[] = {
     {"pginvgauss_c", (DL_FUNC) &pginvgauss_c, 10},
     {"ppowexp_c",    (DL_FUNC) &ppowexp_c,    10},
     {"psimplex_c",   (DL_FUNC) &psimplex_c,   10},
-    {"romberg_c",    (DL_FUNC) &romberg_c,     9},
+    // {"romberg_c",    (DL_FUNC) &romberg_c,     9},
     {NULL, NULL, 0}
+};
+
+
+/* .Call()  */
+extern void romberg_sexp(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
+
+static const R_CallMethodDef callMethods[]  = {
+  {"romberg_sexp", (DL_FUNC) &romberg_sexp, 9},
+  {NULL, NULL, 0}
 };
 
 
@@ -57,6 +66,6 @@ static const R_FortranMethodDef FortranEntries[] = {
 
 void R_init_repeated(DllInfo *dll)
 {
-    R_registerRoutines(dll, CEntries, NULL, FortranEntries, NULL);
+    R_registerRoutines(dll, CEntries, callMethods, FortranEntries, NULL);
     R_useDynamicSymbols(dll, FALSE);
 }

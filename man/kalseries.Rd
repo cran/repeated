@@ -9,15 +9,38 @@
 \title{Repeated Measurements Models for Continuous Variables with Frailty or
 Serial Dependence}
 \usage{
-kalseries(response = NULL, times = NULL, intensity = "exponential",
-  depend = "independence", mu = NULL, shape = NULL,
-  density = FALSE, ccov = NULL, tvcov = NULL, torder = 0,
-  interaction = NULL, preg = NULL, ptvc = NULL, pintercept = NULL,
-  pshape = NULL, pinitial = 1, pdepend = NULL, pfamily = NULL,
-  delta = NULL, transform = "identity", link = "identity",
-  envir = parent.frame(), print.level = 0, ndigit = 10,
-  gradtol = 1e-05, steptol = 1e-05, fscale = 1, iterlim = 100,
-  typsize = abs(p), stepmax = 10 * sqrt(p \%*\% p))
+kalseries(
+  response = NULL,
+  times = NULL,
+  intensity = "exponential",
+  depend = "independence",
+  mu = NULL,
+  shape = NULL,
+  density = FALSE,
+  ccov = NULL,
+  tvcov = NULL,
+  torder = 0,
+  interaction = NULL,
+  preg = NULL,
+  ptvc = NULL,
+  pintercept = NULL,
+  pshape = NULL,
+  pinitial = 1,
+  pdepend = NULL,
+  pfamily = NULL,
+  delta = NULL,
+  transform = "identity",
+  link = "identity",
+  envir = parent.frame(),
+  print.level = 0,
+  ndigit = 10,
+  gradtol = 1e-05,
+  steptol = 1e-05,
+  fscale = 1,
+  iterlim = 100,
+  typsize = abs(p),
+  stepmax = 10 * sqrt(p \%*\% p)
+)
 }
 \arguments{
 \item{response}{A list of two column matrices with responses and

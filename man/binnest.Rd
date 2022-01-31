@@ -4,11 +4,24 @@
 \alias{binnest}
 \title{Binary Random Effects Models with Two Levels of Nesting}
 \usage{
-binnest(response, totals = NULL, nest = NULL, ccov = NULL,
-  tvcov = NULL, mu = ~1, re1 = ~1, re2 = ~1, preg = NULL,
-  pre1 = NULL, pre2 = NULL, binom.mix = c(10, 10),
-  binom.prob = c(0.5, 0.5), fcalls = 900, eps = 0.01,
-  print.level = 0)
+binnest(
+  response,
+  totals = NULL,
+  nest = NULL,
+  ccov = NULL,
+  tvcov = NULL,
+  mu = ~1,
+  re1 = ~1,
+  re2 = ~1,
+  preg = NULL,
+  pre1 = NULL,
+  pre2 = NULL,
+  binom.mix = c(10, 10),
+  binom.prob = c(0.5, 0.5),
+  fcalls = 900,
+  eps = 0.01,
+  print.level = 0
+)
 }
 \arguments{
 \item{response}{A list of three column matrices with counts, corresponding

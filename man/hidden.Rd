@@ -5,13 +5,32 @@
 \alias{plot.hidden}
 \title{Discrete-time Hidden Markov Chain Models}
 \usage{
-hidden(response = NULL, totals = NULL, distribution = "Bernoulli",
-  mu = NULL, cmu = NULL, tvmu = NULL, pgamma, pmu = NULL,
-  pcmu = NULL, ptvmu = NULL, pshape = NULL, pfamily = NULL,
-  par = NULL, pintercept = NULL, delta = NULL,
-  envir = parent.frame(), print.level = 0, ndigit = 10,
-  gradtol = 1e-05, steptol = 1e-05, fscale = 1, iterlim = 100,
-  typsize = abs(p), stepmax = 10 * sqrt(p \%*\% p))
+hidden(
+  response = NULL,
+  totals = NULL,
+  distribution = "Bernoulli",
+  mu = NULL,
+  cmu = NULL,
+  tvmu = NULL,
+  pgamma,
+  pmu = NULL,
+  pcmu = NULL,
+  ptvmu = NULL,
+  pshape = NULL,
+  pfamily = NULL,
+  par = NULL,
+  pintercept = NULL,
+  delta = NULL,
+  envir = parent.frame(),
+  print.level = 0,
+  ndigit = 10,
+  gradtol = 1e-05,
+  steptol = 1e-05,
+  fscale = 1,
+  iterlim = 100,
+  typsize = abs(p),
+  stepmax = 10 * sqrt(p \%*\% p)
+)
 }
 \arguments{
 \item{response}{A list of two or three column matrices with counts or

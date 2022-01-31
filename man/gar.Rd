@@ -10,15 +10,37 @@
 \alias{residuals.gar}
 \title{Generalized Autoregression Models}
 \usage{
-gar(response = NULL, distribution = "normal", times = NULL,
-  totals = NULL, censor = NULL, delta = NULL, mu = NULL,
-  shape = NULL, depend = NULL, shfn = FALSE, common = FALSE,
-  preg = NULL, pshape = NULL, pdepend = NULL, parch = NULL,
-  arch = "square", transform = "identity", link = "identity",
-  autocorr = "exponential", order = 1, envir = parent.frame(),
-  print.level = 0, ndigit = 10, gradtol = 1e-05, steptol = 1e-05,
-  fscale = 1, iterlim = 100, typsize = abs(p), stepmax = 10 *
-  sqrt(p \%*\% p))
+gar(
+  response = NULL,
+  distribution = "normal",
+  times = NULL,
+  totals = NULL,
+  censor = NULL,
+  delta = NULL,
+  mu = NULL,
+  shape = NULL,
+  depend = NULL,
+  shfn = FALSE,
+  common = FALSE,
+  preg = NULL,
+  pshape = NULL,
+  pdepend = NULL,
+  parch = NULL,
+  arch = "square",
+  transform = "identity",
+  link = "identity",
+  autocorr = "exponential",
+  order = 1,
+  envir = parent.frame(),
+  print.level = 0,
+  ndigit = 10,
+  gradtol = 1e-05,
+  steptol = 1e-05,
+  fscale = 1,
+  iterlim = 100,
+  typsize = abs(p),
+  stepmax = 10 * sqrt(p \%*\% p)
+)
 }
 \arguments{
 \item{response}{A list of two or three column matrices with responses,

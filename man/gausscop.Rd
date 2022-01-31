@@ -8,13 +8,29 @@
 \alias{print.gausscop}
 \title{Multivariate Gaussian Copula with Arbitrary Marginals}
 \usage{
-gausscop(response = NULL, distribution = "gamma", mu = NULL,
-  shape = NULL, autocorr = "exponential", pmu = NULL,
-  pshape = NULL, par = NULL, pre = NULL, delta = NULL,
-  shfn = FALSE, common = FALSE, envir = parent.frame(),
-  print.level = 0, ndigit = 10, gradtol = 1e-05, steptol = 1e-05,
-  iterlim = 100, fscale = 1, stepmax = 10 * sqrt(theta \%*\% theta),
-  typsize = abs(c(theta)))
+gausscop(
+  response = NULL,
+  distribution = "gamma",
+  mu = NULL,
+  shape = NULL,
+  autocorr = "exponential",
+  pmu = NULL,
+  pshape = NULL,
+  par = NULL,
+  pre = NULL,
+  delta = NULL,
+  shfn = FALSE,
+  common = FALSE,
+  envir = parent.frame(),
+  print.level = 0,
+  ndigit = 10,
+  gradtol = 1e-05,
+  steptol = 1e-05,
+  iterlim = 100,
+  fscale = 1,
+  stepmax = 10 * sqrt(theta \%*\% theta),
+  typsize = abs(c(theta))
+)
 }
 \arguments{
 \item{response}{A list of two or three column matrices with response

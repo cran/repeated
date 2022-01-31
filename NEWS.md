@@ -1,4 +1,12 @@
 #------------------------------------------------------------------------------
+#version 1.1.3
+#------------------------------------------------------------------------------
+
+  * https://github.com/swihart/repeated/issues/16
+  * `call_R()` be gone!
+  * rewrite the C-code of romberg integration in gnlmix to have entry .Call
+  
+#------------------------------------------------------------------------------
 #version 1.1.2
 #------------------------------------------------------------------------------
 
@@ -38,7 +46,7 @@ https://github.com/swihart/repeated/issues.
 
 **Above this line will be News/Changes for `repeated` only**
 
-**Below this line corresponds to [changes.txt](http://www.commanster.eu/rcode/changes.txt), which was Jim Lindsey's file for
+**Below this line corresponds to [changes.txt](https://www.commanster.eu/rcode/changes.txt), which was Jim Lindsey's file for
 detailing changes across the v1.0 packages `rmutil`, `repeated`, `gnlm`, `growth`, `event`, `stable` on his homepage**
 
 #------------------------------------------------------------------------------
