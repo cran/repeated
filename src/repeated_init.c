@@ -1,6 +1,7 @@
 #include <R_ext/RS.h>
 #include <stdlib.h> // for NULL
 #include <R_ext/Rdynload.h>
+#include <Rinternals.h>
 
 /* .C calls */
 extern void countfb_c(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
@@ -38,7 +39,9 @@ static const R_CMethodDef CEntries[] = {
 
 
 /* .Call()  */
-extern void romberg_sexp(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
+//extern void romberg_sexp(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
+SEXP romberg_sexp(SEXP fcn, SEXP a, SEXP b, SEXP len, SEXP eps,
+                  SEXP pts, SEXP max, SEXP err, SEXP envir);
 
 static const R_CallMethodDef callMethods[]  = {
   {"romberg_sexp", (DL_FUNC) &romberg_sexp, 9},

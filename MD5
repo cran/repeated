@@ -1,7 +1,7 @@
 ad4652e2dcfd4a0ecf91a2c01a7defd5 *COPYING
-bd5a51a7c094a50a825a0a7c4d77ad5e *DESCRIPTION
+fc9184b85688764f5f23f2f1e6ed8b29 *DESCRIPTION
 fba233ff25d8cbc4cf1daa9261662f5c *NAMESPACE
-d5ef707b88a1a7e92a30ca7f2263cfa0 *NEWS.md
+cc06d67833e0404275981cf39978b61b *NEWS.md
 023f9a154fa58c9a8ade2f230bcaa609 *R/binnest.r
 7f7e23c08b633bf337bf4df41a960c41 *R/bivbetab.r
 08f383919987272fb0d1bb761a643570 *R/bivbinom.r
@@ -68,5 +68,5 @@ cb5fe8375fb617a165218b22edc92922 *src/gaps.h
 b1aeb7c33a669bf63ae0229dd09317cc *src/kcountb.c
 195dc78a6c31f837bbfdf7ed511a377e *src/kserieb.c
 add9565115246e964868f026c1aa42a4 *src/logitord.f
-31e2bf985e000cca277c1823c13b0fdf *src/repeated_init.c
-d0827622bcf9a3a116118832aecdeee8 *src/romberg_sexp.c
+0cf2fa427843b20f89b9de3da1b7f5fb *src/repeated_init.c
+b659606ccdaf16303fa5af5fb363eca9 *src/romberg_sexp.c
