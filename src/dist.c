@@ -243,45 +243,45 @@ static void interp(double x[], double fx[], int pts, double tab1[],
     *df=2*ni<(pts-j-3)?tab1[ni+1]:tab2[ni--];
     *f+=*df;}}
 
-static void evalfn(void fcn(), double a[], double b[], int n,
-		   int len, double sum[], double tmpsum[], double zz[],
-		   double pnt1[], double pnt2[], double arg1[],
-		   double arg2[], double arg3[], double x[])
-{
-  int i,j,k,nn;
+static void evalfn(void (*fcn)(double*, double*, double*, double*, int, double*), double a[], double b[], int n,
+                       int len, double sum[], double tmpsum[], double zz[],
+                                                                        double pnt1[], double pnt2[], double arg1[],
+                                                                                                                 double arg2[], double arg3[], double x[])
+    {
+      int i,j,k,nn;
+      
+      if(n==1){
+        for(k=0;k<len;k++)zz[k]=0.5*(a[k]+b[k]);
+        fcn(zz,arg1,arg2,arg3,len,x);
+        for(k=0;k<len;k++)sum[k]=(b[k]-a[k])*x[k];
+        return;}
+      else {
+        for(i=1,j=1;j<n-1;j++) i*=3;
+        nn=i;
+        for(k=0;k<len;k++){
+          pnt1[k]=(b[k]-a[k])/(3.0*nn);
+          pnt2[k]=2.0*pnt1[k];
+          zz[k]=a[k]+0.5*pnt1[k];
+          tmpsum[k]=0.0;}
+        for(j=1;j<=i;j++){
+          fcn(zz,arg1,arg2,arg3,len,x);
+          for(k=0;k<len;k++){
+            tmpsum[k]+=x[k];
+            zz[k]+=pnt2[k];}
+          fcn(zz,arg1,arg2,arg3,len,x);
+          for(k=0;k<len;k++){
+            tmpsum[k]+=x[k];
+            zz[k]+=pnt1[k];}}
+        for(k=0;k<len;k++)sum[k]=(sum[k]+(b[k]-a[k])*tmpsum[k]/nn)/3.0;
+        return;}}
 
-  if(n==1){
-    for(k=0;k<len;k++)zz[k]=0.5*(a[k]+b[k]);
-    fcn(zz,arg1,arg2,arg3,len,x);
-    for(k=0;k<len;k++)sum[k]=(b[k]-a[k])*x[k];
-    return;}
-  else {
-    for(i=1,j=1;j<n-1;j++) i*=3;
-    nn=i;
-    for(k=0;k<len;k++){
-      pnt1[k]=(b[k]-a[k])/(3.0*nn);
-      pnt2[k]=2.0*pnt1[k];
-      zz[k]=a[k]+0.5*pnt1[k];
-      tmpsum[k]=0.0;}
-    for(j=1;j<=i;j++){
-      fcn(zz,arg1,arg2,arg3,len,x);
-      for(k=0;k<len;k++){
-	tmpsum[k]+=x[k];
-	zz[k]+=pnt2[k];}
-      fcn(zz,arg1,arg2,arg3,len,x);
-      for(k=0;k<len;k++){
-	tmpsum[k]+=x[k];
-	zz[k]+=pnt1[k];}}
-    for(k=0;k<len;k++)sum[k]=(sum[k]+(b[k]-a[k])*tmpsum[k]/nn)/3.0;
-    return;}}
-
-static void romberg2(void fcn(), double *a, double *b, int len,
-		    double *arg1, double *arg2, double *arg3, double eps,
-		    int pts, int max, int *err, double sumlen[])
+static void romberg2(void (*fcn)(double*, double*, double*, double*, int, double*), double *a, double *b, int len,
+                     double *arg1, double *arg2, double *arg3, double eps,
+                     int pts, int max, int *err, double sumlen[])
 {
   int i,j,j1,finish;
   double errsum,*tab1,*tab2,*x,*fx,*sum,*tmpsum,*zz,*pnt1,*pnt2,*y;
-
+  
   x=(double*)R_alloc((size_t)(max*len),sizeof(double));
   fx=(double*)R_alloc((size_t)(max*len),sizeof(double));
   sum=(double*)R_alloc((size_t)len,sizeof(double));
@@ -304,9 +304,9 @@ static void romberg2(void fcn(), double *a, double *b, int len,
     for(i=0;i<len;i++){
       fx[j+i*max]=sum[i];
       if(j1>=pts){
-	interp(&x[j1-pts+i*max],&fx[j1-pts+i*max],pts,tab1,tab2,&sumlen[i],&errsum,err);
-	if(*err)return;
-	if(fabs(errsum)>eps*fabs(sumlen[i]))finish=0;}
+        interp(&x[j1-pts+i*max],&fx[j1-pts+i*max],pts,tab1,tab2,&sumlen[i],&errsum,err);
+        if(*err)return;
+        if(fabs(errsum)>eps*fabs(sumlen[i]))finish=0;}
       x[j1+i*max]=x[j+i*max]/9.0;
       fx[j1+i*max]=fx[j+i*max];}
     if(finish)return;}

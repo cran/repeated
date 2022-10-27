@@ -1,5 +1,5 @@
 Package: repeated
-Version: 1.1.5
+Version: 1.1.6
 Title: Non-Normal Repeated Measurements Models
 Authors@R: c(
     person("Bruce", "Swihart", email="bruce.swihart@gmail.com", role=c("cre", "aut")),
@@ -34,7 +34,7 @@ Encoding: UTF-8
 LazyLoad: true
 RoxygenNote: 7.1.2
 NeedsCompilation: yes
-Packaged: 2022-03-01 04:40:04 UTC; swihartbj
+Packaged: 2022-10-27 18:27:05 UTC; swihartbj
 Author: Bruce Swihart [cre, aut],
   Jim Lindsey [aut] (Jim created this package, Bruce is maintaining the
     CRAN version),
@@ -48,4 +48,4 @@ Author: Bruce Swihart [cre, aut],
   Euginia Zharichenko [ctb, cph] (Wrote logitord.f.)
 Maintainer: Bruce Swihart <bruce.swihart@gmail.com>
 Repository: CRAN
-Date/Publication: 2022-03-01 10:10:02 UTC
+Date/Publication: 2022-10-27 23:42:39 UTC
