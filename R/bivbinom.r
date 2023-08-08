@@ -184,8 +184,9 @@ class(z) <- "bivbinom"
 return(z)}
 
 ### print method
-###
-print.bivbinom <- function(z){
+#' @export
+print.bivbinom <- function(x, ...){
+  z <- x
 	npt1 <- z$npt[[1]]
 	npt2 <- z$npt[[2]]
 	npt3 <- z$npt[[3]]

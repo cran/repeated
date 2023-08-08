@@ -215,11 +215,11 @@ mu <- function(p) exp(p[1]+p[2]*sex+p[3]*dose)
 ## starting values for pmu and pshape from z$coef[1:3] and z$coef[4] respectively
 ## starting value for pfamily in z$coef[5]
 gnlmm3(y, dist="Student", mu=mu, nest=nest, pmu=c(3.69,-1.19, 0.039),
-	pshape=4.94, pfamily=-0.6887259, psd=50, points=3)
+       pshape=5, pfamily=0, psd=40, points=3)
 # or equivalently
 gnlmm3(y, dist="Student", mu=~exp(b0+b1*sex+b2*dose), nest=nest,
-	pmu=c(3.69,-1.19, 0.039), pshape=4.94, pfamily=-0.6887259, psd=50,
-	points=3, envir=reps)
+       pmu=c(3.69,-1.19, 0.039), pshape=5, pfamily=0, psd=40,
+       points=3, envir=reps)
 \dontrun{
 # or with identity link
 print(z <- gnlm::gnlr3(y, dist="Student", mu=~sex+dose, pmu=c(0.1,0,0), pshape=1,

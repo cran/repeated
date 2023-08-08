@@ -107,13 +107,13 @@
 ##' #y <- rbind(matrix(rbinom(20,1,0.6), ncol=4),
 ##' #	matrix(rbinom(20,1,0.4), ncol=4))
 ##' y <- matrix(c(1,1,0,1,1,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,0,1,0,1,1,0,1,0,
-##' 	1,1,1,1,1,1,1,1,0,1,1,0),nrow=10,ncol=4,byrow=TRUE)
+##'               1,1,1,1,1,1,1,1,0,1,1,0),nrow=10,ncol=4,byrow=TRUE)
 ##' resp <- restovec(y, nest=1:4, times=FALSE)
 ##' ccov <- tcctomat(c(rep(0,5),rep(1,5)), name="treatment")
 ##' reps <- rmna(resp, ccov=ccov)
 ##' 
 ##' # two random effects
-##' binnest(reps, mu=~treatment, preg=c(1,0), pre1=1, pre2=1)
+##' binnest(reps, mu=~treatment, preg=c(1,1), pre1=2, pre2=2)
 ##' 
 ##' # first level random effect only
 ##' binnest(reps, mu=~treatment, preg=c(1,-1), pre1=1)
@@ -370,8 +370,9 @@ class(z) <- "binnest"
 return(z)}
 
 ### print method
-###
-print.binnest <- function(z){
+#' @export
+print.binnest <- function(x, ...){
+  z <- x
 	np <- z$total1+z$total2+z$total3
 	cat("\nNested binomial model\n")
 	cat("\nCall:",deparse(z$call),sep="\n")

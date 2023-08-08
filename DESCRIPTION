@@ -1,5 +1,5 @@
 Package: repeated
-Version: 1.1.6
+Version: 1.1.7
 Title: Non-Normal Repeated Measurements Models
 Authors@R: c(
     person("Bruce", "Swihart", email="bruce.swihart@gmail.com", role=c("cre", "aut")),
@@ -26,15 +26,15 @@ Description: Various functions to fit models for non-normal repeated
     Ordinal Random Effects Models with Dropouts, marginal homogeneity models for square
     contingency tables, correlated negative binomial models with Kalman update.
     References include Lindsey's text books, 
-    JK Lindsey (2001) <isbn-10:0198508123> and JK Lindsey (1999) <isbn-10:0198505590>.
+    JK Lindsey (2001) <isbn:10-0198508123> and JK Lindsey (1999) <isbn:10-0198505590>.
 License: GPL (>= 2)
 URL: https://www.commanster.eu/rcode.html
 BugReports: https://github.com/swihart/repeated/issues
 Encoding: UTF-8
 LazyLoad: true
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.1
 NeedsCompilation: yes
-Packaged: 2022-10-27 18:27:05 UTC; swihartbj
+Packaged: 2023-08-08 11:49:00 UTC; bruce
 Author: Bruce Swihart [cre, aut],
   Jim Lindsey [aut] (Jim created this package, Bruce is maintaining the
     CRAN version),
@@ -48,4 +48,4 @@ Author: Bruce Swihart [cre, aut],
   Euginia Zharichenko [ctb, cph] (Wrote logitord.f.)
 Maintainer: Bruce Swihart <bruce.swihart@gmail.com>
 Repository: CRAN
-Date/Publication: 2022-10-27 23:42:39 UTC
+Date/Publication: 2023-08-08 13:00:13 UTC

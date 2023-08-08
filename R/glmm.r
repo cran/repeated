@@ -268,18 +268,18 @@ class(z) <- c("glmm",class(z))
 z}
 
 ### standard print methods
-###
-print.glmm <- function(z,...){
-#print.glm(z,...)
+#' @export
+print.glmm <- function(x,...){
+  z <- x #print.glm(z,...)
   class(z) <- "glm"
   print(z)
 if(!is.null(z$scale)){
 	cat("\nModel deviances are -2 log likelihood\n")
 	cat("Model dispersion:      ",z$scale,"\n")}
 cat("Normal mixing variance:",z$coef[names(z$coef)=="sd"]^2,"\n")}
-
-print.summary.glmm <- function(z,...){
-#print.summary.glm(z,...)
+#' @export
+print.summary.glmm <- function(x,...){
+z <- x #print.summary.glm(z,...)
 class(z) <- "summary.glm"
 print(z)
 if(!is.null(z$scale)){

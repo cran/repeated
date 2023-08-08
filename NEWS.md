@@ -1,4 +1,15 @@
 ------------------------------------------------------------------------------
+version 1.1.7
+------------------------------------------------------------------------------
+
+  * Updated kalcount, binnest, gnlmm, gnlmm3, hidden, and gar examples
+  * Corrected binnest.f and logitord.f mixed free/fixed format
+  * fixed Description ISBNs
+  * fixed Mismatches for apparent methods not registered
+  * fixed line 1670 of logitord.f (thanks Uwe!)
+  * fixed line 1849 of binnest.f  (thanks Uwe!)
+
+------------------------------------------------------------------------------
 version 1.1.6
 ------------------------------------------------------------------------------
 

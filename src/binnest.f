@@ -84,7 +84,7 @@ c	Program Logit_bin_nest
 !
 !==============================================================================
 
-        ! Begin main program
+c Begin main program
    
         Implicit none
 
@@ -169,7 +169,7 @@ c	Double Precision, allocatable :: subject(:,:)
 	Double Precision G(max_t1+max_t2+max_t3)
 	Double Precision subject(Num_Subj,totcol)
 
-	! Reading information from the user supplied file 'users_file3'
+c Reading information from the user supplied file 'users_file3'
 
         eps=par(1)
         q1_in=par(2)
@@ -183,11 +183,11 @@ c           Allocate (X(Total))
 	
 c	Allocate(G(total))
 
-	! Initialize variables for Subroutine CONMINBN
+c Initialize variables for Subroutine CONMINBN
 	Accuracy = 10.E-20
 	Method = 1
 
-	! Call Subroutine Conminbn
+c Call Subroutine Conminbn
 	Call Conminbn(total1,total2,total3,num_case1,num_case2,
      1    num_subj,Case1,Case2,Subject,X,G,F_value,Iter_N,Fun_N,Flag,
      2    Eps,Fcalls,Accuracy,Method,Dim_W,Max_Kid,
@@ -196,7 +196,7 @@ c	Allocate(G(total))
      5    h1,h2,betakk,sig1kk,sig2kk,r,sn,z,uu1,uu2,w,iout,totcol)
 
 
-	   ! Call Subroutine Calcbn2 for the second derivative.
+c Call Subroutine Calcbn2 for the second derivative.
         if(flag.eq.0)then
 	   Call Calcbn2(Total1,Total2,Total3,num_case1,num_case2,
      1	     Num_subj,Case1,Case2,X,Subject,Max_Kid,Max_Mother,Uph1_in,
@@ -211,7 +211,7 @@ c	Allocate(G(total))
         res(2)=Fun_N
         res(3)=flag
 
-	END !PROGRAM LOGIT_BIN_NEST ! End main program
+	END 
 !==========================================================================
 
 
@@ -245,10 +245,10 @@ c available in logitord
 	Integer Max_k, Max_M
 
 	Integer Total, T1, T2, T3, Num_F, Num_M,Num_S
-	Integer i		!  index of Father
-	Integer j,jj		!  index of mother
-	Integer k		!  index of children
-	Integer kk		!  index of estimate
+	Integer i		
+	Integer j,jj
+	Integer k		
+	Integer kk	
 	Integer lowh1,lowh2
 	Integer Uph1_Temp,Uph2_Temp
 	Integer Uph1,Uph2
@@ -311,15 +311,15 @@ c    Double Precision, Allocatable :: sig2kk(:,:)
 
 	double precision sum
 
-	Total = T1 + T2 + T3	! Number of estimate
+	Total = T1 + T2 + T3	
 
 C     Initialize Upper H and q and this value can change
 	UpH1 = Uph1_Temp
 	UpH2 = Uph2_Temp
 
-c	beta = Temp_X(1:T1)	! Read Beta values from the vector x
-c	sigma1 = Temp_X(1+T1:T1+T2) ! Read Sigma1 values from the vector x
-c	sigma2 = Temp_X(1+T1+T2:Total) ! Read Sigma2 values from the vector x
+c	beta = Temp_X(1:T1)	
+c	sigma1 = Temp_X(1+T1:T1+T2) 
+c	sigma2 = Temp_X(1+T1+T2:Total) 
 	do i=1, t1
 	   beta(i)=temp_x(i)
 	enddo
@@ -420,9 +420,9 @@ c      allocate(Mother(Case1(i)))
 c	   Mother = 0
 
 C       Calculate beta and sigma
-	   Do j = 1, Case1(i)	! Number of mothers with in a father
+	   Do j = 1, Case1(i)	
 	      Mother(j) = Case2(Case2_count1)    
-	      Do k = 1, Mother(j) ! Number of kids with in a mather
+	      Do k = 1, Mother(j) 
 		 Do kk = 1, t1
 		    betakk(j,k) = betakk(j,k) + Z(i,j,k,kk) * beta(kk)
 		 End do
@@ -455,10 +455,10 @@ c      Allocate(HAB(Case1(i),t1))
 	      enddo
 	   enddo
 
-	   Do  LowH1 = 0, UpH1	! Loop to do the Summation of lowh1 to UpH1
-	      Do j = 1, Case1(i) ! Loop to do the Product of J     
-		 Do lowh2 = 0, uph2 ! Loop to do the Summation of lowh2 to UpH2
-		    Do k = 1, Mother(j)	! Loop to do the Product of K
+	   Do  LowH1 = 0, UpH1	
+	      Do j = 1, Case1(i) 
+		 Do lowh2 = 0, uph2 
+		    Do k = 1, Mother(j)	
 c  lines added JKL
 		       Expon = betakk(j,k) + (sig1kk(j,k)*v1(lowH1+1))
      1		        +(sig2kk(j,k)*v2(lowh2+1))
@@ -485,7 +485,7 @@ c     1		         - R(i,j,k)))
 		       A_tmp = dexp(dlog(A_tmp)+R(i,j,k)*dlog(P)+
      1                      (Sn(i,j,k)- R(i,j,k))*dlog(Q))
 
-		  ! Summation of Bi, Ci, and Di for First derivative.  
+c Summation of Bi, Ci, and Di for First derivative.  
 		       Do kk = 1, t1
 			  B_Sum(kk) = B_Sum(kk) + (Z(i,j,k,kk) * N)
 		       End do
@@ -497,10 +497,10 @@ c     1		         - R(i,j,k)))
 			  D_Sum(kk) = D_Sum(kk) + (V2(lowh2+1)
      1		           * Uu2(i,j,k,kk) *  N)	
 		       End do
-		    End do	! End Loop Product K
+		    End do	
+c End Loop Product K
 
-
-	       ! Calculate the Sum of HAB, HAC, HAD, and HA
+c Calculate the Sum of HAB, HAC, HAD, and HA
 		    Do kk = 1, T1
 		       HAB(j,kk) = HAB(j,kk) + (Hn(lowh2+1) *
      1		         A_tmp * B_Sum(kk))
@@ -515,14 +515,14 @@ c     1		         - R(i,j,k)))
 		    End Do 
 		    HA(j) = HA(j) + (Hn(lowh2+1) * A_tmp)
 
-	       ! Calculate Summation of lowh2 to UpH2
+c  Calculate Summation of lowh2 to UpH2
 c  changed JKL
 c		    H2(lowh2+1) = h2choo(lowh2+1) * q2**lowh2 *
 c     1		      (1-q2)**(UpH2 - lowh2) * A_tmp
 		    H2(lowh2+1) = dexp(dlog(h2choo(lowh2+1))+lowh2*dlog(q2)
      1		      +(UpH2-lowh2)*dlog(1-q2)+dlog(A_tmp))
 
-	       ! Reset A,B,C, and D
+c Reset A,B,C, and D
 		    A_tmp = 1.0
 		    do kk=1,t1
 		       B_Sum(kk) = 0.0
@@ -533,13 +533,13 @@ c     1		      (1-q2)**(UpH2 - lowh2) * A_tmp
 		    do kk=1,t3
 		       D_Sum(kk) = 0.0
 		    enddo
-		 End do		! End Loop Sumamtion of lowh2 to UpH2
-		 J_Prod = J_Prod * Sum(H2,uph2) ! Calculate the product of J
-		 HAj =  Haj * ha(j) ! Calculate the Product of HA
+		 End do		
+		 J_Prod = J_Prod * Sum(H2,uph2) 
+		 HAj =  Haj * ha(j) 
 
-	      End do		! End Loop of Product J
-
-	 ! Calculate E, F, and G for first Derivative.
+	      End do		
+c End Loop of Product J
+c Calculate E, F, and G for first Derivative.
 	      Do jj = 1, Case1(i)
 		 Do kk = 1, T1
 		    E(kk) = E(kk) + ((HAj/HA(jj)) * HAB(jj,kk))
@@ -552,7 +552,7 @@ c     1		      (1-q2)**(UpH2 - lowh2) * A_tmp
 		 End do
 	      End do
 
-	 ! Reset HA,HAB,HAC,HAD,HAj
+c Reset HA,HAB,HAC,HAD,HAj
 	      do jj=1,case1(i)
 		 HA(jj) = 0.0
 		 do kk=1,t1
@@ -567,15 +567,15 @@ c     1		      (1-q2)**(UpH2 - lowh2) * A_tmp
 	      enddo
 	      HAj = 1.0 
 
-	 ! Calculate the Summation of lowh1 to UpH1
+c Calculate the Summation of lowh1 to UpH1
 c  changed JKL
 c	      H1(lowh1+1) = h1choo(lowh1+1)*q1**lowh1*(1-q1)**(UpH1-lowh1)
 c     1	        * J_Prod
 	      H1(lowh1+1) = dexp(dlog(h1choo(lowh1+1))+lowh1*dlog(q1)+
      1             (UpH1-lowh1)*dlog(1-q1))*J_Prod
-	      J_Prod = 1.0	! Reset product of J
-
-	 ! Calculate the Summation of beta and sigma
+	      J_Prod = 1.0	
+c Reset product of J
+c Calculate the Summation of beta and sigma
 	      Do kk = 1, t1
 c  changed JKL
 c		 D1_beta(kk) = D1_beta(kk) + (h1choo(lowh1+1)*q1**
@@ -597,7 +597,7 @@ c     1	            lowh1*(1-q1)**(UpH1-lowh1) * G(kk))
 		 D1_Sig2(kk) = D1_Sig2(kk) + dexp(dlog(h1choo(lowh1+1))
      1	            +lowh1*dlog(q1)+(UpH1-lowh1)*dlog(1-q1))*G(kk)
 	      End do	 
-	 ! Reset vectors E,F, and G
+c Reset vectors E,F, and G
 	      do kk=1,t1
 		 E(kk) = 0.0
 	      enddo
@@ -610,8 +610,8 @@ c     1	            lowh1*(1-q1)**(UpH1-lowh1) * G(kk))
 
 	   End do
 
-c      deallocate(Mother)   !Deallocate a 
-
+c      deallocate(Mother)   
+c Deallocate a 
 C       Release Unused space
 c      Deallocate(HA)
 c      Deallocate(HAB)
@@ -622,10 +622,10 @@ c      Deallocate(betakk)
 c      Deallocate(Sig1kk)
 c      Deallocate(Sig2kk)
 
-
-	   Li = Sum(H1,uph1)		! Li = Suma(h1-H1)*[Prod(J)*{Suma(h2-H2)*(Prod(K)}]
-	   sLi = sLi + LOG(Li)	! Summation of SLI
-
+c Li = Suma(h1-H1)*[Prod(J)*{Suma(h2-H2)*(Prod(K)}]
+	   Li = Sum(H1,uph1)		
+	   sLi = sLi + LOG(Li)	
+c Summation of SLI
 
 C       Calculate First Derivative
 	   Do kk = 1, t1
@@ -648,8 +648,8 @@ C       Reset beta and sigma
 	   do kk=1,t3
 	      D1_Sig2(kk) = 0.0
 	   enddo
-	End do			! End Main Loop
-
+	End do			
+c End Main Loop
 c    DeAllocate (v1)
 c    DeAllocate (h1choo)
 c    DeAllocate (v2)
@@ -658,16 +658,17 @@ c    DeAllocate (Hn)
 c    DeAllocate (H1)
 c    DeAllocate (H2)
 
-
-	Sli = - Sli		! Take the '-' to change from Max to Min
+c Take the '-' to change from Max to Min
+	Sli = - Sli		
 	do kk=1,total
-	   Gradient(kk) = - Gradient(kk) ! Take the '-' to change from Max to Min
+c Take the '-' to change from Max to Min	
+	   Gradient(kk) = - Gradient(kk) 
 	enddo
-	Return			! Return Sli and Gradient to Conminbn
-
-	End !Subroutine Calcbn	! End Subroutine Calcbn
+	Return			
+c Return Sli and Gradient to Conminbn
+	End 
 C==========================================================================
-
+c  Subroutine Calcbn End Subroutine Calcbn
 
 
 C**************************************************************************
@@ -691,10 +692,10 @@ C     Constant declaration
 
 C     Integer declaration
 	Integer Total, T1, T2, T3, Num_F, Num_M,Num_S
-	Integer i		!  index of Father
-	Integer j,jj,jjj	!  index of mother
-	Integer k		!  index of children
-	Integer kk,kkk		!  index of estimate
+	Integer i		
+	Integer j,jj,jjj	
+	Integer k		
+	Integer kk,kkk		
 	Integer UpH1, UpH2 
 	Integer lowh1,lowh2
 	Integer count
@@ -812,7 +813,7 @@ c    Double Precision, Allocatable :: sig2kk(:,:)
 
 	double precision sum
 
-	Total = T1 + T2 + T3	! Number of estimate
+	Total = T1 + T2 + T3	
 
 C     Initalize R, Sn, Z, Uu1, and Uu2
 	count = 0.0
@@ -854,9 +855,9 @@ C     Initialize Upper H and q and this value can change
 	UpH1 = Uph1_Temp
 	UpH2 = Uph2_Temp
 
-c	beta = Temp_X(1:T1)	! Read Beta values from the vector x
-c	sigma1 = Temp_X(1+T1:T1+T2) ! Read Sigma1 values from the vector x
-c	sigma2 = Temp_X(1+T1+T2:Total) ! Read Sigma2 values from the vector x
+c	beta = Temp_X(1:T1)	
+c	sigma1 = Temp_X(1+T1:T1+T2) 
+c	sigma2 = Temp_X(1+T1+T2:Total) 
 
 	do i=1,t1
 	   beta(i)=temp_x(i)
@@ -1004,9 +1005,9 @@ c      Allocate(Mother(Case1(i)))
 	      Mother(j) = 0
 	   enddo
 
-	   Do j = 1, Case1(i)	! Number of mothers with in a father
+	   Do j = 1, Case1(i)	
 	      Mother(j) = Case2(Case2_count3)
-	      Do k = 1, Mother(j) ! Number of kids with in a mother
+	      Do k = 1, Mother(j) 
 		 Do kk = 1, t1
 		    betakk(j,k) = betakk(j,k) + Z(i,j,k,kk) * beta(kk)
 		 End do
@@ -1102,10 +1103,10 @@ c      Allocate(G2S2S2(Case1(i),Case1(i),t3,t3))
 	      enddo
 	   enddo
 
-	   Do  LowH1 = 0, UpH1	! Loop to do the Summation of lowh1 to UpH1
-	      Do j = 1, Case1(i) ! Loop to do the Product of J     
-		 Do lowh2 = 0, uph2 ! Loop to do the Summation of lowh2 to UpH2
-		    Do k = 1, Mother(j)	! Loop to do the Product of K
+	   Do  LowH1 = 0, UpH1	
+	      Do j = 1, Case1(i)
+		 Do lowh2 = 0, uph2 
+		    Do k = 1, Mother(j)	
 c  lines added JKL
 		       Expon = betakk(j,k) + (sig1kk(j,k)*v1(lowH1+1))
      1		        +(sig2kk(j,k)*v2(lowh2+1))
@@ -1132,7 +1133,7 @@ c		       A_tmp = A_tmp *(P**(RR(i,j,k)) * Q**(Sn(i,j,k)
 c     1		          - RR(i,j,k)))
 		       A_tmp = A_tmp *dexp(RR(i,j,k)*dlog(P)+
      1		          (Sn(i,j,k)- RR(i,j,k))*dlog(Q))
-		       Do kk = 1, t1 ! Summation of Bi 
+		       Do kk = 1, t1 
 			  B_Sum(kk) = B_Sum(kk) + (Z(i,j,k,kk) * N)
 			  Do kkk = 1, t1
 			     BB(kk,kkk) = BB(kk,kkk)+(Z(i,j,k,kk)
@@ -1146,7 +1147,7 @@ c     1		          - RR(i,j,k)))
 			     BS2(kk,kkk) = BS2(kk,kkk)+(Z(i,j,k,kk)*
      1			       V2(lowh2+1)*Uu2(i,j,k,kkk) * O)
 			  End do
-		       End do	! Summation of Ci
+		       End do	
 		       Do kk = 1, t2
 			  C_Sum(kk) = C_Sum(kk) + (V1(lowh1+1) *
      1		            Uu1(i,j,k,kk) * N)
@@ -1161,7 +1162,7 @@ c     1		          - RR(i,j,k)))
      2			       * Uu1(i,j,k,kk) * Uu2(i,j,k,kkk) * O)
 			  End do  
 		       End do
-		       Do kk = 1, t3 ! Summation of Di
+		       Do kk = 1, t3 
 			  D_Sum(kk) = D_Sum(kk) + (V2(lowh2+1) *
      1		            Uu2(i,j,k,kk) *  N)	
 			  Do kkk = 1, t3
@@ -1170,9 +1171,9 @@ c     1		          - RR(i,j,k)))
      2			       * Uu2(i,j,k,kk) * Uu2(i,j,k,kkk) * O)	
 			  End do
 		       End do
-		    End do	! End Loop Product K
+		    End do	
 
-		    Do kk = 1, T1 ! Sum HABi Loop
+		    Do kk = 1, T1 
 		       HAB(j,kk) = HAB(j,kk) + (Hn(lowh2+1) * A_tmp *
      1		          B_Sum(kk))
 		       Do kkk = 1, T1		
@@ -1191,7 +1192,7 @@ c     1		          - RR(i,j,k)))
      2		             (B_Sum(kk) * D_Sum(kkk) - BS2(kk,kkk)))
 		       End do
 		    End Do
-		    Do kk = 1, T2 ! Sum HACi Loop
+		    Do kk = 1, T2 
 		       HAC(j,kk) = HAC(j,kk) + (Hn(lowh2+1) * A_tmp *
      1		         C_Sum(kk))
 		       Do kkk = 1, T2
@@ -1205,7 +1206,7 @@ c     1		          - RR(i,j,k)))
      2		            (C_Sum(kk) * D_Sum(kkk) - S1S2(kk,kkk)))
 		       End do 
 		    End Do
-		    Do kk = 1, T3 ! Sum HADi Loop
+		    Do kk = 1, T3 
 		       HAD(j,kk) = HAD(j,kk) + (Hn(lowh2+1) * A_tmp *
      1		         D_Sum(kk))
 		       Do kkk = 1, T3
@@ -1216,13 +1217,13 @@ c     1		          - RR(i,j,k)))
 		    End Do 
 		    HA(j) = HA(j) + (Hn(lowh2+1) * A_tmp)
 
-	       ! Calculate Summation of lowh2 to UpH2
+c  Calculate Summation of lowh2 to UpH2
 c  changed JKL
 c		    H2(lowh2+1) = h2choo(lowh2+1) * q2**lowh2 *
 c     1		      (1-q2)**(UpH2 - lowh2) * A_tmp
 		    H2(lowh2+1)=dexp(dlog(h2choo(lowh2+1))+lowh2*dlog(q2)+
      1		      (UpH2 - lowh2)*dlog(1-q2)) * A_tmp
-	       ! Reset A,B,C, and D
+c  Reset A,B,C, and D
 		    A_tmp = 1.0
 		    do kk=1,t1
 		       B_Sum(kk) = 0.0
@@ -1251,12 +1252,12 @@ c     1		      (1-q2)**(UpH2 - lowh2) * A_tmp
 			  S2S2(kk,kkk) = 0.0
 		       enddo
 		    enddo
-		 End do		! End Loop Summation of lowh2 to UpH2
-		 J_Prod = J_Prod * Sum(H2,uph2) ! Calculate the product of J
-		 HAj =  Haj * ha(j) ! Calculate the Product of HA
-	      End do		! End Loop of Product J
+		 End do		
+		 J_Prod = J_Prod * Sum(H2,uph2) 
+		 HAj =  Haj * ha(j) 
+	      End do		
 
-	 ! Calculate E, F, and G for first and second Derivative.
+c  Calculate E, F, and G for first and second Derivative.
 	      Do jj = 1, Case1(i)
 		 Do kk = 1, T1
 		    E(kk) = E(kk) + ((HAj/HA(jj)) * HAB(jj,kk))
@@ -1357,7 +1358,7 @@ C	      enddo
 		 End do
 	      End do
 		
-	 ! Reset HA,HAB,HAC,HAD,HAj
+c   Reset HA,HAB,HAC,HAD,HAj
 	      do jj=1,case1(i)
 		 HA(jj) = 0.0
 		 do jjj=1,t1
@@ -1477,16 +1478,16 @@ C	      enddo
 		 enddo
 	      enddo
 
-	 ! Calculate the Summation of lowh1 to UpH1
+c  Calculate the Summation of lowh1 to UpH1
 c  changed JKL
 c	      H1(lowh1+1) = h1choo(lowh1+1)*q1**lowh1*(1-q1)**(UpH1-lowh1)
 c     1	        * J_Prod
 	      H1(lowh1+1) = dexp(dlog(h1choo(lowh1+1))+lowh1*dlog(q1)+
      1	        (UpH1-lowh1)*dlog(1-q1))* J_Prod
 	
-	      J_Prod = 1.0	! Reset product of J
+	      J_Prod = 1.0	
 
-	 ! Calculate the Summation of beta and sigma
+c  Calculate the Summation of beta and sigma
 	      Do kk = 1, t1
 c  changed JKL
 c		 D1_beta(kk) = D1_beta(kk) + (h1choo(lowh1+1)*q1**
@@ -1556,7 +1557,7 @@ c     1  		 lowh1*(1-q1)**(UpH1-lowh1)*GGS2S2(kk,kkk))
      2  		 (UpH1-lowh1)*dlog(1-q1))*GGS2S2(kk,kkk)
 		 End do
 	      End do
-	 ! Reset vectors E,F, and G
+c  Reset vectors E,F, and G
 	      do kk=1,t1
 		 E(kk) = 0.0
 		 do kkk=1,t1
@@ -1619,8 +1620,8 @@ c      Deallocate(E2BS2)
 c      Deallocate(F2S1S1)
 c      Deallocate(F2S1S2)
 c      Deallocate(G2S2S2)
-
-	   Li = Sum(H1,uph1)		! Li = Suma(h1-H1)*[Prod(J)*{Suma(h2-H2)*(Prod(K)}]
+c    Li = Suma(h1-H1)*[Prod(J)*{Suma(h2-H2)*(Prod(K)}]
+	   Li = Sum(H1,uph1)		
 
 C       Calculate First Derivative
 	   Do kk = 1, t1
@@ -1659,31 +1660,31 @@ C       Calculate First Derivative
 	   End do 
       
 	   Do kk = 1, T1
-	      Do kkk = 1, T1	! Derivatives with respect to beta_beta
+	      Do kkk = 1, T1	
 		 Hess(kk,kkk) = Hess(kk,kkk) +
      1	          ((D2_BB(kk,kkk) / Li) - beta_beta(kk,kkk))
 	      End do
-	      Do kkk = 1, T2	! Derivatives with respect to beta_Sigma1
+	      Do kkk = 1, T2	
 		 Hess(kk,kkk+T1) = Hess(kk,kkk+t1) +
      1	          ((D2_BS1(kk,kkk) / Li) - beta_Sig1(kk,kkk)) 
 	      End do
-	      Do kkk = 1, T3	! Derivatives with respect to beta_Sigma2
+	      Do kkk = 1, T3	
 		 Hess(kk,kkk+T1+T2)= Hess(kk,kkk+t1+t2) +
      1	           ((D2_BS2(kk,kkk) / Li) - beta_Sig2(kk,kkk)) 
 	      End do
 	   End do
 	   Do kk = 1, T2
-	      Do kkk = 1, T2	! Derivatives with respect to Sigma1_Sigma1
+	      Do kkk = 1, T2	
 		 Hess(kk+T1,kkk+T1) = Hess(kk+t1,kkk+T1) +
      1	           ((D2_S1S1(kk,kkk) / Li) - Sig1_Sig1(kk,kkk)) 
 	      End do
-	      Do kkk = 1, T3	! Derivatives with respect to Sigma1_Sigma2
+	      Do kkk = 1, T3	
 		 Hess(kk+T1,kkk+T1+T2) = Hess(kk+t1,kkk+t1+T2) +
      1	           ((D2_S1S2(kk,kkk) / Li) - Sig1_Sig2(kk,kkk))
 	      End do
 	   End do
 	   Do kk = 1, T3
-	      Do kkk = 1, T3	! Derivatives with respect to sigma2_sigma2
+	      Do kkk = 1, T3	
 		 Hess(kk+T1+T2,kkk+T1+T2) = Hess(kk+t1+t2,kkk+T1+T2) +
      1	           ((D2_S2S2(kk,kkk) / Li) - Sig2_Sig2(kk,kkk))
 	      End do
@@ -1721,7 +1722,7 @@ C       Reset beta and sigma
 	      enddo
 	   enddo
 
-	End do			! End Main Loop
+	End do			
 
 	Do kk = 1, total
 	   Do kkk = kk+1, total
@@ -1729,11 +1730,11 @@ C       Reset beta and sigma
 	   End do
 	End do
 
-	Return			! Return Sli and Gradient to Conminbn
-	End !Subroutine Calcbn2	! End Subroutine Calcbn
-
+	Return			
+	End 
+c   Subroutine Calcbn2	 End Subroutine Calcbn
 C*************************************************************************
-		      ! Begin Subroutine CONMINBN	
+c  Begin Subroutine CONMINBN	
 C=========================================================================
 
 	Subroutine Conminbn(total1,total2,total3,Father,mother,kid,
@@ -1845,9 +1846,9 @@ C     AT THE BEST CURRENT ESTIMATE.
 C     TEST WHICH METHOD IS BEING USED.
 C     IF NMETH=0, W(NRY+I) HOLDS THE RESTART Y VECTOR AND
 C     W(NRD+I) HOLDS THE RESTART SEARCH VECTOR.
-
+c  If NMETH=1, W(NCONS+I) holds the appr. inverse HESSIAN
 	IF (NMETH.EQ.1) THEN 
-	   NCONS = 3 * N 	!If NMETH=1, W(NONS+I) holds the appr. inverse HESSIAN
+	   NCONS = 3 * N 	
 	ELSE 
 	   NRY=NG+N
 	   NRD=NRY+N
@@ -1900,7 +1901,7 @@ C     IF OUTPUT IS DESIRED,TEST IF THIS IS THE CORRECT ITERATION
 C     AND IF SO, WRITE OUTPUT.
 
 	IF (IOUT .eq. 0) THEN
-	   ALPHA = ALPHA * DG / DG1 ! Set ALPHA to nonrestart conjugate gadient
+	   ALPHA = ALPHA * DG / DG1 
 	ELSE IF (IOUTK .ne. 0) THEN
 	   IOUTK = IOUTK + 1
 	   IF (IOUTK .eq. IOUT) THEN
@@ -1958,7 +1959,7 @@ C     TEST FOR FAILURE OF THE LINEAR SEARCH.
  80	IF (ALPHA*STEP .le. ACC) THEN
 C     TEST IF DIRECTION IS A GRADIENT DIRECTION.
 	   IF (.NOT.RSW) THEN
-	      GO TO 20		! Call subroutine CALCBN           
+	      GO TO 20		
 	   ELSE
 	      NFLAG=2
 	      RETURN
@@ -2079,7 +2080,7 @@ C     SEARCH CONTINUES. SET W(I)=ALPHA*W(I),THE FULL STEP VECTOR.
 
 C     COMPUTE THE NEW SEARCH VECTOR. FIRST TEST WHETHER A
 C     CONJUGATE GRADIENT OR A VARIABLE METRIC VECTOR IS USED.
-	IF (NMETH .ne. 1) THEN	! Begin if nmeth /= 1
+	IF (NMETH .ne. 1) THEN	
 C        CONJUGATE GRADIENT UPDATE SECTION.
 C        TEST IF A POWELL RESTART IS INDICATED.
 	   RTST=0.
@@ -2125,9 +2126,9 @@ C        CALCULATE  THE RESTART HESSIAN TIMES THE CURRENT GRADIENT.
 	   END DO
 C        IF THIS IS A RESTART ITERATION,W(NX+I) CONTAINS THE NEW SEARCH
 C        VECTOR.
-	   IF (NRST .ne. N) THEN	! begin if nrst /= n
-	  ! NOT A RESTART ITERATION. CALCULATE THE RESTART HESSIAN
-	  ! TIMES THE CURRENT Y.
+	   IF (NRST .ne. N) THEN	
+c   NOT A RESTART ITERATION. CALCULATE THE RESTART HESSIAN
+c   TIMES THE CURRENT Y.
 	      U1=0.
 	      U2=0.
 	      U3=0.
@@ -2152,8 +2153,8 @@ C        VECTOR.
 		 W(NGPI)=STEP
 	      END DO
 
-	  ! CALCULATE THE DOUBLY UPDATED HESSIAN TIMES THE CURRENT
-	  ! GRADIENT TO OBTAIN THE SEARCH VECTOR.
+c CALCULATE THE DOUBLY UPDATED HESSIAN TIMES THE CURRENT
+c GRADIENT TO OBTAIN THE SEARCH VECTOR.
 	      U1=0.0
 	      U2=0.0
 	      DO I=1,N
@@ -2167,8 +2168,8 @@ C        VECTOR.
 		 W(NXPI)=W(NXPI)-U1*W(NGPI)-U2*W(I)
 	      END DO
 C           CALCULATE THE DERIVATIVE ALONG THE NEW SEARCH VECTOR.
-	   END IF		! End if nrst /= n
-
+	   END IF		
+c End if nrst /= n
 	   DG1=0.
 	   DO I=1,N
 	      NXPI=NX+I
@@ -2176,7 +2177,7 @@ C           CALCULATE THE DERIVATIVE ALONG THE NEW SEARCH VECTOR.
 	      DG1=DG1+W(I)*G(I)
 	   END DO
 C        IF THE NEW DIRECTION IS NOT A DESCENT DIRECTION,STOP.
-	   IF (DG1.gt.0.) THEN	!    GO TO 320
+	   IF (DG1.gt.0.) THEN	
 	      NFLAG = 3
 	      RETURN
 	   END IF 
@@ -2187,7 +2188,7 @@ C        UPDATE NRST TO ASSURE AT LEAST ONE RESTART EVERY N ITERATIONS.
 	   RSW=.FALSE.
 	   GO TO 40
 C        A VARIABLE METRIC ALGORITM IS BEING USED. CALCULATE Y AND D'Y.
-	END IF			! End if nmeth /= 1
+	END IF			
       
 	U1=0.0
 	DO I=1,N
@@ -2299,8 +2300,8 @@ C     TEST FOR A DOWNHILL DIRECTION.
 	   GO TO 40
 	END IF
 
-	End !Subroutine CONMINBN	! End subroutine CONMINBN
-
+	End 
+c  Subroutine CONMINBN	 End subroutine CONMINBN
 C ========================================================================
 
-C!! The End
+C The End

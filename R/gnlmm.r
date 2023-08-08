@@ -183,11 +183,11 @@
 ##' mu <- function(p) exp(p[1]+p[2]*sex+p[3]*dose)
 ##' ## print(z <- gnlm::gnlr(y, dist="gamma", mu=mu, pmu=c(1,0,0), pshape=1))
 ##' ## starting values for pmu and pshape from z$coef[1:3] and z$coef[4] respectively
-##' gnlmm(y, dist="gamma", mu=mu, nest=nest, pmu=c(1.101,0.326,-0.045),
-##'      pshape=0.391, psd=0.1, points=3)
+##' gnlmm(y, dist="gamma", mu=mu, nest=nest, 
+##'       pmu=10*c(0.59072535, 0.32618702, 0.01024245),pshape=1, psd=0.1, points=3)
 ##' # or equivalently
 ##' gnlmm(y, dist="gamma", mu=~exp(b0+b1*sex+b2*dose), nest=nest,
-##'      pmu=c(1.101,0.326,-0.045), pshape=0.391, psd=0.1, points=3, envir=reps)
+##'       pmu=10*c(0.59072535, 0.32618702, 0.01024245),pshape=1, psd=0.1, points=3, envir=reps)
 ##' \dontrun{
 ##' # or with identity link
 ##' print(z <- gnlm::gnlr(y, dist="gamma", mu=~sex+dose, pmu=c(0.1,0,0), pshape=1))

@@ -97,12 +97,12 @@ c
 
       subroutine logitord_f(y,upk,EPS,FCALLS,iout,cg,total1,total2a,
      &     total2b,nobs,p,x,ster,hess,hesinv,nflag,iter,ifun,f)
-                                ! Begin main program
+c     Begin main program
 
       implicit none  
-                                ! Declaration Section
+c     Declaration Section
 
-                                ! Constant Declaration
+c     Constant Declaration
       INTEGER maxsub,maxcas,maxsig,maxbet,maxest,max_w	   
       PARAMETER (maxsub=5200)
       PARAMETER (maxcas=10)
@@ -111,50 +111,50 @@ c
       PARAMETER (maxest=maxsig+maxbet)
       PARAMETER (max_w=maxest*(maxest+7)/2)
       
-                                ! INTEGER Declaration
+c     INTEGER Declaration
 
-                                ! INTEGER
+c     INTEGER
       INTEGER total,total1,total2a,total2b,total3,total4
       INTEGER total1x,cg,nobs,iout
       INTEGER i,j,jj,ii
       INTEGER nmeth,idev,IFun,iter,nflag,upk,FCALLS
 
-                                ! INTEGER Array
+c     INTEGER Array
       INTEGER id(maxsub), numcas(maxsub)
 
-                                ! Double Precision Declaration
+c     Double Precision Declaration
 
-                                ! Double Precision
+c     Double Precision
       Double Precision EPS,F,ACC,aa
 
-                                ! One Dim Array
+c     One Dim Array
       DOUBLE PRECISION x(total1+total2a+total2b)
       DOUBLE PRECISION p(total1+total2a+total2b)
       DOUBLE PRECISION w(max_w),g(maxest)
       double precision ster(total1+total2a+total2b)
 
-                                ! Two Dim Array      	  
+c     Two Dim Array      	  
       DOUBLE PRECISION hess(total1+total2a+total2b,
      +     total1+total2a+total2b), hesinv(total1+total2a+total2b,
      +     total1+total2a+total2b)
       DOUBLE PRECISION ri(maxsub,maxcas)
       double precision y(nobs,3+total1-cg+total2a+total2b)
       
-                                ! Three Dim Array
+c     Three Dim Array
       DOUBLE PRECISION z(maxsub,maxcas,maxbet)
       DOUBLE PRECISION uu1(maxsub,maxcas,maxsig),
      +     uu2(maxsub,maxcas,maxsig)
       
 c     *** End Declaration Section                      
 
-
-      total=total1+total2a+total2b !  total # of estimates
+c     total # of estimates
+      total=total1+total2a+total2b
       total1x=total1-cg+1
       do jj=1,total
          x(jj)=p(jj)
       enddo
-
-      total4=total*(total+7)/2  ! Calculate dimension of vector W
+c     Calculate dimension of vector W
+      total4=total*(total+7)/2
 
       i=1
       j=1
@@ -170,8 +170,8 @@ c     *** End Declaration Section
       do jj=1,total2b
          uu2(i,j,jj)=y(1,2+total1x+total2a+jj)
       enddo
-
- 1    i=i+1                     !  Begin loop
+c     Begin loop
+ 1    i=i+1
       do ii=2,nobs
          id(i)=y(ii,1)
          IF (id(i) .eq. id(i-1)) then
@@ -182,7 +182,8 @@ c     *** End Declaration Section
                   z(i-1,j,jj) = y(ii,jj+2)
                END DO
             ENDIF
-            IF (total2a .ge. 1) then !  If there is more than 1 sigma
+            IF (total2a .ge. 1) then 
+c                                          If there is more than 1 sigma
                DO jj=1,total2a
                   uu1(i-1,j,jj)=y(ii,2+total1x+jj)
                END DO
@@ -192,7 +193,8 @@ c     *** End Declaration Section
                   uu2(i-1,j,jj)=y(ii,2+total1x+total2a+jj)
                END DO
             ENDIF
-         else                   !  Number of case inside i-th mother.
+         else                   
+c     Number of case inside i-th mother.
             numcas(i-1)=j
             j=1
             ri(i,j) = y(ii,2)
@@ -215,15 +217,15 @@ c     *** End Declaration Section
          ENDIF
       enddo
 
-                                ! Total number of subjects (mothers) :
+c     Total number of subjects (mothers) :
       total3=i-1
       numcas(total3)=j
       
-      ACC = 10.D - 20           !  Set stop criteria
-      nmeth = 1                 !  Set method to conjugate gradient method
-      idev = 6                  !  Set initial estimates to the minimizer
+      ACC = 10.D - 20
+      nmeth = 1
+      idev = 6
 
-                                ! Call procedure CONMIN
+c     Call procedure CONMIN
       CALL CONMIN(upk,x,f,g,hess,ifun,iter,EPS,nflag,FCALLS,w,
      &     iout,total4,idev,ACC,nmeth,ri,z,uu1,uu2,
      &     total1,cg,total2a,total2b,total3,numcas)
@@ -233,19 +235,19 @@ c     *** End Declaration Section
      &        uu1,uu2,ri,numcas,F,G,HESS)
       End If 
 
-                                ! invert HESSIAN matrix
-      CALL invert(hess,hesinv,total) ! Call Invert procedure
+c     invert HESSIAN matrix -- Call Invert procedure
+      CALL invert(hess,hesinv,total)
 
-                                ! find standard errors (square root of the negative main diagonal)
+c     find standard errors (square root of the negative main diagonal)
       DO  i=1,total
          aa= -hesinv(i,i)
          STER(i)=dsqrt(aa)
       END DO
 
       END
-c     PROGRAM LOGITORD		! End main program
+c     PROGRAM LOGITORD -- End main program
 c==========================================================================
-                                !  Begin Subroutine CALCFG	
+c      Begin Subroutine CALCFG	
 
       SUBROUTINE CALCFG(upk_temp,x,total1,cg,total2a,total2b,total3,z,
      &     uu1,uu2,ri,numcas,sli,g,hess)
@@ -296,10 +298,10 @@ c==========================================================================
 *     ========================================================================
 
       implicit none
-                                ! implicit DOUBLE PRECISION (A-Z)
+c     implicit DOUBLE PRECISION (A-Z)
 c     Declaration Section
 
-                                ! Constant Declaration
+c     Constant Declaration
       INTEGER maxsub,maxcas,maxsig,maxbet,maxest 
       PARAMETER (maxsub=5200)
       PARAMETER (maxcas=10)
@@ -308,20 +310,20 @@ c     Declaration Section
       PARAMETER (maxest=maxsig+maxbet)
 c     Integer Declaration
 
-                                ! Integer Variables
+c     Integer Variables
       INTEGER total,total1,total1x,total2a,total2b,total3
       INTEGER j, jj, j2
       INTEGER i, j1, upk,upk_temp,cg 
 
-                                ! Integer Array
+c     Integer Array
       INTEGER numcas(maxsub)
       
 c     Double Precision Declaration
 
-                                ! Double Precision Variables
+c     Double Precision Variables
       DOUBLE PRECISION DLOG, li, sli, sqi1, sqi2 
 
-                                ! One Dim Array
+c     One Dim Array
       DOUBLE PRECISION x(total1+total2a+total2b), g(maxest)	
       DOUBLE PRECISION sigmaj1(maxcas), sigmaj2(maxcas),betaj(maxcas)
       DOUBLE PRECISION dbeta(maxbet), sbetaj(maxbet),beta(maxbet)
@@ -329,7 +331,7 @@ c     Double Precision Declaration
       DOUBLE PRECISION dsigma2(maxsig), ssigmn2(maxsig)       
       DOUBLE PRECISION ssigmn12(maxsig),sigma1(maxsig),sigma2(maxsig) 
 
-                                ! Two Dim Array
+c     Two Dim Array
       DOUBLE PRECISION hess(total1+total2a+total2b,
      +     total1+total2a+total2b)
       DOUBLE PRECISION s2bjbl(maxbet,maxbet)
@@ -338,26 +340,26 @@ c     Double Precision Declaration
       DOUBLE PRECISION s2snso2(maxsig,maxsig),s2snso12(maxsig,maxsig)
       DOUBLE PRECISION s2snso1(maxsig,maxsig)
       
-                                !Three Dim Array
+c     Three Dim Array
       DOUBLE PRECISION z(maxsub,maxcas,maxbet)
       DOUBLE PRECISION uu1(maxsub,maxcas,maxsig),
      &     uu2(maxsub,maxcas,maxsig)
       
 c     End Declaration Section
-      
-
+c     Upper K = 10 & can be changed      
+c     Small Qi = 0.5 & can be changed
       total=total1+total2a+total2b           
       total1x=total1-cg+1
-      upk = upk_temp            ! Upper K = 10 & can be changed
-      sqi1 = 0.5d0		! Small Qi = 0.5 & can be changed
+      upk = upk_temp            
+      sqi1 = 0.5d0		
       sqi2 = 0.5d0
 
-                                ! read BETA values from the vector X
+c     read BETA values from the vector X
       DO j=1,total1x
          beta(j)=x(cg-1+j)
       END DO 
 
-                                ! read SIGMA values from the vector X
+c     read SIGMA values from the vector X
       DO j=1,total2a
          sigma1(j)=x(total1+j)
       END DO 
@@ -365,7 +367,7 @@ c     End Declaration Section
       DO j=1,total2b
          sigma2(j)=x(total1+total2a+j)
       END DO
-                                ! Initialization of the G-vector,HESS matrix and function sli
+c     Initialization of the G-vector,HESS matrix and function sli
       DO j=1,total
          G(j)=0.0d0
          DO j2=1,total
@@ -374,17 +376,20 @@ c     End Declaration Section
       END DO
 
       sli=0.0d0
-                                ! calculate everything for each subject and 
-                                ! sum all information at the end 
-      
-      Do jj=1,total3		! Begin Main Loop              
-         DO i=1,numcas(jj)	! product of one row from matrix z to the 
-            betaj(i)=0.0d0      ! vector beta for the formula (5)
+c     calculate everything for each subject and 
+c     sum all information at the end 
+c     Begin Main Loop                    
+      Do jj=1,total3
+c     product of one row from matrix z to the       
+c     vector beta for the formula (5)      
+         DO i=1,numcas(jj)	    
+            betaj(i)=0.0d0      
             DO j=1,total1x
                betaj(i)=betaj(i)+z(jj,i,j)*beta(j)    
             END DO				      
-                                ! product of one row from matrix u to the 
-            sigmaj1(i)=0.0d0    ! vector sigma for the formula (5) 
+c     product of one row from matrix u to the 
+c vector sigma for the formula (5) 
+            sigmaj1(i)=0.0d0    
             sigmaj2(i)=0.0d0
             DO j=1,total2a
                sigmaj1(i)=sigmaj1(i)+uu1(jj,i,j)*sigma1(j)
@@ -393,7 +398,7 @@ c     End Declaration Section
                sigmaj2(i)=sigmaj2(i)+uu2(jj,i,j)*sigma2(j)
             END DO
          END DO 
-                                ! Call subroutine FORMUL
+c     Call subroutine FORMUL
          CALL FORMUL(betaj,sigmaj1,sigmaj2,upK,sqi1,sqi2,
      &        ri,jj,numcas,
      &        total1,total1x,cg,total2a,
@@ -402,15 +407,19 @@ c     End Declaration Section
      &        s2snso2,ssigmn12,s2snso12,x)
          
          if(Li.gt.0.)then
-            sli=sli+dlog(Li)    ! formula (1)
+c        formula (1)         
+            sli=sli+dlog(Li)
             
             DO j=1,total1
-               dbeta(j)=sbetaj(j)/Li ! first derivatives w.r.t. beta j's
-               G(j)=G(j)+dbeta(j) ! FINAL array for the gradient G(j)
+c     first derivatives w.r.t. beta j's            
+               dbeta(j)=sbetaj(j)/Li
+c     FINAL array for the gradient G(j)               
+               G(j)=G(j)+dbeta(j) 
             END DO
             
             DO j=1,total2a 
-               dsigma1(j) = ssigmn1(j)/Li ! First derivative w.r.t. sigma
+c     First derivative w.r.t. sigma            
+               dsigma1(j) = ssigmn1(j)/Li 
                G(total1+j) = G(total1+j)+dsigma1(j)
             END DO
 
@@ -420,20 +429,23 @@ c     End Declaration Section
      &              dsigma2(j)
             END DO
          endif
-      END DO                    ! end main loop
+      END DO                    
+c     end main loop
+c     take "-" in order to change Max to Min
+      sli=-sli                  
       
-      sli=-sli                  !  take "-" in order to change Max to Min
-      
-                                ! FINAL Hessian Matrix for all second partial derivatives
+c     FINAL Hessian Matrix for all second partial derivatives
       DO j1=1,total             
-         g(j1) = - g(j1)        ! take "-" in order to change Max to Min
+         g(j1) = - g(j1)        
+c     take "-" in order to change Max to Min
       END DO
       RETURN	
 
-      End                       !  Subroutine CALCFG     ! End Subroutine CALCFG
+      End
+c     Subroutine CALCFG     End Subroutine CALCFG
 c=========================================================================
 
-                                !  Begin Subroutine CALCFG2
+c      Begin Subroutine CALCFG2
 
       SUBROUTINE CALCFG2(upk_temp,x,total1,cg,total2a,total2b,total3,z,
      &     uu1,uu2,ri,numcas,sli,g,hess)
@@ -485,10 +497,10 @@ c=========================================================================
 *     ========================================================================
 
       implicit none
-                                ! implicit DOUBLE PRECISION (A-Z)
+c     implicit DOUBLE PRECISION (A-Z)
 c     Declaration Section
 
-                                ! Constant Declaration
+c     Constant Declaration
       INTEGER maxsub,maxcas,maxsig,maxbet,maxest 
       PARAMETER (maxsub=5200)
       PARAMETER (maxcas=10)
@@ -498,20 +510,20 @@ c     Declaration Section
       
 c     Integer Declaration
 
-                                ! Integer Variables
+c     Integer Variables
       INTEGER total,total1,total1x,total2a,total2b,total3
       INTEGER j, jj, j2
       INTEGER i, j1, upk,upk_temp,cg 
 
-                                ! Integer Array
+c     Integer Array
       INTEGER numcas(maxsub)
       
 c     Double Precision Declaration
 
-                                ! Double Precision Variables
+c     Double Precision Variables
       DOUBLE PRECISION DLOG, li, sli, sqi1, sqi2
 
-                                ! One Dim Array
+c     One Dim Array
       DOUBLE PRECISION x(total1+total2a+total2b), g(maxest)	
       DOUBLE PRECISION sigmaj1(maxcas), sigmaj2(maxcas),betaj(maxcas)
       DOUBLE PRECISION dbeta(maxbet), sbetaj(maxbet),beta(maxbet)
@@ -519,7 +531,7 @@ c     Double Precision Declaration
       DOUBLE PRECISION dsigma2(maxsig), ssigmn2(maxsig)       
       DOUBLE PRECISION ssigmn12(maxsig),sigma1(maxsig),sigma2(maxsig)
 
-                                ! Two Dim Array
+c     Two Dim Array
       DOUBLE PRECISION hess(total1+total2a+total2b,
      +     total1+total2a+total2b)
       DOUBLE PRECISION s2bjbl(maxbet,maxbet)
@@ -528,26 +540,26 @@ c     Double Precision Declaration
       DOUBLE PRECISION s2snso2(maxsig,maxsig),s2snso12(maxsig,maxsig)
       DOUBLE PRECISION s2snso1(maxsig,maxsig)
       
-                                !Three Dim Array
+c     Three Dim Array
       DOUBLE PRECISION z(maxsub,maxcas,maxbet)
       DOUBLE PRECISION uu1(maxsub,maxcas,maxsig),
      &     uu2(maxsub,maxcas,maxsig)
       
 c     End Declaration Section
-      
-
+c     Upper K = 10 & can be changed      
+c     Small Qi = 0.5 & can be changed
       total=total1+total2a+total2b           
       total1x=total1-cg+1
-      upk = upk_temp            !  Upper K = 10 & can be changed
-      sqi1 = 0.5d0              !  Small Qi = 0.5 & can be changed
+      upk = upk_temp            
+      sqi1 = 0.5d0              
       sqi2 = 0.5d0
 
-                                ! read BETA values from the vector X
+c     read BETA values from the vector X
       DO j=1,total1x
          beta(j)=x(cg-1+j)
       END DO 
 
-                                ! read SIGMA values from the vector X
+c     read SIGMA values from the vector X
       DO j=1,total2a
          sigma1(j)=x(total1+j)
       END DO 
@@ -556,7 +568,7 @@ c     End Declaration Section
          sigma2(j)=x(total1+total2a+j)
       END DO
       
-                                ! Initialization of the G-vector,HESS matrix and function sli
+c     Initialization of the G-vector,HESS matrix and function sli
       DO j=1,total
          G(j)=0.0d0
          DO j2=1,total
@@ -565,17 +577,20 @@ c     End Declaration Section
       END DO
 
       sli=0.0d0
-                                ! calculate everything for each subject and 
-                                ! sum all information at the end 
-      
-      Do jj=1,total3            !  Begin Main Loop              
-         DO i=1,numcas(jj)      !  product of one row from matrix z to the 
-            betaj(i)=0.0d0      ! vector beta for the formula (5)
+c     calculate everything for each subject and 
+c     sum all information at the end 
+c     Begin Main Loop              
+c     product of one row from matrix z to the 
+c     vector beta for the formula (5)
+      Do jj=1,total3            
+         DO i=1,numcas(jj)      
+            betaj(i)=0.0d0     
             DO j=1,total1x
                betaj(i)=betaj(i)+z(jj,i,j)*beta(j)    
             END DO
 c     product of one row from matrix u to the 
-            sigmaj1(i)=0.0d0    !  vector sigma for the formula (5) 
+            sigmaj1(i)=0.0d0      
+c     vector sigma for the formula (5) 
             sigmaj2(i)=0.0d0
             DO j=1,total2a
                sigmaj1(i)=sigmaj1(i)+uu1(jj,i,j)*sigma1(j)
@@ -585,23 +600,26 @@ c     product of one row from matrix u to the
             END DO
          END DO 
          
-                                ! Call subroutine FORMUL
+c     Call subroutine FORMUL
          CALL FORMUL2(betaj,sigmaj1,sigmaj2,upK,sqi1,sqi2,
      &        ri,jj,numcas,
      &        total1,total1x,cg,total2a,
      &        total2b,z,uu1,uu2,Li,sbetaj,ssigmn1,
      &        s2bjbl,s2bjsn1,s2snso1,ssigmn2,s2bjsn2,
      &        s2snso2,ssigmn12,s2snso12,x)
-         
-         sli=sli+dlog(Li)       !  formula (1)
+c     formula (1)         
+         sli=sli+dlog(Li)       
          
          DO j=1,total1
-            dbeta(j)=sbetaj(j)/Li !   first derivatives w.r.t. beta j's
-            G(j)=G(j)+dbeta(j)  !  FINAL array for the gradient G(j)
+c     first derivatives w.r.t. beta j's         
+            dbeta(j)=sbetaj(j)/Li
+c     FINAL array for the gradient G(j)            
+            G(j)=G(j)+dbeta(j)  
          END DO
          
          DO j=1,total2a 
-            dsigma1(j) = ssigmn1(j)/Li !   First derivative w.r.t. sigma
+c     First derivative w.r.t. sigma         
+            dsigma1(j) = ssigmn1(j)/Li 
             G(total1+j) = G(total1+j)+dsigma1(j)
          END DO
 
@@ -634,7 +652,7 @@ c     second order derivatives
                HESS(j1,j2)=HESS(j1,j2)+s2bjbl(j1,j2)/Li - 
      &              dbeta(j1)*dbeta(j2)
             END DO 
-                                ! 2.Derivatives with respect to beta(j1) and sigma(j2)
+c     2.Derivatives with respect to beta(j1) and sigma(j2)
             DO j2=1,total2a
                HESS(j1,total1+j2)=HESS(j1,total1+j2)+
      &              s2bjsn1(j1,j2)/Li - dbeta(j1)*dsigma1(j2)
@@ -646,7 +664,7 @@ c     second order derivatives
             END DO
          END DO 
 
-                                ! 4. Derivatives with respect to sigma(j1) and sigma(j2)
+c     4. Derivatives with respect to sigma(j1) and sigma(j2)
          DO j1=1,total2a
             DO j2=1,total2a
                HESS(total1+j1,total1+j2)=HESS(total1+j1,total1+j2)
@@ -667,23 +685,25 @@ c     bug corrected JKL
      &              s2snso2(j1,j2)/Li-dsigma2(j1)*dsigma2(j2)
             END DO
          END DO    
-      End DO                    ! End main loop
-      
-      sli=-sli                  !  take "-" in order to change Max to Min
-      
-                                ! FINAL Hessian Matrix for all second partial derivatives
+      End DO                    
+c     End main loop      
+      sli=-sli                  
+c     take "-" in order to change Max to Min      
+c     FINAL Hessian Matrix for all second partial derivatives
       DO j1=1,total
          DO j2=1,total
             IF (j1 .gt. j2) THEN
                HESS(j1,j2) = HESS(j2,j1)
             END IF
          END DO 
-         g(j1) = - g(j1)        !  take "-" in order to change Max to Min
+         g(j1) = - g(j1)        
+c     take "-" in order to change Max to Min
       END DO
       
       RETURN	
 
-      End                       ! Subroutine CALCFG2    End Subroutine CALCFG2
+      End                        
+c     Subroutine CALCFG2    End Subroutine CALCFG2
 c=========================================================================
 
 *     =========================================================================
@@ -709,7 +729,7 @@ c=========================================================================
 
 
 
-                                ! Begin Subroutine FORMUL	
+c     Begin Subroutine FORMUL	
 
       SUBROUTINE FORMUL(betaj,sigmaj1,sigmaj2,upK,sqi1,sqi2,
      &     ri,jj,numcas,
@@ -723,7 +743,7 @@ c=========================================================================
 
 c     Declaration Section
       
-                                ! Constant Declaration
+c     Constant Declaration
       INTEGER maxsub,maxcas,maxsig,maxbet,maxest
       PARAMETER (maxsub=5200)
       PARAMETER (maxcas=10)
@@ -733,19 +753,19 @@ c     Declaration Section
 
 c     Integer Declaration 
 
-                                ! Integer Variables
+c     Integer Variables
       INTEGER i,j,jj
       INTEGER total1, total1x, total2a, total2b
       INTEGER upperk, lowerk1, lowerk2, upk,cg
       INTEGER        y1
 
-                                ! Integer Array
+c     Integer Array
       INTEGER numcas(maxsub)
       
       
 c     Double Precision Declaration
 
-                                ! Double Precision Variables
+c     Double Precision Variables
       DOUBLE PRECISION Li,Ai,Pi,Mi
       DOUBLE PRECISION V1,V2, sqi1, sqi2
       DOUBLE PRECISION ukfact, lkfact1, lkfact2
@@ -763,7 +783,7 @@ c     ,Oij(maxcas)
       DOUBLE PRECISION Niuu1(maxsig), Niuu2(maxsig)
       DOUBLE PRECISION uu(maxsig)
 
-                                ! Two Dim Array
+c     Two Dim Array
       DOUBLE PRECISION s2bjbl(maxbet,maxbet)
 c     , Ozz(maxbet,maxbet)
       DOUBLE PRECISION ri(maxsub,maxcas)
@@ -774,7 +794,7 @@ c     DOUBLE PRECISION Ouuu1(maxsig,maxsig),Ouuu2(maxsig,maxsig)
       DOUBLE PRECISION s2bjsn1(maxbet,maxsig),s2bjsn2(maxbet,maxsig) 
 c     DOUBLE PRECISION Ozuu1(maxbet,maxsig),Ozuu2(maxbet,maxsig)
 
-                                ! Three Dim Array
+c     Three Dim Array
       DOUBLE PRECISION z(maxsub,maxcas,maxbet)
       DOUBLE PRECISION uu1(maxsub,maxcas,maxsig),
      &     uu2(maxsub,maxcas,maxsig)
@@ -787,12 +807,12 @@ c     End Declaration Section
       end do
       
 
-      
+c     init of variables for deri. wrt beta      
       DO j=1,total1
-         Sbetaj(j)=0.0d0        !  init of variables for deri. wrt beta
+         Sbetaj(j)=0.0d0      
       END DO 
       
-                                ! Inititalization of Var for derivatives wrt sigma
+c     Inititalization of Var for derivatives wrt sigma
       DO j = 1, total2a
          ssigmn1(j) = 0
       END DO   
@@ -807,7 +827,7 @@ c     End Declaration Section
       upperK=upK-1
 c     dec upperK by 1 to compare results from EGRET w/same K
       ukfact=FACTOR(upperK)
-                                ! loop for summations from k=0 to K 
+c     loop for summations from k=0 to K 
       DO lowerk1=0,upperK
          kkq1=lowerk1-upperK*sqi1
          v1=kkq1/dsqrt(upperK*sqi1*(1-sqi1))
@@ -815,11 +835,11 @@ c     dec upperK by 1 to compare results from EGRET w/same K
          Kkfact1=FACTOR(upperK-lowerk1)
          kchoos1=uKfact/(lkfact1*Kkfact1)
          DO lowerk2=0,upperK		 
-                                ! formula (4)                
+c     formula (4)                
             kkq2=lowerk2-upperK*sqi2                 
             v2=kkq2/dsqrt(upperK*sqi2*(1-sqi2))
-            
-            Ai=1.0d0            ! initialization of some variables and arrays	     
+c     initialization of some variables and arrays            
+            Ai=1.0d0            	     
             DO j=1,total1 
                Niz(j)=0.0d0
             END DO
@@ -863,7 +883,7 @@ c     formula (5)
                else
                   if (y1 .eq. 1) then
                      expon2=dexp(uu(y1)+betaj(i)+
-     *                    sigmaj1(i)*v1+sigmaj2(i)*v2) ! formula (5)
+     *                    sigmaj1(i)*v1+sigmaj2(i)*v2) 
                      gamma2=expon2/(1+expon2)
                      gamma1=0
                      d2=gamma2*(1-gamma2)
@@ -872,9 +892,9 @@ c     formula (5)
                      dd1=0
                   else
                      expon2=dexp(uu(y1)+betaj(i)+
-     *                    sigmaj1(i)*v1+sigmaj2(i)*v2) ! formula (5)
+     *                    sigmaj1(i)*v1+sigmaj2(i)*v2) 
                      expon1=dexp(uu(y1-1)+betaj(i)+
-     *                    sigmaj1(i)*v1+sigmaj2(i)*v2) ! formula (5)
+     *                    sigmaj1(i)*v1+sigmaj2(i)*v2) 
                      gamma2=expon2/(1+expon2)
                      gamma1=expon1/(1+expon1)
                      d2=gamma2*(1-gamma2)
@@ -886,12 +906,12 @@ c     formula (5)
                pi=gamma2-gamma1
                Nij(i)=(d2-d1)/pi
                
-                                ! for the formula (3)                                        
+c     for the formula (3)                                        
                lkfact2=FACTOR(lowerk2)                   
                Kkfact2=FACTOR(upperK-lowerk2)                   
                kchoos2=uKfact/(lkfact2*Kkfact2)
 
-                                ! for the formula (3)
+c     for the formula (3)
                Ai=Ai*Pi
                
                if (y1 .gt. 1) then
@@ -907,26 +927,26 @@ c     formula (5)
                   Niz(j)=Niz(j)+z(jj,i,j-cg+1)*Nij(i)
                END DO
                
-                                ! for the formula (17)
+c     for the formula (17)
                DO j=1,total2a
                   Niuu1(j)=Niuu1(j)+uu1(jj,i,j)*Nij(i)
 c     for the formulas (11),(15), and (17)
                END DO
 
-                                ! for the formula (17)
+c     for the formula (17)
                DO j=1,total2b
                   Niuu2(j)=Niuu2(j)+uu2(jj,i,j)*Nij(i)
 c     for the formulas (11),(15), and (17)
                END DO
 
-                                ! formula (3)
+c     formula (3)
                Mi=Ai*
      &              kchoos1*sqi1**lowerk1*(1-sqi1)**(upperK-lowerk1)* 
      &              kchoos2*sqi2**lowerk2*(1-sqi2)**(upperK-lowerk2) 
-            END DO              ! end of i loop
+            END DO              
 
             
-                                ! products for derivatives of 1st order ( formulas (10)-(11) )
+c     products for derivatives of 1st order ( formulas (10)-(11) )
             DO j=1,total1
                Sbetaj(j)=Sbetaj(j)+Mi*Niz(j)
             END DO
@@ -939,12 +959,12 @@ c     for the formulas (11),(15), and (17)
                Ssigmn2(j)=Ssigmn2(j)+v2*Mi*Niuu2(j)
             END DO
 
-            Li=Li+Mi            !  sum for Li variable ( formula (2) )
+            Li=Li+Mi            
          END DO
-      END DO                    ! End loop for summation
+      END DO                    
 
       RETURN
-      End                       !  Subroutine FORMUL     ! End Subroutine FORMUL
+      End                       
 
 c======================================================================
 
@@ -971,7 +991,7 @@ c======================================================================
 
 
 
-                                ! Begin Subroutine FORMUL2
+c     Begin Subroutine FORMUL2
 
       SUBROUTINE FORMUL2(betaj,sigmaj1,sigmaj2,upK,sqi1,sqi2,
      &     ri,jj,numcas, 
@@ -984,9 +1004,9 @@ c======================================================================
 
       implicit none
 
-                                ! Declaration Section
+c     Declaration Section
       
-                                ! Constant Declaration
+c     Constant Declaration
       INTEGER maxsub,maxcas,maxsig,maxbet,maxest
       PARAMETER (maxsub=5200)
       PARAMETER (maxcas=10)
@@ -994,21 +1014,21 @@ c======================================================================
       PARAMETER (maxbet=25)
       PARAMETER (maxest=maxsig+maxbet)
 
-                                ! Integer Declaration 
+c     Integer Declaration 
 
-                                ! Integer Variables
+c     Integer Variables
       INTEGER i,j,j2,jj
       INTEGER total1,total1x,total2a, total2b
       INTEGER upk, upperk, lowerk1, lowerk2,cg 
       INTEGER        y1
 
-                                ! Integer Array
+c     Integer Array
       INTEGER numcas(maxsub)
       
       
-                                ! Double Precision Declaration
+c     Double Precision Declaration
 
-                                ! Double Precision Variables
+c     Double Precision Variables
       DOUBLE PRECISION Li,Ai,Pi,Mi
       DOUBLE PRECISION V1,V2, sqi1, sqi2
       DOUBLE PRECISION ukfact, lkfact1, lkfact2
@@ -1018,7 +1038,7 @@ c======================================================================
       DOUBLE PRECISION d1, d2, dd1, dd2
 
 
-                                ! One Dim Array
+c     One Dim Array
       DOUBLE PRECISION sigmaj1(maxcas),sigmaj2(maxcas)
       DOUBLE PRECISION betaj(maxcas),Nij(maxcas),Oij(maxcas)
       DOUBLE PRECISION Niz(maxbet),sbetaj(maxbet) 
@@ -1027,7 +1047,7 @@ c======================================================================
       DOUBLE PRECISION Niuu1(maxsig), Niuu2(maxsig)
       DOUBLE PRECISION uu(maxsig)
 
-                                ! Two Dim Array
+c     Two Dim Array
       DOUBLE PRECISION s2bjbl(maxbet,maxbet), Ozz(maxbet,maxbet)
       DOUBLE PRECISION ri(maxsub,maxcas)
       DOUBLE PRECISION s2snso1(maxsig,maxsig),s2snso2(maxsig,maxsig)
@@ -1036,12 +1056,12 @@ c======================================================================
       DOUBLE PRECISION s2bjsn1(maxbet,maxsig),s2bjsn2(maxbet,maxsig) 
       DOUBLE PRECISION Ozuu1(maxbet,maxsig),Ozuu2(maxbet,maxsig)
 
-                                ! Three Dim Array
+c     Three Dim Array
       DOUBLE PRECISION z(maxsub,maxcas,maxbet)
       DOUBLE PRECISION uu1(maxsub,maxcas,maxsig),
      &     uu2(maxsub,maxcas,maxsig)
       
-                                ! End Declaration Section
+c     End Declaration Section
 
       
       DO j=1,cg-1
@@ -1050,19 +1070,19 @@ c======================================================================
       
       
       DO j=1,total1
-         Sbetaj(j)=0.0d0        !   init of variables for deri. wrt beta
+         Sbetaj(j)=0.0d0        
          DO j2=1,total1
             S2bjbl(j,j2)=0
          END DO 
          DO j2=1,total2a
-            S2bjsn1(j,j2)=0     !  init of var for deri. wrt beta & sigma
+            S2bjsn1(j,j2)=0     
          END DO 	   
          DO j2=1,total2b
             S2bjsn2(j,j2)= 0
          END DO
       END DO 
       
-                                ! Inititalization of Var for derivatives wrt sigma
+c     Inititalization of Var for derivatives wrt sigma
       DO j = 1, total2a
          ssigmn1(j) = 0
          DO j2 = 1, total2a
@@ -1077,7 +1097,7 @@ c======================================================================
          END DO
       END DO   
       
-                                ! Initialization of Var for derivatives wrt sigma1 & sigma2
+c     Initialization of Var for derivatives wrt sigma1 & sigma2
       DO J = 1, total2a
          DO j2 = 1, total2b
             S2snso12(j,j2) = 0
@@ -1089,7 +1109,7 @@ c======================================================================
       upperK=upK-1
 c     dec upperK by 1 to compare results from EGRET w/same K
       ukfact=FACTOR(upperK)
-                                ! loop for summations from k=0 to K 
+c     loop for summations from k=0 to K 
       DO lowerk1=0,upperK
          kkq1=lowerk1-upperK*sqi1
          v1=kkq1/dsqrt(upperK*sqi1*(1-sqi1))
@@ -1097,10 +1117,10 @@ c     dec upperK by 1 to compare results from EGRET w/same K
          Kkfact1=FACTOR(upperK-lowerk1)
          kchoos1=uKfact/(lkfact1*Kkfact1)
          DO lowerk2=0,upperK		 
-                                ! formula (4)                
+c     formula (4)                
             kkq2=lowerk2-upperK*sqi2                 
             v2=kkq2/dsqrt(upperK*sqi2*(1-sqi2))         
-            Ai=1.0d0            !  initialization of some variables and arrays
+            Ai=1.0d0            
             DO j=1,total1 
                Niz(j)=0.0d0
                DO j2=1,total1
@@ -1189,12 +1209,12 @@ c     formula (5)
                Nij(i)=(d2-d1)/pi
                Oij(i)=-Nij(i)**2 + (dd2-dd1)/pi
                
-                                ! for the formula (3)                                        
+c     for the formula (3)                                        
                lkfact2=FACTOR(lowerk2)                   
                Kkfact2=FACTOR(upperK-lowerk2)                   
                kchoos2=uKfact/(lkfact2*Kkfact2)
 
-                                ! for the formula (3)
+c     for the formula (3)
                Ai=Ai*Pi
                
                if (y1 .gt. 1) then
@@ -1238,7 +1258,7 @@ c     formula (5)
                   END DO
                END DO
                
-                                ! for the formula (17)
+c     for the formula (17)
                DO j=1,total2a
                   Niuu1(j)=Niuu1(j)+uu1(jj,i,j)*Nij(i)
 c     for the formulas (11),(15), and (17)
@@ -1263,7 +1283,7 @@ c     for the formulas (11),(15), and (17)
                   END DO
                END DO
 
-                                ! for the formula (17)
+c     for the formula (17)
                DO j=1,total2b
                   Niuu2(j)=Niuu2(j)+uu2(jj,i,j)*Nij(i)
 c     for the formulas (11),(15), and (17)
@@ -1283,14 +1303,14 @@ c     for the formulas (11),(15), and (17)
                   END DO
                END DO
 
-                                ! formula (3)
+c     formula (3)
                Mi=Ai*
      &              kchoos1*sqi1**lowerk1*(1-sqi1)**(upperK-lowerk1)* 
      &              kchoos2*sqi2**lowerk2*(1-sqi2)**(upperK-lowerk2) 
 
-            END DO              ! end of i loop
+            END DO              
             
-                                ! products for derivatives of 1st order ( formulas (10)-(11) )
+c     products for derivatives of 1st order ( formulas (10)-(11) )
             DO j=1,total1
                Sbetaj(j)=Sbetaj(j)+Mi*Niz(j)
             END DO
@@ -1303,7 +1323,7 @@ c     for the formulas (11),(15), and (17)
                Ssigmn2(j)=Ssigmn2(j)+v2*Mi*Niuu2(j)
             END DO
 
-                                !!! summations for derivatives of second order :
+c     summations for derivatives of second order :
             
             DO j=1,total1
                DO j2=1,total1
@@ -1322,7 +1342,7 @@ c     for the formula (15)
                END DO
             END DO  
 
-                                ! for the formula (17)
+c     for the formula (17)
             DO j=1,total2a
                DO j2=1,total2a
                   S2snso1(j,j2)=S2snso1(j,j2)+v1*v1*Mi*
@@ -1341,14 +1361,14 @@ c     for the formula (15)
                END DO
             END DO
             
-            Li=Li+Mi            !  sum for Li variable ( formula (2) )
+            Li=Li+Mi            
          END DO
-      END DO                    !  End loop for summation
+      END DO                    
 
       RETURN
-      End                       !  Subroutine FORMUL2     ! End Subroutine FORMUL2
+      End                       
 
-!======================================================================
+c ======================================================================
 
 * ======================================================================
 * Function "FACTOR" calculates factorial of the number that comes
@@ -1357,7 +1377,7 @@ c     for the formula (15)
 * Output : FACTOR  - equal to n!
 * ======================================================================
 
-      ! Begin Function FACTOR()
+c     Begin Function FACTOR()
 
       DOUBLE PRECISION function FACTOR(n1)
 
@@ -1367,7 +1387,7 @@ c     for the formula (15)
            INTEGER i
 
            nfact=1           
-           IF (n1 .gt. 0) then !   If n .lt. 0 then Factorial = 1. 	
+           IF (n1 .gt. 0) then 
               DO i=1,n1
                  nfact=nfact*i
               END DO	        
@@ -1375,7 +1395,8 @@ c     for the formula (15)
 	   FACTOR = nfact 
            RETURN
 
-      End ! Function FACTOR     ! End Function FACTOR
+      End 
+c     Function FACTOR     End Function FACTOR
 
 c     ======================================================================
 
@@ -1565,7 +1586,7 @@ c=========================================================================
 *     
 c     =======================================================================
 
-                                ! Begin Subroutine CONMIN	
+c     Begin Subroutine CONMIN	
 
       SUBROUTINE CONMIN(upk_in,X,F,G,hess,IFUN,ITER,EPS,NFLAG,MXFUN,W,
      &     IOUT,MDIM,IDEV,ACC,NMETH,ri,z,uu1,
@@ -1575,7 +1596,7 @@ c     =======================================================================
 
 c     Declaration Section
 
-                                ! Constant Declaration
+c     Constant Declaration
       INTEGER maxsub,maxcas,maxsig,maxest,maxbet,max_w
       PARAMETER (maxsub=5200)
       PARAMETER (maxcas=10)
@@ -1584,12 +1605,12 @@ c     Declaration Section
       PARAMETER (maxest=maxsig+maxbet)
       PARAMETER (max_w=maxest*(maxest+7)/2)
       
-                                ! Logical Declaration
+c     Logical Declaration
       LOGICAL RSW
 
 c     Integer Declaration
 
-                                ! Integer Variables
+c     Integer Variables
       INTEGER total1,total2a,total2b,total3
       INTEGER i, n, ii, j, ij
       INTEGER ifun, iter, iout, idev, ioutk
@@ -1597,26 +1618,26 @@ c     Integer Declaration
       INTEGER nrst, ncalls, nxpi, ngpi, nrdpi, nrypi, ngpj, nrd
       INTEGER mdim, upk_in,cg ,mxfun
 
-                                ! Integer Array
+c     Integer Array
       INTEGER numcas(maxsub)
 
 c     Double Precision Declaration
 
-                                ! Double Precision Variables	   
+c     Double Precision Variables	   
       DOUBLE PRECISION F,FP,FMIN,ALPHA,AT,AP,GSQ,DG,DG1
       DOUBLE PRECISION DP,STEP,ACC,DAL,U1,U2,U3,U4,EPS
       DOUBLE PRECISION XSQ,RTST,DSQRT,DMIN1,DMAX1,DABS
       
-                                ! One Dim Array
+c     One Dim Array
       DOUBLE PRECISION x(total1+total2a+total2b) ,g(maxest)
       DOUBLE PRECISION w(max_w)
 
-                                ! Two Dim Array
+c     Two Dim Array
       DOUBLE PRECISION hess(total1+total2a+total2b,
      +     total1+total2a+total2b)
       DOUBLE PRECISION ri(maxsub,maxcas)
 
-                                ! Three Dim Array
+c     Three Dim Array
       DOUBLE PRECISION z(maxsub,maxcas,maxbet)
       DOUBLE PRECISION uu1(maxsub,maxcas,maxsig),
      +     uu2(maxsub,maxcas,maxsig)          
@@ -1626,27 +1647,27 @@ c     End Declaration Section
       
       n=total1+total2a+total2b
 
-                                ! Initialize ITER,IFUN,NFLAG, and IOUTK, which counts output iterations 
+c     Initialize ITER,IFUN,NFLAG, and IOUTK, which counts output iterations 
       ITER=0		
       IFUN=0
       IOUTK=0
       NFLAG=0
 
-                                ! SET PARAMETERS TO EXTRACT VECTORS FROM W.
-                                ! W(I) HOLDS THE SEARCH VECTOR,W(NX+I) HOLDS THE BEST CURRENT
-                                ! ESTIMATE TO THE MINIMIZER,AND W(NG+I) HOLDS THE GRADIENT
-                                ! AT THE BEST CURRENT ESTIMATE.
+c     SET PARAMETERS TO EXTRACT VECTORS FROM W.
+c     W(I) HOLDS THE SEARCH VECTOR,W(NX+I) HOLDS THE BEST CURRENT
+c     ESTIMATE TO THE MINIMIZER,AND W(NG+I) HOLDS THE GRADIENT
+c     AT THE BEST CURRENT ESTIMATE.
 
       NX=N
       NG=NX+N
 
-                                ! TEST WHICH METHOD IS BEING USED.
-                                ! IF NMETH=0, W(NRY+I) HOLDS THE RESTART Y VECTOR AND
-                                ! W(NRD+I) HOLDS THE RESTART SEARCH VECTOR.
+c     TEST WHICH METHOD IS BEING USED.
+c     IF NMETH=0, W(NRY+I) HOLDS THE RESTART Y VECTOR AND
+c     W(NRD+I) HOLDS THE RESTART SEARCH VECTOR.
 
       IF (NMETH.EQ.1) THEN 
          NCONS = 3 * N
-c     If NMETH=1, W(NONS+I) holds the appr. inverse HESSIAN
+c     If NMETH=1, W(NCONS+I) holds the appr. inverse HESSIAN
       ELSE 
          NRY=NG+N
          NRD=NRY+N
@@ -1655,11 +1676,11 @@ c     If NMETH=1, W(NONS+I) holds the appr. inverse HESSIAN
          NCONS2=NCONS+2
       END IF
       
-                                ! CALCULATE THE FUNCTION AND GRADIENT AT THE INITIAL
-                                ! POINT AND INITIALIZE NRST,WHICH IS USED TO DETERMINE
-                                ! WHETHER A BEALE RESTART IS BEING DONE. NRST=N MEANS THAT THIS
-                                ! ITERATION IS A RESTART ITERATION. INITIALIZE RSW,WHICH INDICATES
-                                ! THAT THE CURRENT SEARCH DIRECTION IS A GRADIENT DIRECTION.
+c     CALCULATE THE FUNCTION AND GRADIENT AT THE INITIAL
+c     POINT AND INITIALIZE NRST,WHICH IS USED TO DETERMINE
+c     WHETHER A BEALE RESTART IS BEING DONE. NRST=N MEANS THAT THIS
+c     ITERATION IS A RESTART ITERATION. INITIALIZE RSW,WHICH INDICATES
+c     THAT THE CURRENT SEARCH DIRECTION IS A GRADIENT DIRECTION.
 
  20   CALL CALCFG(upk_in,X,total1,cg,total2a,total2b,total3,z,
      &     uu1,uu2,ri,numcas,F,G,HESS)
@@ -1667,9 +1688,9 @@ c     If NMETH=1, W(NONS+I) holds the appr. inverse HESSIAN
       NRST = N
       RSW = .TRUE.
 
-                                ! CALCULATE THE INITIAL SEARCH DIRECTION , THE NORM OF X SQUARED,
-                                ! AND THE NORM OF G SQUARED. DG1 IS THE CURRENT DIRECTIONAL
-                                ! DERIVATIVE,WHILE XSQ AND GSQ ARE THE SQUARED NORMS.
+c     CALCULATE THE INITIAL SEARCH DIRECTION , THE NORM OF X SQUARED,
+c     AND THE NORM OF G SQUARED. DG1 IS THE CURRENT DIRECTIONAL
+c     DERIVATIVE,WHILE XSQ AND GSQ ARE THE SQUARED NORMS.
 
       DG1 = 0.
       XSQ = 0.
@@ -1680,20 +1701,20 @@ c     If NMETH=1, W(NONS+I) holds the appr. inverse HESSIAN
       END DO
       GSQ = -DG1
 
-                                ! TEST IF THE INITIAL POINT IS THE MINIMIZER.
+c     TEST IF THE INITIAL POINT IS THE MINIMIZER.
       IF (GSQ .le.  EPS*EPS*DMAX1(1.0D0,XSQ)) THEN
          RETURN
       END IF
 
-                                ! BEGIN THE MAJOR ITERATION LOOP. NCALLS IS USED TO GUARANTEE THAT
-                                ! AT LEAST TWO POINTS HAVE BEEN TRIED WHEN NMETH=0. FMIN IS THE
-                                ! CURRENT FUNCTION VALUE.
+c     BEGIN THE MAJOR ITERATION LOOP. NCALLS IS USED TO GUARANTEE THAT
+c     AT LEAST TWO POINTS HAVE BEEN TRIED WHEN NMETH=0. FMIN IS THE
+c     CURRENT FUNCTION VALUE.
 
  40   FMIN=F
       NCALLS=IFUN
 
-                                ! IF OUTPUT IS DESIRED,TEST IF THIS IS THE CORRECT ITERATION
-                                ! AND IF SO, WRITE OUTPUT.
+c     IF OUTPUT IS DESIRED,TEST IF THIS IS THE CORRECT ITERATION
+c     AND IF SO, WRITE OUTPUT.
 
       IF (IOUT .eq. 0) THEN
          ALPHA = ALPHA * DG / DG1
@@ -1712,33 +1733,33 @@ C         WRITE(IDEV,60)(X(I),I=1,total1+total2a+total2b)
  60      FORMAT(/8HINTER X./1H ,20D16.8)
       END IF
 
-                                ! IF NMETH=1 OR A RESTART HAS BEEN PERFORMED, SET ALPHA=1.0.
+c     IF NMETH=1 OR A RESTART HAS BEEN PERFORMED, SET ALPHA=1.0.
       IF (NRST .eq. 1.OR.NMETH .eq. 1) THEN
          ALPHA=1.0
       END IF
 
-                                ! IF A GRADIENT DIRECTION IS USED, SET ALPHA=1.0/DSQRT(GSQ),
-                                ! WHICH SCALES THE INITIAL SEARCH VECTOR TO UNITY.
+c     IF A GRADIENT DIRECTION IS USED, SET ALPHA=1.0/DSQRT(GSQ),
+c     WHICH SCALES THE INITIAL SEARCH VECTOR TO UNITY.
       IF (RSW) THEN
          ALPHA=1.0/DSQRT(GSQ)
       END IF
 
-                                ! THE LINEAR SEARCH FITS A CUBIC TO F AND DAL, THE FUNCTION AND ITS
-                                ! DERIVATIVE AT ALPHA, AND TO FP AND DP,THE FUNCTION
-                                ! AND DERIVATIVE AT THE PREVIOUS TRIAL POINT AP.
-                                ! INITIALIZE AP ,FP,AND DP.
+c     THE LINEAR SEARCH FITS A CUBIC TO F AND DAL, THE FUNCTION AND ITS
+c     DERIVATIVE AT ALPHA, AND TO FP AND DP,THE FUNCTION
+c     AND DERIVATIVE AT THE PREVIOUS TRIAL POINT AP.
+c     INITIALIZE AP ,FP,AND DP.
 
       AP=0.
       FP=FMIN
       DP=DG1
 
-                                ! SAVE THE CURRENT DERIVATIVE TO SCALE THE NEXT SEARCH VECTOR.
+c     SAVE THE CURRENT DERIVATIVE TO SCALE THE NEXT SEARCH VECTOR.
       DG=DG1
 
-                                ! UPDATE THE ITERATION.
+c     UPDATE THE ITERATION.
       ITER=ITER+1
 
-                                ! CALCULATE THE CURRENT STEPLENGTH  AND STORE THE CURRENT X AND G.
+c     CALCULATE THE CURRENT STEPLENGTH  AND STORE THE CURRENT X AND G.
       STEP=0.
       DO I=1,N
          STEP=STEP+W(I)*W(I)
@@ -1749,11 +1770,11 @@ C         WRITE(IDEV,60)(X(I),I=1,total1+total2a+total2b)
       END DO
       STEP=DSQRT(STEP)
 
-                                ! BEGIN THE LINEAR SEARCH ITERATION.
-                                ! TEST FOR FAILURE OF THE LINEAR SEARCH.
+c     BEGIN THE LINEAR SEARCH ITERATION.
+c     TEST FOR FAILURE OF THE LINEAR SEARCH.
 
  80   IF (ALPHA*STEP .le.  ACC) THEN
-                                ! TEST IF DIRECTION IS A GRADIENT DIRECTION.
+c     TEST IF DIRECTION IS A GRADIENT DIRECTION.
          IF (.NOT.RSW) THEN
             GO TO 20
 c     Call subroutine CALCFG           
@@ -1763,42 +1784,42 @@ c     Call subroutine CALCFG
          END IF
       END IF
 
-                                ! CALCULATE THE TRIAL POINT.
+c     CALCULATE THE TRIAL POINT.
       DO I = 1,N
          NXPI = NX + I
          X(I) = W(NXPI) + ALPHA * W(I)
       END DO 
 
-                                ! EVALUATE THE FUNCTION AT THE TRIAL POINT.
-                                ! Call CALCFG
+c     EVALUATE THE FUNCTION AT THE TRIAL POINT.
+c     Call CALCFG
       CALL CALCFG(upk_in,X,total1,cg,total2a,total2b,total3,z,
      &     uu1,uu2,ri,numcas,F,G,HESS)
 
-                                ! TEST IF THE MAXIMUM NUMBER OF FUNCTION CALLS HAVE BEEN USED.
+c     TEST IF THE MAXIMUM NUMBER OF FUNCTION CALLS HAVE BEEN USED.
       IFUN=IFUN+1
       IF(IFUN .gt. MXFUN) THEN 
          NFLAG=1
          RETURN
       END IF
 
-                                ! COMPUTE THE DERIVATIVE OF F AT ALPHA.
+c     COMPUTE THE DERIVATIVE OF F AT ALPHA.
       DAL=0.0
       DO I=1,N
          DAL=DAL+G(I)*W(I)
       END DO
 
-                                ! TEST WHETHER THE NEW POINT HAS A NEGATIVE SLOPE BUT A HIGHER
-                                ! FUNCTION VALUE THAN ALPHA=0. IF THIS IS THE CASE,THE SEARCH
-                                ! HAS PASSED THROUGH A LOCAL MAX AND IS HEADING FOR A DISTANT LOCAL
-                                ! MINIMUM.
+c     TEST WHETHER THE NEW POINT HAS A NEGATIVE SLOPE BUT A HIGHER
+c     FUNCTION VALUE THAN ALPHA=0. IF THIS IS THE CASE,THE SEARCH
+c     HAS PASSED THROUGH A LOCAL MAX AND IS HEADING FOR A DISTANT LOCAL
+c     MINIMUM.
       IF (F .gt. FMIN .AND. DAL .lt. 0.) GO TO 160
 
-                                ! IF NOT, TEST WHETHER THE STEPLENGTH CRITERIA HAVE BEEN MET.
+c     IF NOT, TEST WHETHER THE STEPLENGTH CRITERIA HAVE BEEN MET.
       IF(F .gt. (FMIN+.0001*ALPHA*DG) .OR. DABS(DAL/DG)
      &     .gt. (.9)) GO TO 130
 
-                                ! IF THEY HAVE BEEN MET, TEST IF TWO POINTS HAVE BEEN TRIED
-                                ! IF NMETH=0 AND IF THE TRUE LINE MINIMUM HAS NOT BEEN FOUND.
+c     IF THEY HAVE BEEN MET, TEST IF TWO POINTS HAVE BEEN TRIED
+c     IF NMETH=0 AND IF THE TRUE LINE MINIMUM HAS NOT BEEN FOUND.
       IF ((IFUN-NCALLS).le. 1 .AND. DABS(DAL/DG) .gt.  EPS .AND.
      &     NMETH .eq. 0) THEN 
          GO TO 130
@@ -1806,8 +1827,8 @@ c     Call subroutine CALCFG
          GO TO 170
       END IF
 
-                                ! A NEW POINT MUST BE TRIED. USE CUBIC INTERPOLATION TO FIND
-                                ! THE TRIAL POINT AT.
+c     A NEW POINT MUST BE TRIED. USE CUBIC INTERPOLATION TO FIND
+c     THE TRIAL POINT AT.
  130  U1=DP+DAL-3.0*(FP-F)/(AP-ALPHA)
       U2=U1*U1-DP*DAL
       IF(U2.LT.0.)U2=0.
@@ -1815,49 +1836,49 @@ c     Call subroutine CALCFG
       AT=ALPHA-(ALPHA-AP)*(DAL+U2-U1)/(DAL-DP+2.*U2)
 
 
-                                ! TEST WHETHER THE LINE MINIMUM HAS BEEN BRACKETED.
+c     TEST WHETHER THE LINE MINIMUM HAS BEEN BRACKETED.
       IF((DAL/DP).GT.0.)GO TO 140
 
-                                ! THE MINIMUM HAS BEEN BRACKETED. TEST WHETHER THE TRIAL POINT LIES
-                                ! SUFFICIENTLY WITHIN THE BRACKETED INTERVAL.
-                                ! IF IT DOES NOT, CHOOSE AT AS THE MIDPOINT OF THE INTERVAL.
+c     THE MINIMUM HAS BEEN BRACKETED. TEST WHETHER THE TRIAL POINT LIES
+c     SUFFICIENTLY WITHIN THE BRACKETED INTERVAL.
+c     IF IT DOES NOT, CHOOSE AT AS THE MIDPOINT OF THE INTERVAL.
 
       IF(AT.LT.(1.01*DMIN1(ALPHA,AP)).OR.AT.GT.(.99*DMAX1
      &     (ALPHA,AP)))AT=(ALPHA+AP)/2.0
       GO TO 150
 
-                                ! THE MINIMUM HAS NOT BEEN BRACKETED. TEST IF BOTH POINTS ARE
-                                ! GREATER THAN THE MINIMUM AND THE TRIAL POINT IS SUFFICIENTLY
-                                ! SMALLER THAN EITHER.
+c     THE MINIMUM HAS NOT BEEN BRACKETED. TEST IF BOTH POINTS ARE
+c     GREATER THAN THE MINIMUM AND THE TRIAL POINT IS SUFFICIENTLY
+c     SMALLER THAN EITHER.
 
  140  IF (DAL .GT.0.0.AND.0.0.LT.AT.AND.AT.LT.
      &     (.99*DMIN1(AP,ALPHA))) GO TO 150
 
-                                ! TEST IF BOTH POINTS ARE LESS THAN THE MINIMUM AND THE TRIAL POINT
-                                ! IS SUFFICIENTLY LARGE.
+c     TEST IF BOTH POINTS ARE LESS THAN THE MINIMUM AND THE TRIAL POINT
+c     IS SUFFICIENTLY LARGE.
       IF(DAL.LE.0.0.AND.AT.GT.(1.01*DMAX1(AP,ALPHA)))GO TO 150
 
-                                ! IF THE TRIAL POINT IS TOO SMALL,DOUBLE THE LARGEST PRIOR POINT.
+c     IF THE TRIAL POINT IS TOO SMALL,DOUBLE THE LARGEST PRIOR POINT.
       IF(DAL.LE.0.)AT=2.0*DMAX1(AP,ALPHA)
 
-                                ! IF THE TRIAL POINT IS TOO LARGE, HALVE THE SMALLEST PRIOR POINT.
+c     IF THE TRIAL POINT IS TOO LARGE, HALVE THE SMALLEST PRIOR POINT.
       IF(DAL.GT.0.)AT=DMIN1(AP,ALPHA)/2.0
 
-                                ! SET AP=ALPHA, ALPHA=AT,AND CONTINUE SEARCH.
+c     SET AP=ALPHA, ALPHA=AT,AND CONTINUE SEARCH.
  150  AP=ALPHA
       FP=F
       DP=DAL
       ALPHA=AT
       GO TO 80
 
-                                ! A RELATIVE MAX HAS BEEN PASSED.REDUCE ALPHA AND RESTART THE SEARCH.
+c     A RELATIVE MAX HAS BEEN PASSED.REDUCE ALPHA AND RESTART THE SEARCH.
  160  ALPHA=ALPHA/3.
       AP=0.
       FP=FMIN
       DP=DG
       GO TO 80
 
-                                ! THE LINE SEARCH HAS CONVERGED. TEST FOR CONVERGENCE OF THE ALGORITHM.
+c     THE LINE SEARCH HAS CONVERGED. TEST FOR CONVERGENCE OF THE ALGORITHM.
  170  GSQ=0.0
       XSQ=0.0
       DO I=1,N
@@ -1869,17 +1890,17 @@ c     Call subroutine CALCFG
          RETURN
       END IF
 
-                                ! SEARCH CONTINUES. SET W(I)=ALPHA*W(I),THE FULL STEP VECTOR.
+c     SEARCH CONTINUES. SET W(I)=ALPHA*W(I),THE FULL STEP VECTOR.
       DO I=1,N
          W(I)=ALPHA*W(I)
       END DO
 
-                                ! COMPUTE THE NEW SEARCH VECTOR. FIRST TEST WHETHER A
-                                ! CONJUGATE GRADIENT OR A VARIABLE METRIC VECTOR IS USED.
+c     COMPUTE THE NEW SEARCH VECTOR. FIRST TEST WHETHER A
+c     CONJUGATE GRADIENT OR A VARIABLE METRIC VECTOR IS USED.
       IF (NMETH .ne. 1) THEN
 c     Begin if nmeth /= 1
-                                ! CONJUGATE GRADIENT UPDATE SECTION.
-                                ! TEST IF A POWELL RESTART IS INDICATED.
+c     CONJUGATE GRADIENT UPDATE SECTION.
+c     TEST IF A POWELL RESTART IS INDICATED.
          RTST=0.
          DO I=1,N
             NGPI=NG+I
@@ -1888,9 +1909,9 @@ c     Begin if nmeth /= 1
          IF (DABS(RTST/GSQ) .gt. 0.2) THEN
             NRST=N
          END IF
-                                ! IF A RESTART IS INDICATED, SAVE THE CURRENT D AND Y
-                                ! AS THE BEALE RESTART VECTORS AND SAVE D'Y AND Y'Y
-                                ! IN W(NCONS+1) AND W(NCONS+2).
+c     IF A RESTART IS INDICATED, SAVE THE CURRENT D AND Y
+c     AS THE BEALE RESTART VECTORS AND SAVE D'Y AND Y'Y
+c     IN W(NCONS+1) AND W(NCONS+2).
          IF (NRST .eq. N) THEN 
             W(NCONS+1)=0.
             W(NCONS+2)=0.
@@ -1904,7 +1925,7 @@ c     Begin if nmeth /= 1
                W(NCONS2)=W(NCONS2)+W(I)*W(NRYPI)
             END DO	
          END IF
-                                ! CALCULATE  THE RESTART HESSIAN TIMES THE CURRENT GRADIENT.
+c     CALCULATE  THE RESTART HESSIAN TIMES THE CURRENT GRADIENT.
          U1=0.0
          U2=0.0
          DO I=1,N
@@ -1921,12 +1942,12 @@ c     Begin if nmeth /= 1
             NRYPI=NRY+I
             W(NXPI)=-U3*G(I)-U1*W(NRYPI)-U2*W(NRDPI)
          END DO
-                                ! IF THIS IS A RESTART ITERATION,W(NX+I) CONTAINS THE NEW SEARCH
-                                ! VECTOR.
+c     IF THIS IS A RESTART ITERATION,W(NX+I) CONTAINS THE NEW SEARCH
+c     VECTOR.
          IF (NRST .ne. N) THEN
 c     begin if nrst /= n
-                                ! NOT A RESTART ITERATION. CALCULATE THE RESTART HESSIAN
-                                ! TIMES THE CURRENT Y.
+c     NOT A RESTART ITERATION. CALCULATE THE RESTART HESSIAN
+c     TIMES THE CURRENT Y.
             U1=0.
             U2=0.
             U3=0.
@@ -1951,8 +1972,8 @@ c     begin if nrst /= n
                W(NGPI)=STEP
             END DO
 
-                                ! CALCULATE THE DOUBLY UPDATED HESSIAN TIMES THE CURRENT
-                                ! GRADIENT TO OBTAIN THE SEARCH VECTOR.
+c     CALCULATE THE DOUBLY UPDATED HESSIAN TIMES THE CURRENT
+c     GRADIENT TO OBTAIN THE SEARCH VECTOR.
             U1=0.0
             U2=0.0
             DO I=1,N
@@ -1965,7 +1986,7 @@ c     begin if nrst /= n
                NXPI=NX+I
                W(NXPI)=W(NXPI)-U1*W(NGPI)-U2*W(I)
             END DO
-                                ! CALCULATE THE DERIVATIVE ALONG THE NEW SEARCH VECTOR.
+c     CALCULATE THE DERIVATIVE ALONG THE NEW SEARCH VECTOR.
          END IF
 c     End if nrst /= n
          DG1=0.
@@ -1974,19 +1995,19 @@ c     End if nrst /= n
             W(I)=W(NXPI)
             DG1=DG1+W(I)*G(I)
          END DO
-                                ! IF THE NEW DIRECTION IS NOT A DESCENT DIRECTION,STOP.
+c     IF THE NEW DIRECTION IS NOT A DESCENT DIRECTION,STOP.
          IF (DG1 .gt. 0.) THEN
 c     GO TO 320
             NFLAG = 3
             RETURN
          END IF 
 
-                                ! UPDATE NRST TO ASSURE AT LEAST ONE RESTART EVERY N ITERATIONS.
+c     UPDATE NRST TO ASSURE AT LEAST ONE RESTART EVERY N ITERATIONS.
          IF (NRST .eq. N) NRST=0
          NRST=NRST+1
          RSW=.FALSE.
          GO TO 40	      
-                                ! A VARIABLE METRIC ALGORITM IS BEING USED. CALCULATE Y AND D'Y.
+c     A VARIABLE METRIC ALGORITM IS BEING USED. CALCULATE Y AND D'Y.
       END IF
 c     End if nmeth /= 1
 
@@ -1997,16 +2018,16 @@ c     End if nmeth /= 1
          U1=U1+W(I)*W(NGPI)
       END DO
 
-                                ! IF RSW=.TRUE.,SET UP THE INITIAL SCALED APPROXIMATE HESSIAN.
+c     IF RSW=.TRUE.,SET UP THE INITIAL SCALED APPROXIMATE HESSIAN.
       IF (RSW) THEN
-                                ! CALCULATE Y'Y.
+c     CALCULATE Y'Y.
          U2=0.
          DO I=1,N
             NGPI=NG+I
             U2=U2+W(NGPI)*W(NGPI)
          END DO
-                                ! CALCULATE THE INITIAL HESSIAN AS H=(P'Y/Y'Y)*I
-                                ! AND THE INITIAL U2=Y'HY AND W(NX+I)=HY.
+c     CALCULATE THE INITIAL HESSIAN AS H=(P'Y/Y'Y)*I
+c     AND THE INITIAL U2=Y'HY AND W(NX+I)=HY.
          IJ=1
          U3=U1/U2
          DO I=1,N
@@ -2022,7 +2043,7 @@ c     End if nmeth /= 1
          END DO
          U2=U3*U2
       ELSE
-                                ! CALCULATE W(NX+I)=HY AND U2=Y'HY.
+c     CALCULATE W(NX+I)=HY AND U2=Y'HY.
          U2=0.0
          DO I=1,N
             U3=0.0
@@ -2049,7 +2070,7 @@ c     End if nmeth /= 1
          END DO
       END IF
 
-                                ! CALCULATE THE UPDATED APPROXIMATE HESSIAN.
+c     CALCULATE THE UPDATED APPROXIMATE HESSIAN.
       U4=1.0+U2/U1
       DO I=1,N
          NXPI=NX+I
@@ -2069,7 +2090,7 @@ c     End if nmeth /= 1
          END DO	      
       END DO
 
-                                ! CALCULATE THE NEW SEARCH DIRECTION W(I)=-HG AND ITS DERIVATIVE.
+c     CALCULATE THE NEW SEARCH DIRECTION W(I)=-HG AND ITS DERIVATIVE.
       DG1=0.0
       DO I=1,N
          U3=0.0
@@ -2091,7 +2112,7 @@ c     End if nmeth /= 1
          W(I)=U3
       END DO
 
-                                ! TEST FOR A DOWNHILL DIRECTION.
+c     TEST FOR A DOWNHILL DIRECTION.
       IF (DG1 .gt. 0.) THEN      
          NFLAG = 3
          RETURN
@@ -2101,7 +2122,7 @@ c     End if nmeth /= 1
       END IF    
 
 
-      End                       ! Subroutine CONMIN        ! End subroutine CONMIN
-
-! ========================================================================
-!!! The End
+      End                 
+c     Subroutine CONMIN         End subroutine CONMIN
+c ========================================================================
+c     The End

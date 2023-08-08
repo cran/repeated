@@ -173,50 +173,46 @@
 ##' 
 ##' treat <- c(0,0,1,1)
 ##' tr <- tcctomat(treat)
-##' dose <- # matrix(rpois(20,10),ncol=5)
-##' 	matrix(c(9,13,16,7,12,6,9,10,11,9,10,10,7,9,9,9,8,10,15,4),
-##' 		ncol=5,byrow=TRUE)
+##' dose <- 
+##'   matrix(c(9,13,16,7,12,6,9,10,11,9,10,10,7,9,9,9,8,10,15,4),
+##'          ncol=5,byrow=TRUE)
 ##' dd <- tvctomat(dose)
-##' y <- # matrix(rpois(20,1+3*rep(treat,5)),ncol=5)
-##' 	restovec(matrix(c(1,1,1,1,0,1,0,1,0,5,3,3,4,1,4,4,2,3,2,5),
-##' 		ncol=5,byrow=TRUE))
+##' y <- restovec(structure(c(6, 4, 0, 0, 3, 6, 1, 1, 1, 5, 0, 0, 0, 4, 0, 1, 0, 
+##'                           13, 0, 3), dim = 4:5))
 ##' reps <- rmna(y, ccov=tr, tvcov=dd)
-##' #
-##' # log normal intensity, independence model
-##' kalcount(y, intensity="log normal", dep="independence", preg=1,
-##' 	pshape=0.1)
-##' # random effect
+#
+# log normal intensity, independence model
+##' kalcount(y, intensity="log normal", dep="independence", 
+##'         preg=0.3, pshape=0.1)
+# random effect
 ##' kalcount(y, intensity="log normal", dep="frailty", pinitial=0.1,
-##' 	preg=1, psh=0.1)
-##' # serial dependence
+##'          preg=1, psh=0.1)
+# serial dependence
 ##' kalcount(y, intensity="log normal", dep="serial", pinitial=0.1,
-##' 	preg=1, pdep=0.01, psh=0.1)
-##' # random effect and autoregression
-##' kalcount(y, intensity="log normal", dep="frailty", pinitial=0.1,
-##' 	pdep=0.1, preg=1, psh=0.1)
+##'          preg=1, pdep=0.75, psh=0.1)
+##' # random effect and autoregression (commented out: AR difficult to estimate)
+##' #kalcount(y, intensity="log normal", dep="frailty", pinitial=0.1,
+##' #         pdep=0.5, preg=1, psh=0.1)
 ##' # add time-constant variable
-##' kalcount(y, intensity="log normal", pinitial=0.1, psh=0.1,
-##' 	preg=c(1,0), ccov=treat)
-##' # or equivalently
-##' kalcount(y, intensity="log normal", mu=~treat, pinitial=0.1,
-##' 	psh=0.1, preg=c(1,0))
+##' kalcount(y, intensity="log normal", pinitial=1, psh=1,
+##'          preg=c(0.8,0.11), ccov=treat)
 ##' # or
 ##' kalcount(y, intensity="log normal", mu=~b0+b1*treat,
-##' 	pinitial=0.1, psh=0.1, preg=c(1,0), envir=reps)
+##'          pinitial=1, psh=.1, preg=c(0.4,-0.04), envir=reps)
 ##' # add time-varying variable
-##' kalcount(y, intensity="log normal", pinitial=0.1, psh=0.1,
-##' 	preg=c(1,0), ccov=treat, ptvc=0, tvc=dose)
+##' kalcount(y, intensity="log normal", pinitial=1, psh=1,
+##'          preg=c(-1,2), ccov=treat, ptvc=0, tvc=dose)
 ##' # or equivalently, from the environment
 ##' dosev <- as.vector(t(dose))
 ##' kalcount(y, intensity="log normal", mu=~b0+b1*rep(treat,rep(5,4))+b2*dosev,
-##' 	pinitial=0.1, psh=0.1, ptvc=c(1,0,0))
+##'          pinitial=1, psh=1, ptvc=c(-1,2,0))
 ##' # or from the reps data object
 ##' kalcount(y, intensity="log normal", mu=~b0+b1*treat+b2*dose,
-##' 	pinitial=0.1, psh=0.1, ptvc=c(1,0,0), envir=reps)
+##'         pinitial=1, psh=1, ptvc=c(-1,2,0), envir=reps)
 ##' # try power variance family
 ##' kalcount(y, intensity="log normal", mu=~b0+b1*treat+b2*dose,
-##' 	pinitial=0.001, psh=14, ptvc=c(5,-1,0.1), envir=reps,
-##' 	pfamily=0.8)
+##'          pinitial=1, psh=1, ptvc=c(-1,2,0.1), envir=reps,
+##'          pfamily=0.8)
 ##' 
 ##' @aliases kalcount deviance.kalcount residuals.kalcount fitted.kalcount print.kalcount 
 ##' @export kalcount
@@ -298,7 +294,7 @@ call <- sys.call()
 #
 tmp <- c("exponential", "Weibull","gamma","gen logistic","log normal",
 	"log logistic","log Cauchy","log Laplace")
-mdl <- match(intensity <- match.arg(intensity,tmp),tmp)
+mdl <- match(intensity <- match.arg(intensity,tmp),tmp); #print(paste0("using model number: ",as.integer(mdl))) ## BRUCE
 depend <- match.arg(depend,c("independence","serial","frailty"))
 tmp <- c("Markov","serial","event","cumulated","count","kalman","time")
 dep <- match(update <- match.arg(update,tmp),tmp)
@@ -651,9 +647,19 @@ else count <- kcountb
 if(fscale==1)fscale <- count(p)
 if(is.na(count(p)))
 	stop("Likelihood returns NAs: probably invalid initial values")
+# print(paste0("p before z0<-nlm: ")) ## BRUCE
+# print(p)                            ## BRUCE
+# print(paste0("sf before z0<-nlm: ")) ## BRUCE
+# print(sf)                            ## BRUCE
+# print(paste0("b before z0<-nlm: ")) ## BRUCE
+# print(b)                            ## BRUCE
 z0 <- nlm(count, p=p, hessian=TRUE, print.level=print.level,
 	typsize=typsize, ndigit=ndigit, gradtol=gradtol, stepmax=stepmax,
 	steptol=steptol, iterlim=iterlim, fscale=fscale)
+# print(paste0("z0$estimate after z0<-nlm: "))  ## BRUCE
+# print(z0$estimate)                            ## BRUCE
+# print("as.integer(nccov):")## BRUCE
+# print(as.integer(nccov))## BRUCE
 a <- if(any(is.na(z0$hessian))||any(abs(z0$hessian)==Inf))0
 	else qr(z0$hessian)$rank
 if(a==np)cov <- solve(z0$hessian)
@@ -663,7 +669,7 @@ else cov <- matrix(NA,ncol=np,nrow=np)
 #
 se <- sqrt(diag(cov))
 corr <- cov/(se%o%se)
-dimnames(corr) <- list(1:np,1:np)
+dimnames(corr) <- list(1:np,1:np); #print(z0); print(summary(z0)); ## BRUCE
 #
 # calculate recursive fitted values
 #
@@ -723,7 +729,7 @@ else {
 		vv=as.double(v),
 		like=double(1),
 		#DUP=FALSE,
-		PACKAGE="repeated")}
+		PACKAGE="repeated")}; #print(paste0("resp$response$times: ", resp$response$times)); print(paste0("resp$response$y: ", resp$response$y)); print(paste0("as.double(b): ", as.double(b))); ## BRUCE
 #
 # return appropriate attributes on functions
 #

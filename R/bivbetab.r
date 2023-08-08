@@ -142,8 +142,9 @@ class(z1) <- "bevbetab"
 return(z1)}
 
 ### print method
-###
-print.bevbetab <- function(z) {
+#' @export
+print.bevbetab <- function(x, ...) {
+  z <- x
 np <- length(z$coef)
 cat("\nCall:",deparse(z$call),sep="\n")
 cat("\n")
