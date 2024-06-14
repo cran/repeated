@@ -1,7 +1,7 @@
 ad4652e2dcfd4a0ecf91a2c01a7defd5 *COPYING
-41bbed6a1914ed2aa9e1ebd7ddac5a80 *DESCRIPTION
-32d498c057ce9df90262337f15d65b90 *NAMESPACE
-ed986ac168928817ff866702cedd0442 *NEWS.md
+743d03f85fdc047c6afee3e3c49aa3a1 *DESCRIPTION
+70f821e109a273ba91a392b582120cc9 *NAMESPACE
+8cb92f546478bf22ac45cfa013d23ceb *NEWS.md
 e9e083780182cfa9fb0bdcb54f9ed142 *R/binnest.r
 36b5179aa79da612436cadcbe9b71c0d *R/bivbetab.r
 f3be42da5b719cbf46d3e1ccb5c4ddda *R/bivbinom.r
@@ -19,7 +19,6 @@ e3072f94c81e1247efc6d122c1fca39b *R/gnlmm3.r
 7d6674e60868b15e52ab90a3c381da71 *R/hnlmix.r
 fdc3fd07640fc413f5f1f3d6505ed441 *R/kalcount.r
 ed422b441c0749b4af316a1ca48879ab *R/kalseries.r
-26ea825319fec150cabdf6b8e73e8196 *R/logitord.r
 52b4810f7f45c1ca692d52d3b65deab9 *R/marghom.r
 ec287193a91d11ba3f0efbc484c95067 *R/nbkal.r
 35aafabc2f0b8fce14c43287ed0d5a81 *man/binnest.Rd
@@ -39,10 +38,9 @@ bdb7c42f68b0ec2690191bfc7eab0c57 *man/hidden.Rd
 14dc80c4f9a9587d56b54fe3306afce5 *man/hnlmix.Rd
 4223085ce50435f07ef57c23bafb1b87 *man/kalcount.Rd
 f6b5356377487bd5d5a240a16c9489fe *man/kalseries.Rd
-dc624e0cb56fb7067317779044d143b7 *man/logitord.Rd
 1cd82bf6e8067a4b4aeaf8beb387a8b9 *man/marg.hom.Rd
 30b099e9d2b4ae76daf598130a4dbc38 *man/nbkal.Rd
-903cfd150aaa6183dc75b3f779ccbb67 *src/binnest.f
+af9c285b688f63747895fb1d56e09883 *src/binnest.f
 f55cb7f6df10e13568e79d24a99e72ef *src/calcs.c
 060d342737d89663a98b6b169988d8aa *src/calcs.h
 b9f07255b7d951784841e927258e4621 *src/calcs1.c
@@ -59,7 +57,7 @@ fd6402b5ca818411a437833f22a1b63f *src/chidden.f
 dec0bfcc01ab69b25ed9121cf66652c0 *src/defs.h
 a0548a77c75486186ab6f15c90828dc2 *src/dist.c
 dccd5a32702ff168ef068262881d710c *src/dist.h
-86525d463916de7bbdb23ec868bc2032 *src/eigen.f
+c4424102a3323d345030323bd4463337 *src/eigen.f
 b9c96a37979accae8a8baa5cd7e81448 *src/gaps.c
 cb5fe8375fb617a165218b22edc92922 *src/gaps.h
 4b1958c5f3b14e3a82a0cae793dc0264 *src/gar.c
@@ -67,6 +65,6 @@ cb5fe8375fb617a165218b22edc92922 *src/gaps.h
 458000a5efc369f8998f7c449730a071 *src/hidden.f
 b1aeb7c33a669bf63ae0229dd09317cc *src/kcountb.c
 195dc78a6c31f837bbfdf7ed511a377e *src/kserieb.c
-f8d35b49c38c3f9a312d346b8fa1969a *src/logitord.f
+9623d4480cd604dc65ad3cfc6d5c5ffa *src/logitord.f
 103eec97dfd97cf6ddb48913e1031513 *src/repeated_init.c
 b659606ccdaf16303fa5af5fb363eca9 *src/romberg_sexp.c

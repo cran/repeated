@@ -116,8 +116,9 @@ C
          GO TO 20
   170 CONTINUE
 C     .......... NOW BALANCE THE SUBMATRIX IN ROWS K TO L ..........
-      DO 180 I = K, L
-  180 SCALE(I) = 1.0D0
+      DO I = K, L
+         SCALE(I) = 1.0D0
+      END DO
 C     .......... ITERATIVE LOOP FOR NORM REDUCTION ..........
   190 NOCONV = .FALSE.
 C
@@ -150,11 +151,13 @@ C     .......... NOW BALANCE ..........
          SCALE(I) = SCALE(I) * F
          NOCONV = .TRUE.
 C
-         DO 250 J = K, N
-  250    A(I,J) = A(I,J) * G
+         DO     J = K, N
+            A(I,J) = A(I,J) * G
+         END DO
 C
-         DO 260 J = 1, L
-  260    A(J,I) = A(J,I) * F
+         DO     J = 1, L
+            A(J,I) = A(J,I) * F
+         END DO   
 C
   270 CONTINUE
 C
@@ -216,8 +219,9 @@ C
 C     .......... LEFT HAND EIGENVECTORS ARE BACK TRANSFORMED
 C                IF THE FOREGOING STATEMENT IS REPLACED BY
 C                S=1.0D0/SCALE(I). ..........
-         DO 100 J = 1, M
-  100    Z(I,J) = Z(I,J) * S
+         DO J = 1, M
+            Z(I,J) = Z(I,J) * S
+         END DO   
 C
   110 CONTINUE
 C     ......... FOR I=LOW-1 STEP -1 UNTIL 1,
@@ -451,8 +455,9 @@ C
          GO TO 20
   170 CONTINUE
 C     .......... NOW BALANCE THE SUBMATRIX IN ROWS K TO L ..........
-      DO 180 I = K, L
-  180 SCALE(I) = 1.0D0
+      DO     I = K, L
+         SCALE(I) = 1.0D0
+      END DO   
 C     .......... ITERATIVE LOOP FOR NORM REDUCTION ..........
   190 NOCONV = .FALSE.
 C
@@ -1069,12 +1074,13 @@ C     .......... ALL ROOTS FOUND.  BACKSUBSTITUTE TO FIND
 C                VECTORS OF UPPER TRIANGULAR FORM ..........
   680 NORM = 0.0D0
 C
-      DO 720 I = 1, N
+      DO I = 1, N
 C
-         DO 720 J = I, N
+         DO J = I, N
             TR = DABS(HR(I,J)) + DABS(HI(I,J))
             IF (TR .GT. NORM) NORM = TR
-  720 CONTINUE
+         END DO
+      END DO   
 C
       IF (N .EQ. 1 .OR. NORM .EQ. 0.0D0) GO TO 1001
 C     .......... FOR EN=N STEP -1 UNTIL 2 DO -- ..........
@@ -1137,11 +1143,11 @@ C
 C     .......... MULTIPLY BY TRANSFORMATION MATRIX TO GIVE
 C                VECTORS OF ORIGINAL FULL MATRIX.
 C                FOR J=N STEP -1 UNTIL LOW+1 DO -- ..........
-      DO 880 JJ = LOW, ENM1
+      DO JJ = LOW, ENM1
          J = N + LOW - JJ
          M = MIN0(J,IGH)
 C
-         DO 880 I = LOW, IGH
+         DO I = LOW, IGH
             ZZR = 0.0D0
             ZZI = 0.0D0
 C
@@ -1152,7 +1158,8 @@ C
 C
             ZR(I,J) = ZZR
             ZI(I,J) = ZZI
-  880 CONTINUE
+         END DO
+      END DO   
 C
       GO TO 1001
 C     .......... SET ERROR -- ALL EIGENVALUES HAVE NOT
@@ -1221,8 +1228,9 @@ C
          ORTI(M) = 0.0D0
          SCALE = 0.0D0
 C     .......... SCALE COLUMN (ALGOL TOL THEN NOT NEEDED) ..........
-         DO 90 I = M, IGH
-   90    SCALE = SCALE + DABS(AR(I,M-1)) + DABS(AI(I,M-1))
+         DO I = M, IGH
+            SCALE = SCALE + DABS(AR(I,M-1)) + DABS(AI(I,M-1))
+         END DO   
 C
          IF (SCALE .EQ. 0.0D0) GO TO 180
          MP = M + IGH
@@ -1397,11 +1405,13 @@ C
             Y = Y / X
             A(I,MM1) = Y
 C
-            DO 140 J = M, N
-  140       A(I,J) = A(I,J) - Y * A(M,J)
+            DO J = M, N
+               A(I,J) = A(I,J) - Y * A(M,J)
+            END DO   
 C
-            DO 150 J = 1, IGH
-  150       A(J,M) = A(J,M) + Y * A(J,I)
+            DO J = 1, IGH
+               A(J,M) = A(J,M) + Y * A(J,I)
+            END DO   
 C
   160    CONTINUE
 C
@@ -1458,8 +1468,9 @@ C
 C     .......... INITIALIZE Z TO IDENTITY MATRIX ..........
       DO 80 J = 1, N
 C
-         DO 60 I = 1, N
-   60    Z(I,J) = 0.0D0
+         DO I = 1, N
+            Z(I,J) = 0.0D0
+         END DO   
 C
          Z(J,J) = 1.0D0
    80 CONTINUE
@@ -1471,8 +1482,9 @@ C     .......... FOR MP=IGH-1 STEP -1 UNTIL LOW+1 DO -- ..........
          MP = IGH - MM
          MP1 = MP + 1
 C
-         DO 100 I = MP1, IGH
-  100    Z(I,MP) = A(I,MP-1)
+         DO I = MP1, IGH
+            Z(I,MP) = A(I,MP-1)
+         END DO   
 C
          I = INT(MP)
          IF (I .EQ. MP) GO TO 140
@@ -1595,8 +1607,9 @@ C     .......... STORE ROOTS ISOLATED BY BALANC
 C                AND COMPUTE MATRIX NORM ..........
       DO 50 I = 1, N
 C
-         DO 40 J = K, N
-   40    NORM = NORM + DABS(H(I,J))
+         DO J = K, N
+            NORM = NORM + DABS(H(I,J))
+         END DO   
 C
          K = I
          IF (I .GE. LOW .AND. I .LE. IGH) GO TO 50
@@ -1634,8 +1647,9 @@ C     .......... FORM SHIFT ..........
 C     .......... FORM EXCEPTIONAL SHIFT ..........
       T = T + X
 C
-      DO 120 I = LOW, EN
-  120 H(I,I) = H(I,I) - X
+      DO I = LOW, EN
+         H(I,I) = H(I,I) - X
+      END DO
 C
       S = DABS(H(EN,NA)) + DABS(H(NA,ENM2))
       X = 0.75D0 * S
@@ -1853,8 +1867,9 @@ C     .......... STORE ROOTS ISOLATED BY BALANC
 C                AND COMPUTE MATRIX NORM ..........
       DO 50 I = 1, N
 C
-         DO 40 J = K, N
-   40    NORM = NORM + DABS(H(I,J))
+         DO J = K, N
+            NORM = NORM + DABS(H(I,J))
+         END DO
 C
          K = I
          IF (I .GE. LOW .AND. I .LE. IGH) GO TO 50
@@ -1892,8 +1907,9 @@ C     .......... FORM SHIFT ..........
 C     .......... FORM EXCEPTIONAL SHIFT ..........
       T = T + X
 C
-      DO 120 I = LOW, EN
-  120 H(I,I) = H(I,I) - X
+      DO I = LOW, EN
+         H(I,I) = H(I,I) - X
+      END DO   
 C
       S = DABS(H(EN,NA)) + DABS(H(NA,ENM2))
       X = 0.75D0 * S
@@ -2082,8 +2098,9 @@ C     .......... FOR I=EN-1 STEP -1 UNTIL 1 DO -- ..........
             W = H(I,I) - P
             R = 0.0D0
 C
-            DO 610 J = M, EN
-  610       R = R + H(I,J) * H(J,EN)
+            DO J = M, EN
+               R = R + H(I,J) * H(J,EN)
+            END DO   
 C
             IF (WI(I) .GE. 0.0D0) GO TO 630
             ZZ = W
@@ -2200,25 +2217,29 @@ C                VECTORS OF ISOLATED ROOTS ..........
       DO 840 I = 1, N
          IF (I .GE. LOW .AND. I .LE. IGH) GO TO 840
 C
-         DO 820 J = I, N
-  820    Z(I,J) = H(I,J)
+         DO J = I, N
+            Z(I,J) = H(I,J)
+         END DO   
 C
   840 CONTINUE
 C     .......... MULTIPLY BY TRANSFORMATION MATRIX TO GIVE
 C                VECTORS OF ORIGINAL FULL MATRIX.
 C                FOR J=N STEP -1 UNTIL LOW DO -- ..........
-      DO 880 JJ = LOW, N
+      DO JJ = LOW, N
          J = N + LOW - JJ
          M = MIN0(J,IGH)
 C
-         DO 880 I = LOW, IGH
+         DO I = LOW, IGH
             ZZ = 0.0D0
 C
-            DO 860 K = LOW, M
-  860       ZZ = ZZ + Z(I,K) * H(K,J)
+            DO K = LOW, M
+               ZZ = ZZ + Z(I,K) * H(K,J)
+            END DO   
 C
             Z(I,J) = ZZ
-  880 CONTINUE
+
+         END DO
+      END DO   
 C
       GO TO 1001
 C     .......... SET ERROR -- ALL EIGENVALUES HAVE NOT
@@ -2280,12 +2301,13 @@ C
 C     .......... TRANSFORM THE EIGENVECTORS OF THE REAL SYMMETRIC
 C                TRIDIAGONAL MATRIX TO THOSE OF THE HERMITIAN
 C                TRIDIAGONAL MATRIX. ..........
-      DO 50 K = 1, N
+      DO K = 1, N
 C
-         DO 50 J = 1, M
+         DO J = 1, M
             ZI(K,J) = -ZR(K,J) * TAU(2,K)
             ZR(K,J) = ZR(K,J) * TAU(1,K)
-   50 CONTINUE
+         END DO
+      END DO   
 C
       IF (N .EQ. 1) GO TO 200
 C     .......... RECOVER AND APPLY THE HOUSEHOLDER MATRICES ..........
@@ -2373,8 +2395,9 @@ C
       TAU(1,N) = 1.0D0
       TAU(2,N) = 0.0D0
 C
-      DO 100 I = 1, N
-  100 D(I) = AR(I,I)
+      DO I = 1, N
+         D(I) = AR(I,I)
+      END DO   
 C     .......... FOR I=N STEP -1 UNTIL 1 DO -- ..........
       DO 300 II = 1, N
          I = N + 1 - II
@@ -2383,8 +2406,9 @@ C     .......... FOR I=N STEP -1 UNTIL 1 DO -- ..........
          SCALE = 0.0D0
          IF (L .LT. 1) GO TO 130
 C     .......... SCALE ROW (ALGOL TOL THEN NOT NEEDED) ..........
-         DO 120 K = 1, L
-  120    SCALE = SCALE + DABS(AR(I,K)) + DABS(AI(I,K))
+         DO K = 1, L
+            SCALE = SCALE + DABS(AR(I,K)) + DABS(AI(I,K))
+         END DO   
 C
          IF (SCALE .NE. 0.0D0) GO TO 140
          TAU(1,L) = 1.0D0
@@ -2442,7 +2466,7 @@ C     .......... FORM ELEMENT OF P ..........
 C
          HH = F / (H + H)
 C     .......... FORM REDUCED A ..........
-         DO 260 J = 1, L
+         DO J = 1, L
             F = AR(I,J)
             G = E(J) - HH * F
             E(J) = G
@@ -2450,12 +2474,13 @@ C     .......... FORM REDUCED A ..........
             GI = TAU(2,J) - HH * FI
             TAU(2,J) = -GI
 C
-            DO 260 K = 1, J
+            DO K = 1, J
                AR(J,K) = AR(J,K) - F * E(K) - G * AR(I,K)
      X                           + FI * TAU(2,K) + GI * AI(I,K)
                AI(J,K) = AI(J,K) - F * TAU(2,K) - G * AI(I,K)
      X                           - FI * E(K) - GI * AR(I,K)
-  260    CONTINUE
+            END DO
+         END DO   
 C
   270    DO 280 K = 1, L
             AR(I,K) = SCALE * AR(I,K)
@@ -2545,8 +2570,9 @@ C
       IERR = 0
       IF (N .EQ. 1) GO TO 1001
 C
-      DO 100 I = 2, N
-  100 E(I-1) = E(I)
+      DO I = 2, N
+         E(I-1) = E(I)
+      END DO   
 C
       F = 0.0D0
       TST1 = 0.0D0
@@ -2579,8 +2605,9 @@ C     .......... FORM SHIFT ..........
          H = G - D(L)
          IF (L2 .GT. N) GO TO 145
 C
-         DO 140 I = L2, N
-  140    D(I) = D(I) - H
+         DO I = L2, N
+            D(I) = D(I) - H
+         END DO   
 C
   145    F = F + H
 C     .......... QL TRANSFORMATION ..........
@@ -2701,8 +2728,9 @@ C
       IERR = 0
       IF (N .EQ. 1) GO TO 1001
 C
-      DO 100 I = 2, N
-  100 E(I-1) = E(I)
+      DO I = 2, N
+         E(I-1) = E(I)
+      END DO   
 C
       F = 0.0D0
       TST1 = 0.0D0
@@ -2735,8 +2763,9 @@ C     .......... FORM SHIFT ..........
          H = G - D(L)
          IF (L2 .GT. N) GO TO 145
 C
-         DO 140 I = L2, N
-  140    D(I) = D(I) - H
+         DO I = L2, N
+            D(I) = D(I) - H
+         END DO   
 C
   145    F = F + H
 C     .......... QL TRANSFORMATION ..........
@@ -2858,8 +2887,9 @@ C
       IERR = 0
       IF (N .EQ. 1) GO TO 1001
 C
-      DO 100 I = 2, N
-  100 E2(I-1) = E2(I)
+      DO I = 2, N
+         E2(I-1) = E2(I)
+      END DO
 C
       F = 0.0D0
       T = 0.0D0
@@ -2891,8 +2921,9 @@ C     .......... FORM SHIFT ..........
          D(L) = S / (P + DSIGN(R,P))
          H = G - D(L)
 C
-         DO 140 I = L1, N
-  140    D(I) = D(I) - H
+         DO I = L1, N
+            D(I) = D(I) - H
+         END DO   
 C
          F = F + H
 C     .......... RATIONAL QL TRANSFORMATION ..........
@@ -2999,8 +3030,9 @@ C     .......... FOR I=N STEP -1 UNTIL 1 DO -- ..........
          SCALE = 0.0D0
          IF (L .LT. 1) GO TO 130
 C     .......... SCALE ROW (ALGOL TOL THEN NOT NEEDED) ..........
-         DO 120 K = 1, L
-  120    SCALE = SCALE + DABS(D(K))
+         DO K = 1, L
+            SCALE = SCALE + DABS(D(K))
+         END DO   
 C
          IF (SCALE .NE. 0.0D0) GO TO 140
 C
@@ -3027,8 +3059,9 @@ C
          D(L) = F - G
          IF (L .EQ. 1) GO TO 285
 C     .......... FORM A*U ..........
-         DO 170 J = 1, L
-  170    E(J) = 0.0D0
+         DO J = 1, L
+            E(J) = 0.0D0
+         END DO   
 C
          DO 240 J = 1, L
             F = D(J)
@@ -3053,15 +3086,17 @@ C
 C
          H = F / (H + H)
 C     .......... FORM Q ..........
-         DO 250 J = 1, L
-  250    E(J) = E(J) - H * D(J)
+         DO J = 1, L
+            E(J) = E(J) - H * D(J)
+         END DO   
 C     .......... FORM REDUCED A ..........
          DO 280 J = 1, L
             F = D(J)
             G = E(J)
 C
-            DO 260 K = J, L
-  260       A(K,J) = A(K,J) - F * E(K) - G * D(K)
+            DO K = J, L
+               A(K,J) = A(K,J) - F * E(K) - G * D(K)
+            END DO   
 C
   280    CONTINUE
 C
@@ -3122,8 +3157,9 @@ C     ------------------------------------------------------------------
 C
       DO 100 I = 1, N
 C
-         DO 80 J = I, N
-   80    Z(J,I) = A(J,I)
+         DO J = I, N
+            Z(J,I) = A(J,I)
+         END DO   
 C
          D(I) = A(N,I)
   100 CONTINUE
@@ -3137,8 +3173,9 @@ C     .......... FOR I=N STEP -1 UNTIL 2 DO -- ..........
          SCALE = 0.0D0
          IF (L .LT. 2) GO TO 130
 C     .......... SCALE ROW (ALGOL TOL THEN NOT NEEDED) ..........
-         DO 120 K = 1, L
-  120    SCALE = SCALE + DABS(D(K))
+         DO K = 1, L
+            SCALE = SCALE + DABS(D(K))
+         END DO   
 C
          IF (SCALE .NE. 0.0D0) GO TO 140
   130    E(I) = D(L)
@@ -3162,8 +3199,9 @@ C
          H = H - F * G
          D(L) = F - G
 C     .......... FORM A*U ..........
-         DO 170 J = 1, L
-  170    E(J) = 0.0D0
+         DO J = 1, L
+            E(J) = 0.0D0
+         END DO   
 C
          DO 240 J = 1, L
             F = D(J)
@@ -3189,15 +3227,17 @@ C
 C
          HH = F / (H + H)
 C     .......... FORM Q ..........
-         DO 250 J = 1, L
-  250    E(J) = E(J) - HH * D(J)
+         DO J = 1, L
+            E(J) = E(J) - HH * D(J)
+         END DO   
 C     .......... FORM REDUCED A ..........
          DO 280 J = 1, L
             F = D(J)
             G = E(J)
 C
-            DO 260 K = J, L
-  260       Z(K,J) = Z(K,J) - F * E(K) - G * D(K)
+            DO K = J, L
+               Z(K,J) = Z(K,J) - F * E(K) - G * D(K)
+            END DO   
 C
             D(J) = Z(L,J)
             Z(I,J) = 0.0D0
@@ -3213,21 +3253,25 @@ C     .......... ACCUMULATION OF TRANSFORMATION MATRICES ..........
          H = D(I)
          IF (H .EQ. 0.0D0) GO TO 380
 C
-         DO 330 K = 1, L
-  330    D(K) = Z(K,I) / H
+         DO K = 1, L
+            D(K) = Z(K,I) / H
+         END DO   
 C
-         DO 360 J = 1, L
+         DO J = 1, L
             G = 0.0D0
 C
-            DO 340 K = 1, L
-  340       G = G + Z(K,I) * Z(K,J)
+            DO K = 1, L
+               G = G + Z(K,I) * Z(K,J)
+            END DO   
 C
-            DO 360 K = 1, L
+            DO K = 1, L
                Z(K,J) = Z(K,J) - G * D(K)
-  360    CONTINUE
+            END DO
+         END DO   
 C
-  380    DO 400 K = 1, L
-  400    Z(K,I) = 0.0D0
+  380    DO K = 1, L
+            Z(K,I) = 0.0D0
+         END DO   
 C
   500 CONTINUE
 C

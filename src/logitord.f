@@ -1727,10 +1727,10 @@ c     Set ALPHA to nonrestart conjugate gadient
          ALPHA = ALPHA * DG / DG1   	        
       ELSE
 C         WRITE(IDEV,50)ITER,IFUN,FMIN,GSQ
- 50      FORMAT(10H ITERATION,I5,20H      FUNCTION CALLS,I6/5H F = 
-     &        ,D15.8,13H G-SQUARED = ,D15.8/)  
+C 50      FORMAT(10H ITERATION,I5,20H      FUNCTION CALLS,I6/5H F = 
+C     &        ,D15.8,13H G-SQUARED = ,D15.8/)  
 C         WRITE(IDEV,60)(X(I),I=1,total1+total2a+total2b)
- 60      FORMAT(/8HINTER X./1H ,20D16.8)
+C 60      FORMAT(/8HINTER X./1H ,20D16.8)
       END IF
 
 c     IF NMETH=1 OR A RESTART HAS BEEN PERFORMED, SET ALPHA=1.0.
