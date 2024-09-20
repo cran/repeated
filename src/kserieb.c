@@ -170,7 +170,7 @@ void kserie_c(double p[],double y[],double t[],double x[],int *nind,int nobs[],
 	  v=sqrt(y[nm]*lambda);
 	  h=1-pnorm((tmp-1)/v,0,1,1,0)-exp(2/(bt*lambda))*pnorm(-(tmp+1)/v,0,1,1,0);
 	  b1-=log(h);
-	  h=-(pow(y[nm]/bt-1,2)/(2*y[nm]*lambda))-log(2*PI*lambda*pow(y[nm],3))-log(h);
+	  h=-(pow(y[nm]/bt-1,2)/(2*y[nm]*lambda))-log(2*M_PI*lambda*pow(y[nm],3))-log(h);
 	  break;}}
       else{
 	/* density models */
@@ -229,7 +229,7 @@ void kserie_c(double p[],double y[],double t[],double x[],int *nind,int nobs[],
 	  tmp=y[nm]/bt;
 	  v=sqrt(y[nm]*lambda);
 	  b1+=pnorm((tmp-1)/v,0,1,1,0)+exp(2/(bt*lambda))*pnorm(-(tmp+1)/v,0,1,1,0);
-	  h=-(pow(y[nm]/bt-1,2)/(y[nm]*lambda))-log(2*PI*lambda*pow(y[nm],3))/2;
+	  h=-(pow(y[nm]/bt-1,2)/(y[nm]*lambda))-log(2*M_PI*lambda*pow(y[nm],3))/2;
 	  break;}}
       /* calculate likelihood */
       *like-=h+log(a);
@@ -404,7 +404,7 @@ void krand_c(double p[],double y[],double t[],double x[],int *nind,int nobs[],
 	  tmp=y[nm]/bt;
 	  v=sqrt(y[nm]*lambda);
 	  H=1-pnorm((tmp-1)/v,0,1,1,0)+exp(2/(bt*lambda))*pnorm(-(tmp+1)/v,0,1,1,0);
-	  l1+=-(pow(y[nm]/bt-1,2)/(y[nm]*lambda))-log(H*sqrt(2*PI*lambda*pow(y[nm],3)));
+	  l1+=-(pow(y[nm]/bt-1,2)/(y[nm]*lambda))-log(H*sqrt(2*M_PI*lambda*pow(y[nm],3)));
 	  H=-log(H);
 	  break;}}
       else{
@@ -464,7 +464,7 @@ void krand_c(double p[],double y[],double t[],double x[],int *nind,int nobs[],
 	  tmp=y[nm]/bt;
 	  v=sqrt(y[nm]*lambda);
 	  H=pnorm((tmp-1)/v,0,1,1,0)+exp(2/(bt*lambda))*pnorm(-(tmp+1)/v,0,1,1,0);
-	  l1+=-(pow(y[nm]/bt-1,2)/(y[nm]*lambda))-log(sqrt(2*PI*lambda*pow(y[nm],3)));
+	  l1+=-(pow(y[nm]/bt-1,2)/(y[nm]*lambda))-log(sqrt(2*M_PI*lambda*pow(y[nm],3)));
 	  break;}}
       /* calculate likelihood and residual */
       *like-=l1;
