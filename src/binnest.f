@@ -215,15 +215,15 @@ c Call Subroutine Calcbn2 for the second derivative.
 !==========================================================================
 
 
-	double precision function sum(x,n)
-	integer i,n
-	double precision x(n)
-	sum=0.0
-	do i=1,n
-	   sum=sum+x(i)
-	enddo
-	return
-	end
+c	double precision function sum(x,n)
+c	integer i,n
+c	double precision x(n)
+c	sum=0.0
+c	do i=1,n
+c	   sum=sum+x(i)
+c	enddo
+c	return
+c	end
 
 c      Double precision FUNCTION FACTOR(n1)	         
 c available in logitord
@@ -309,7 +309,7 @@ c    Double Precision, Allocatable :: sig2kk(:,:)
 	Double Precision  Uu1(Num_F,Max_M,Max_K,T2) 
 	Double Precision  Uu2(Num_F,Max_M,Max_K,T3) 
 
-	double precision sum
+c	double precision sum
 
 	Total = T1 + T2 + T3	
 
@@ -811,7 +811,7 @@ c    Double Precision, Allocatable :: sig2kk(:,:)
 	Double Precision sig1kk(max_m,Max_k)
 	Double Precision sig2kk(max_m,Max_k)
 
-	double precision sum
+c	double precision sum
 
 	Total = T1 + T2 + T3	
 

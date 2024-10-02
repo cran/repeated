@@ -80,11 +80,19 @@ C
          A(M,I) = F
    40 CONTINUE
 C
-   50 GO TO (80,130), IEXC
+C   50 GO TO (80,130), IEXC
+   50 select case(IEXC)
+          case(1)
+              IF (L .EQ. 1) GO TO 280
+              L = L - 1
+          case(2)
+              K = K + 1 
+              GO TO 140
+      end select
 C     .......... SEARCH FOR ROWS ISOLATING AN EIGENVALUE
 C                AND PUSH THEM DOWN ..........
-   80 IF (L .EQ. 1) GO TO 280
-      L = L - 1
+C   80 IF (L .EQ. 1) GO TO 280
+C      L = L - 1
 C     .......... FOR J=L STEP -1 UNTIL 1 DO -- ..........
   100 DO 120 JJ = 1, L
          J = L + 1 - JJ
@@ -102,7 +110,7 @@ C
       GO TO 140
 C     .......... SEARCH FOR COLUMNS ISOLATING AN EIGENVALUE
 C                AND PUSH THEM LEFT ..........
-  130 K = K + 1
+C  130 K = K + 1
 C
   140 DO 170 J = K, L
 C
@@ -419,11 +427,19 @@ C
          AI(M,I) = F
    40 CONTINUE
 C
-   50 GO TO (80,130), IEXC
+C   50 GO TO (80,130), IEXC
+   50 select case(IEXC)
+          case(1)
+              IF (L .EQ. 1) GO TO 280
+              L = L - 1
+          case(2)
+              K = K + 1 
+              GO TO 140
+      end select
 C     .......... SEARCH FOR ROWS ISOLATING AN EIGENVALUE
 C                AND PUSH THEM DOWN ..........
-   80 IF (L .EQ. 1) GO TO 280
-      L = L - 1
+C   80 IF (L .EQ. 1) GO TO 280
+C      L = L - 1
 C     .......... FOR J=L STEP -1 UNTIL 1 DO -- ..........
   100 DO 120 JJ = 1, L
          J = L + 1 - JJ
@@ -441,7 +457,7 @@ C
       GO TO 140
 C     .......... SEARCH FOR COLUMNS ISOLATING AN EIGENVALUE
 C                AND PUSH THEM LEFT ..........
-  130 K = K + 1
+C  130 K = K + 1
 C
   140 DO 170 J = K, L
 C
